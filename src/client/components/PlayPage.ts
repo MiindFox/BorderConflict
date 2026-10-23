@@ -150,8 +150,7 @@ export class PlayPage extends LitElement {
           </p>
         </div>
 
-        <!-- Integrated News Box -->
-        <news-box></news-box>
+        <!-- Integrated News Box removed as requested -->
       </div>
     `;
   }
