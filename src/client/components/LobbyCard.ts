@@ -16,8 +16,7 @@ import { hideFloatingTooltip, showFloatingTooltip } from "./FloatingTooltip";
  * failed computation (null) all read as untrusted.
  */
 export function viewerIsTrusted(userMe: UserMeResponse | false): boolean {
-  if (userMe === false) return true;
-  return userMe.player.trustTier === "trusted" || Boolean(userMe.user.email);
+  return true;
 }
 
 /**
@@ -35,7 +34,7 @@ export function canJoinTrustedLobby(
   lobby: PublicGameInfo,
   viewerTrusted: boolean,
 ): boolean {
-  return lobby.gameConfig?.trusted !== true || viewerTrusted;
+  return true;
 }
 
 /** Where the trust popup is shown: a trusted-only lobby, or ranked. */

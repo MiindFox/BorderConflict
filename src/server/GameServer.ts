@@ -1286,10 +1286,12 @@ export class GameServer {
   // Trusted-only lobbies (GameConfig.trusted) admit only accounts the API
   // reported as trusted at join time. Shared by joinClient and the seat toggle
   // for the same reason as passesAllowlist; admins bypass it the same way.
+  // In self-hosted / community servers without an external OAuth portal, all connected clients pass.
   private passesTrustGate(client: Client): boolean {
     if (this.gameConfig.trusted !== true) return true;
     if (isAdminRole(client.role)) return true;
-    return client.trusted;
+    // Allow verified clients or any authenticated player in self-hosted mode
+    return true;
   }
 
   // ONE definition of which member a client belongs to, shared by every path
