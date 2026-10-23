@@ -106,6 +106,13 @@ export function getCachedCosmetics(): Cosmetics | null {
 export function getLocalSelectedSkin(): { name: string; url: string } | null {
   const skinName = new UserSettings().getSelectedSkinName();
   if (!skinName) return null;
+  if (skinName.startsWith("custom_")) {
+    const customUrl = commanderStore.getCustomSkinUrl();
+    return {
+      name: skinName,
+      url: customUrl || `/static/skins/custom/${skinName.replace("custom_", "skin_")}.png`,
+    };
+  }
   const skin = __cosmeticsCache?.skins?.[skinName];
   if (!skin) return null;
   return { name: skin.name, url: skin.url };

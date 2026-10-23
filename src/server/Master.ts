@@ -99,6 +99,8 @@ app.get("/desktop/release.json", async (_req, res) => {
   }
 });
 
+app.use("/static", express.static(path.join(__dirname, "../../static")));
+
 app.use(
   express.static(path.join(__dirname, "../../static"), {
     maxAge: "1y", // Set max-age to 1 year for all static assets

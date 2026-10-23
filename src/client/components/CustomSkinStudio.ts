@@ -23,7 +23,7 @@ const PRESET_ICONS: PresetIcon[] = [
         <path d="M50 15 C30 15 20 28 20 45 C20 58 28 66 32 72 L32 82 L42 82 L42 75 L46 75 L46 82 L54 82 L54 75 L58 75 L58 82 L68 82 L68 72 C72 66 80 58 80 45 C80 28 70 15 50 15 Z M35 48 C30 48 30 40 35 40 C40 40 40 48 35 48 Z M65 48 C60 48 60 40 65 40 C70 40 70 48 65 48 Z M50 55 L45 64 L55 64 Z" />
       </svg>
     `,
-    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#22d3ee"><path d="M50 15 C30 15 20 28 20 45 C20 58 28 66 32 72 L32 82 L42 82 L42 75 L46 75 L46 82 L54 82 L54 75 L58 75 L58 82 L68 82 L68 72 C72 66 80 58 80 45 C80 28 70 15 50 15 Z M35 48 C30 48 30 40 35 40 C40 40 40 48 35 48 Z M65 48 C60 48 60 40 65 40 C70 40 70 48 65 48 Z M50 55 L45 64 L55 64 Z"/></svg>`,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 100 100" fill="#22d3ee"><path d="M50 15 C30 15 20 28 20 45 C20 58 28 66 32 72 L32 82 L42 82 L42 75 L46 75 L46 82 L54 82 L54 75 L58 75 L58 82 L68 82 L68 72 C72 66 80 58 80 45 C80 28 70 15 50 15 Z M35 48 C30 48 30 40 35 40 C40 40 40 48 35 48 Z M65 48 C60 48 60 40 65 40 C70 40 70 48 65 48 Z M50 55 L45 64 L55 64 Z"/></svg>`,
   },
   {
     name: "Aigle Impérial",
@@ -33,7 +33,7 @@ const PRESET_ICONS: PresetIcon[] = [
         <path d="M50 10 L44 25 L30 20 L36 34 L18 35 L30 46 L10 56 L30 60 L20 78 L38 72 L36 90 L50 78 L64 90 L62 72 L80 78 L70 60 L90 56 L70 46 L82 35 L64 34 L70 20 L56 25 Z" />
       </svg>
     `,
-    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#f59e0b"><path d="M50 10 L44 25 L30 20 L36 34 L18 35 L30 46 L10 56 L30 60 L20 78 L38 72 L36 90 L50 78 L64 90 L62 72 L80 78 L70 60 L90 56 L70 46 L82 35 L64 34 L70 20 L56 25 Z"/></svg>`,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 100 100" fill="#f59e0b"><path d="M50 10 L44 25 L30 20 L36 34 L18 35 L30 46 L10 56 L30 60 L20 78 L38 72 L36 90 L50 78 L64 90 L62 72 L80 78 L70 60 L90 56 L70 46 L82 35 L64 34 L70 20 L56 25 Z"/></svg>`,
   },
   {
     name: "Foudre Plasma",
@@ -43,7 +43,7 @@ const PRESET_ICONS: PresetIcon[] = [
         <polygon points="56,5 18,52 46,52 38,95 82,42 54,42" />
       </svg>
     `,
-    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#ec4899"><polygon points="56,5 18,52 46,52 38,95 82,42 54,42"/></svg>`,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 100 100" fill="#ec4899"><polygon points="56,5 18,52 46,52 38,95 82,42 54,42"/></svg>`,
   },
   {
     name: "Symbole Biohazard",
@@ -54,7 +54,7 @@ const PRESET_ICONS: PresetIcon[] = [
         <path d="M50 20 A22 22 0 0 0 32 30 A24 24 0 1 1 68 30 A22 22 0 0 0 50 20 Z M26 62 A22 22 0 0 0 42 70 A24 24 0 1 1 20 40 A22 22 0 0 0 26 62 Z M74 62 A22 22 0 0 0 80 40 A24 24 0 1 1 58 70 A22 22 0 0 0 74 62 Z" />
       </svg>
     `,
-    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#10b981"><circle cx="50" cy="50" r="12"/><path d="M50 20 A22 22 0 0 0 32 30 A24 24 0 1 1 68 30 A22 22 0 0 0 50 20 Z M26 62 A22 22 0 0 0 42 70 A24 24 0 1 1 20 40 A22 22 0 0 0 26 62 Z M74 62 A22 22 0 0 0 80 40 A24 24 0 1 1 58 70 A22 22 0 0 0 74 62 Z"/></svg>`,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 100 100" fill="#10b981"><circle cx="50" cy="50" r="12"/><path d="M50 20 A22 22 0 0 0 32 30 A24 24 0 1 1 68 30 A22 22 0 0 0 50 20 Z M26 62 A22 22 0 0 0 42 70 A24 24 0 1 1 20 40 A22 22 0 0 0 26 62 Z M74 62 A22 22 0 0 0 80 40 A24 24 0 1 1 58 70 A22 22 0 0 0 74 62 Z"/></svg>`,
   },
   {
     name: "Étoile Suprême",
@@ -64,7 +64,7 @@ const PRESET_ICONS: PresetIcon[] = [
         <polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36" />
       </svg>
     `,
-    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#38bdf8"><polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36"/></svg>`,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 100 100" fill="#38bdf8"><polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36"/></svg>`,
   },
 ];
 
@@ -88,12 +88,13 @@ export class CustomSkinStudio extends LitElement {
 
   @state() private currentImage: HTMLImageElement | null = null;
   @state() private imageScale = 1.0;
-  @state() private imageOpacity = 0.9;
+  @state() private imageOpacity = 0.95;
   @state() private imageRotation = 0;
   @state() private imageOffsetX = 0;
   @state() private imageOffsetY = 0;
   @state() private selectedBlendMode: GlobalCompositeOperation = "source-over";
   @state() private territoryColorIndex = 0;
+  @state() private selectedPresetIndex = 0;
   @state() private isSaving = false;
   @state() private isDragging = false;
   @state() private dragStartX = 0;
@@ -110,7 +111,7 @@ export class CustomSkinStudio extends LitElement {
     if (existingUrl) {
       this.loadImageFromUrl(existingUrl);
     } else {
-      this.loadSvgPreset(PRESET_ICONS[0].rawSvg);
+      this.loadSvgPreset(PRESET_ICONS[0].rawSvg, 0);
     }
   }
 
@@ -125,7 +126,10 @@ export class CustomSkinStudio extends LitElement {
 
   protected firstUpdated(_changed: PropertyValues) {
     super.firstUpdated(_changed);
-    requestAnimationFrame(() => this.redrawCanvas());
+    // Double frame ensure canvas layout is computed
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => this.redrawCanvas());
+    });
   }
 
   protected updated(_changed: PropertyValues) {
@@ -138,34 +142,63 @@ export class CustomSkinStudio extends LitElement {
     img.crossOrigin = "anonymous";
     img.onload = () => {
       this.currentImage = img;
-      this.redrawCanvas();
+      this.selectedPresetIndex = -1;
+      this.requestUpdate();
+      requestAnimationFrame(() => this.redrawCanvas());
+    };
+    img.onerror = () => {
+      console.warn("Could not load skin image from URL, falling back to preset:", url);
+      this.loadSvgPreset(PRESET_ICONS[0].rawSvg, 0);
     };
     img.src = url;
   }
 
-  private loadSvgPreset(svgMarkup: string) {
-    const encoded = encodeURIComponent(svgMarkup);
-    const dataUri = `data:image/svg+xml;utf8,${encoded}`;
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      this.currentImage = img;
-      this.redrawCanvas();
-    };
-    img.src = dataUri;
+  private loadSvgPreset(svgMarkup: string, index = 0) {
+    this.selectedPresetIndex = index;
+    try {
+      const b64 = btoa(unescape(encodeURIComponent(svgMarkup)));
+      const dataUri = `data:image/svg+xml;base64,${b64}`;
+      const img = new Image();
+      img.onload = () => {
+        this.currentImage = img;
+        this.requestUpdate();
+        requestAnimationFrame(() => this.redrawCanvas());
+      };
+      img.onerror = () => {
+        // Fallback to standard Blob URL
+        try {
+          const blob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+          const blobUrl = URL.createObjectURL(blob);
+          const fallbackImg = new Image();
+          fallbackImg.onload = () => {
+            this.currentImage = fallbackImg;
+            URL.revokeObjectURL(blobUrl);
+            this.requestUpdate();
+            requestAnimationFrame(() => this.redrawCanvas());
+          };
+          fallbackImg.src = blobUrl;
+        } catch (e) {
+          console.error("Blob URL fallback failed:", e);
+        }
+      };
+      img.src = dataUri;
+    } catch (e) {
+      console.error("loadSvgPreset failed:", e);
+    }
   }
 
   private onFileChange(e: Event) {
-    const file = (e.target as HTMLInputElement).files?.[0];
+    const input = e.target as HTMLInputElement;
+    const file = input?.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      showToast("Veuillez sélectionner un fichier image valide (PNG, JPG, WEBP).", "red");
+      showToast("Veuillez sélectionner un fichier image valide (PNG, JPG, WEBP, SVG).", "red");
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      showToast("L'image ne doit pas dépasser 5 Mo.", "red");
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("L'image ne doit pas dépasser 10 Mo.", "red");
       return;
     }
 
@@ -175,10 +208,16 @@ export class CustomSkinStudio extends LitElement {
       const img = new Image();
       img.onload = () => {
         this.currentImage = img;
+        this.selectedPresetIndex = -1;
         this.imageOffsetX = 0;
         this.imageOffsetY = 0;
         this.imageScale = 1.0;
-        this.redrawCanvas();
+        this.requestUpdate();
+        requestAnimationFrame(() => this.redrawCanvas());
+        showToast("Image importée avec succès !", "green");
+      };
+      img.onerror = () => {
+        showToast("Impossible de décoder ce fichier image.", "red");
       };
       img.src = dataUrl;
     };
@@ -195,7 +234,7 @@ export class CustomSkinStudio extends LitElement {
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    const swatch = TERRITORY_SWATCHES[this.territoryColorIndex];
+    const swatch = TERRITORY_SWATCHES[this.territoryColorIndex] || TERRITORY_SWATCHES[0];
 
     // 1. Draw Simulated In-Game Territory Ground
     ctx.fillStyle = "#090d16";
@@ -219,26 +258,41 @@ export class CustomSkinStudio extends LitElement {
     ctx.restore();
 
     // Territory Color Tint Glow
-    const gradient = ctx.createRadialGradient(w / 2, h / 2, 40, w / 2, h / 2, w / 1.8);
+    const gradient = ctx.createRadialGradient(w / 2, h / 2, 40, w / 2, h / 2, w / 1.7);
     gradient.addColorStop(0, swatch.color + "99");
     gradient.addColorStop(0.7, swatch.color + "44");
     gradient.addColorStop(1, swatch.color + "11");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, w, h);
 
-    // 2. Draw Custom Player Image
+    // 2. Draw Custom Player Image / Emblem
     if (this.currentImage) {
+      const nw = this.currentImage.naturalWidth || this.currentImage.width || 200;
+      const nh = this.currentImage.naturalHeight || this.currentImage.height || 200;
+      const imgAspect = nw > 0 && nh > 0 ? nw / nh : 1;
+      let drawW = (w * 0.72) * (this.imageScale || 1.0);
+      let drawH = drawW / imgAspect;
+
       ctx.save();
       ctx.translate(w / 2 + this.imageOffsetX, h / 2 + this.imageOffsetY);
       ctx.rotate((this.imageRotation * Math.PI) / 180);
       ctx.globalAlpha = Math.max(0.1, Math.min(1, this.imageOpacity));
       ctx.globalCompositeOperation = this.selectedBlendMode;
 
-      const imgAspect = this.currentImage.width / this.currentImage.height;
-      let drawW = (w * 0.7) * this.imageScale;
-      let drawH = drawW / imgAspect;
-
-      ctx.drawImage(this.currentImage, -drawW / 2, -drawH / 2, drawW, drawH);
+      try {
+        ctx.drawImage(this.currentImage, -drawW / 2, -drawH / 2, drawW, drawH);
+      } catch (err) {
+        console.error("Canvas drawImage error:", err);
+      }
+      ctx.restore();
+    } else {
+      // Empty state prompt on canvas
+      ctx.save();
+      ctx.fillStyle = "rgba(148, 163, 184, 0.7)";
+      ctx.font = "bold 16px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("Choisissez un insigne ou importez une image", w / 2, h / 2);
       ctx.restore();
     }
 
@@ -323,6 +377,14 @@ export class CustomSkinStudio extends LitElement {
     this.isDragging = false;
   }
 
+  private resetTransform() {
+    this.imageOffsetX = 0;
+    this.imageOffsetY = 0;
+    this.imageRotation = 0;
+    this.imageScale = 1.0;
+    this.redrawCanvas();
+  }
+
   private generateHighResTexture(): string {
     const offscreen = document.createElement("canvas");
     offscreen.width = 1024;
@@ -341,19 +403,30 @@ export class CustomSkinStudio extends LitElement {
     ctx.globalAlpha = Math.max(0.1, Math.min(1, this.imageOpacity));
     ctx.globalCompositeOperation = this.selectedBlendMode;
 
-    const imgAspect = this.currentImage.width / this.currentImage.height;
+    const nw = this.currentImage.naturalWidth || this.currentImage.width || 200;
+    const nh = this.currentImage.naturalHeight || this.currentImage.height || 200;
+    const imgAspect = nw > 0 && nh > 0 ? nw / nh : 1;
     let drawW = (w * 0.75) * this.imageScale;
     let drawH = drawW / imgAspect;
 
-    ctx.drawImage(this.currentImage, -drawW / 2, -drawH / 2, drawW, drawH);
+    try {
+      ctx.drawImage(this.currentImage, -drawW / 2, -drawH / 2, drawW, drawH);
+    } catch (e) {
+      console.error("High res texture draw error:", e);
+    }
     ctx.restore();
 
-    return offscreen.toDataURL("image/png");
+    try {
+      return offscreen.toDataURL("image/png");
+    } catch (e) {
+      console.error("Canvas export error:", e);
+      return "";
+    }
   }
 
   private async handleSaveAndEquip() {
     if (!this.currentImage) {
-      showToast("Veuillez importer ou sélectionner une image avant de sauvegarder.", "red");
+      showToast("Veuillez importer ou sélectionner un insigne avant de sauvegarder.", "red");
       return;
     }
 
@@ -366,6 +439,11 @@ export class CustomSkinStudio extends LitElement {
     this.isSaving = true;
     try {
       const dataUrl = this.generateHighResTexture();
+      if (!dataUrl) {
+        showToast("Erreur lors de la génération de l'image haute définition.", "red");
+        return;
+      }
+
       const profile = commanderStore.getProfile();
       const email = profile.email || "";
       const publicId = profile.username || "cmd";
@@ -390,7 +468,7 @@ export class CustomSkinStudio extends LitElement {
       commanderStore.setCustomSkin(data.skinUrl, skinName);
       this.userSettings.setSelectedPatternName(`skin:${skinName}`);
 
-      showToast("🎉 Skin de Territoire forgé et équipé avec succès !", "green");
+      showToast("🎉 Skin de Territoire forgé et équipé avec succès ! Vos troupes arborent votre emblème !", "green");
     } catch {
       showToast("Erreur de communication avec le serveur.", "red");
     } finally {
@@ -447,8 +525,7 @@ export class CustomSkinStudio extends LitElement {
       commanderStore.getCustomSkinUrl() || "",
       `custom_${publicId}`
     );
-    showToast("🎉 Forge de Skin débloquée pour 750 Plutonium ! Vous pouvez maintenant sauvegarder.", "green");
-    this.requestUpdate();
+    showToast("🎉 Forge de Skin débloquée pour 750 Plutonium ! Vous pouvez maintenant forger votre skin.", "green");
   }
 
   render() {
@@ -458,58 +535,62 @@ export class CustomSkinStudio extends LitElement {
     return html`
       <div class="w-full flex flex-col gap-6 p-4 md:p-6 text-slate-100 font-sans select-none">
         <!-- Header Banner -->
-        <div class="rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-slate-900/90 to-purple-950/40 p-5 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="space-y-1 text-center md:text-left">
-            <div class="flex items-center justify-center md:justify-start gap-2">
-              <span class="text-3xl">🎨</span>
-              <h2 class="text-xl font-black uppercase tracking-wider text-cyan-300">
-                Atelier & Forge de Skin de Territoire
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
+          <div>
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🎨</span>
+              <h2 class="text-xl md:text-2xl font-black tracking-wide uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-amber-300">
+                Atelier de Forge · Skin de Territoire
               </h2>
-              <span class="rounded bg-cyan-400 text-slate-950 text-[10px] font-black px-2 py-0.5 uppercase tracking-widest">
-                HD 1024×1024
-              </span>
             </div>
-            <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              Importez votre propre logo, emblème ou illustration pour remplacer les motifs standards en jeu.
-              Votre image sera <strong class="text-cyan-300">projetée en temps réel sur l'ensemble de votre territoire</strong> et visible par tous les joueurs adverses !
+            <p class="text-xs md:text-sm text-slate-400 mt-1">
+              Personnalisez le visuel et les armoiries qui s'afficheront sur l'ensemble de votre territoire en partie.
             </p>
           </div>
 
-          <!-- Unlocked Status Badge -->
-          <div class="shrink-0">
-            ${hasUnlocked
+          <div class="flex items-center gap-3 self-start md:self-auto">
+            ${isVip
               ? html`
-                  <div class="rounded-xl border border-emerald-500/40 bg-emerald-950/40 px-4 py-2 text-center shadow-lg">
-                    <span class="text-xs font-black uppercase text-emerald-300 tracking-wider flex items-center gap-1.5">
-                      <span>👑</span>
-                      <span>${isVip ? "Avantage VIP Actif" : "Forge Débloquée à Vie"}</span>
-                    </span>
-                    <span class="block text-[10px] text-emerald-400/80">Création & sauvegardes illimitées</span>
-                  </div>
+                  <span class="px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-400/20 border border-amber-400/50 text-amber-300 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                    <span>👑 VIP ACTIF</span>
+                    <span class="text-[10px] text-amber-200">· ACCÈS ILLIMITÉ</span>
+                  </span>
+                `
+              : hasUnlocked
+              ? html`
+                  <span class="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-xs font-black uppercase tracking-wider flex items-center gap-1.5">
+                    <span>✓ ATELIER DÉBLOQUÉ</span>
+                  </span>
                 `
               : html`
-                  <div class="rounded-xl border border-amber-500/40 bg-amber-950/40 px-4 py-2 text-center shadow-lg">
-                    <span class="text-xs font-black uppercase text-amber-300 tracking-wider flex items-center gap-1.5">
-                      <span>🔒</span>
-                      <span>Forge Verrouillée</span>
-                    </span>
-                    <span class="block text-[10px] text-amber-400/80">3,99 € · 750 Plutonium · ou VIP</span>
-                  </div>
+                  <span class="px-3 py-1 rounded-full bg-slate-800 border border-white/10 text-slate-300 text-xs font-bold uppercase tracking-wider">
+                    🔒 Déblocage Requis
+                  </span>
                 `}
+            <currency-display></currency-display>
           </div>
         </div>
 
-        <!-- Main Studio Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- Left: Interactive Canvas Viewport (7 Cols) -->
-          <div class="lg:col-span-7 flex flex-col items-center gap-4 bg-slate-900/90 border border-white/10 rounded-2xl p-5 shadow-xl relative overflow-hidden">
-            <div class="w-full flex items-center justify-between">
-              <span class="text-xs font-mono font-black text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
-                <span>🛰️ APERÇU DE COMBAT EN DIRECT</span>
+        <!-- Main Studio Grid: Left (Preview & Swatches) / Right (Controls & Presets) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Left: Canvas Live Preview (7 Cols) -->
+          <div class="lg:col-span-7 flex flex-col items-center gap-4 bg-slate-900/90 border border-white/10 rounded-2xl p-5 shadow-2xl relative">
+            <div class="w-full flex items-center justify-between text-xs font-mono font-bold text-slate-400">
+              <span class="flex items-center gap-2 text-cyan-400">
+                <span>🛰️</span>
+                <span>APERÇU DE COMBAT EN DIRECT</span>
               </span>
-              <span class="text-[11px] text-slate-400">
-                Faites glisser la souris sur le terrain pour déplacer
-              </span>
+              <div class="flex items-center gap-3">
+                <button
+                  type="button"
+                  @click=${() => this.resetTransform()}
+                  title="Réinitialiser le centrage"
+                  class="text-[11px] text-cyan-300 hover:text-cyan-100 hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  <span>↺ Recentrer</span>
+                </button>
+                <span class="text-[11px] text-slate-500 hidden sm:inline">Glissez à la souris</span>
+              </div>
             </div>
 
             <!-- Canvas Element -->
@@ -519,33 +600,35 @@ export class CustomSkinStudio extends LitElement {
                 width="600"
                 height="600"
                 class="w-full h-full block"
-                @mousedown=${this.onMouseDown}
-                @mousemove=${this.onMouseMove}
-                @mouseup=${this.onMouseUp}
-                @mouseleave=${this.onMouseUp}
-                @touchstart=${this.onTouchStart}
-                @touchmove=${this.onTouchMove}
-                @touchend=${this.onTouchEnd}
+                @mousedown=${(e: MouseEvent) => this.onMouseDown(e)}
+                @mousemove=${(e: MouseEvent) => this.onMouseMove(e)}
+                @mouseup=${() => this.onMouseUp()}
+                @mouseleave=${() => this.onMouseUp()}
+                @touchstart=${(e: TouchEvent) => this.onTouchStart(e)}
+                @touchmove=${(e: TouchEvent) => this.onTouchMove(e)}
+                @touchend=${() => this.onTouchEnd()}
               ></canvas>
+
+              <div class="absolute bottom-2 left-3 pointer-events-none text-[10px] font-mono text-cyan-400/80 uppercase tracking-widest bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm">
+                Atlas 1024×1024 · WebGL Ready
+              </div>
             </div>
 
-            <!-- Territory Background Color Switcher -->
-            <div class="w-full flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
+            <!-- Simulated Territory Color Picker -->
+            <div class="w-full max-w-[460px] flex items-center justify-between pt-2 border-t border-white/10">
               <span class="text-xs font-bold text-slate-300">Couleur d'équipe simulée :</span>
               <div class="flex items-center gap-2">
                 ${TERRITORY_SWATCHES.map(
-                  (swatch, idx) => html`
+                  (s, idx) => html`
                     <button
                       type="button"
                       @click=${() => {
                         this.territoryColorIndex = idx;
                         this.redrawCanvas();
                       }}
-                      title=${swatch.name}
-                      style="background-color: ${swatch.color}; border-color: ${this.territoryColorIndex === idx ? '#ffffff' : swatch.border};"
-                      class="w-7 h-7 rounded-full border-2 transition-all shadow-md ${this.territoryColorIndex === idx
-                        ? 'scale-125 shadow-[0_0_12px_#ffffff]'
-                        : 'opacity-70 hover:opacity-100 hover:scale-110'}"
+                      title=${s.name}
+                      class="w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 active:scale-95 ${this.territoryColorIndex === idx ? "ring-2 ring-white scale-110 border-white" : "border-transparent opacity-80"}"
+                      style="background-color: ${s.color};"
                     ></button>
                   `
                 )}
@@ -564,9 +647,9 @@ export class CustomSkinStudio extends LitElement {
                 <input
                   id="fileInput"
                   type="file"
-                  accept="image/png, image/jpeg, image/webp"
+                  accept="image/png, image/jpeg, image/webp, image/svg+xml"
                   class="hidden"
-                  @change=${this.onFileChange}
+                  @change=${(e: Event) => this.onFileChange(e)}
                 />
                 <button
                   type="button"
@@ -574,7 +657,7 @@ export class CustomSkinStudio extends LitElement {
                   class="w-full cursor-pointer rounded-xl border-2 border-dashed border-cyan-500/40 hover:border-cyan-400 bg-cyan-950/20 hover:bg-cyan-950/40 p-4 transition-all flex flex-col items-center justify-center gap-1 group text-center"
                 >
                   <span class="text-2xl group-hover:scale-110 transition-transform">📁</span>
-                  <span class="text-xs font-bold text-cyan-300">Sélectionner une Image (PNG, JPG, WEBP)</span>
+                  <span class="text-xs font-bold text-cyan-300">Sélectionner une Image (PNG, JPG, WEBP, SVG)</span>
                   <span class="text-[10px] text-slate-400">Glissez ou parcourez · Résolution max conseillée : 1024×1024</span>
                 </button>
               </div>
@@ -582,16 +665,16 @@ export class CustomSkinStudio extends LitElement {
               <!-- Quick Tactical Presets -->
               <div>
                 <label class="block text-xs font-mono font-black text-slate-400 uppercase tracking-widest mb-1.5">
-                  Ou choisir un insigne pré-configuré :
+                  Ou choisir un insigne tactique :
                 </label>
                 <div class="grid grid-cols-5 gap-2">
                   ${PRESET_ICONS.map(
-                    (p) => html`
+                    (p, idx) => html`
                       <button
                         type="button"
-                        @click=${() => this.loadSvgPreset(p.rawSvg)}
+                        @click=${() => this.loadSvgPreset(p.rawSvg, idx)}
                         title=${p.name}
-                        class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-white/10 hover:border-cyan-400/50 transition-all flex items-center justify-center hover:scale-105 active:scale-95"
+                        class="p-2.5 rounded-xl border transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${this.selectedPresetIndex === idx ? "ring-2 ring-cyan-400 border-cyan-400 bg-cyan-950/60 shadow-lg scale-105" : "bg-slate-800/80 hover:bg-slate-700/80 border-white/10 hover:border-cyan-400/50"}"
                       >
                         <div class="w-7 h-7 flex items-center justify-center">
                           ${p.renderIcon()}
@@ -696,7 +779,7 @@ export class CustomSkinStudio extends LitElement {
                 ? html`
                     <button
                       type="button"
-                      @click=${this.handleSaveAndEquip}
+                      @click=${() => this.handleSaveAndEquip()}
                       ?disabled=${this.isSaving}
                       class="w-full cursor-pointer rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 py-3.5 text-xs font-black uppercase tracking-wider text-slate-950 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2"
                     >
@@ -711,7 +794,7 @@ export class CustomSkinStudio extends LitElement {
 
                       <button
                         type="button"
-                        @click=${this.handleBuyPassStripe}
+                        @click=${() => this.handleBuyPassStripe()}
                         class="w-full cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 py-2.5 text-xs font-black uppercase tracking-wider text-slate-950 transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
                       >
                         <span>💳 Débloquer à Vie · 3,99 € (Stripe)</span>
@@ -720,7 +803,7 @@ export class CustomSkinStudio extends LitElement {
                       <div class="grid grid-cols-2 gap-2">
                         <button
                           type="button"
-                          @click=${this.handleUnlockWithPlutonium}
+                          @click=${() => this.handleUnlockWithPlutonium()}
                           class="cursor-pointer rounded-xl bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 py-2 text-[11px] font-extrabold uppercase tracking-wider text-cyan-300 transition-all shadow-sm flex items-center justify-center gap-1.5"
                         >
                           <span>750</span>
