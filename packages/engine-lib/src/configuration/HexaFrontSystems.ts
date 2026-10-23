@@ -2271,7 +2271,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Commun",
     rarityColor: "#38bdf8",
     description: "Remporter votre première victoire sur HexaFront.",
-    xpBonus: 250,
+    xpBonus: 25,
   },
   {
     id: "hegemon",
@@ -2280,7 +2280,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Épique",
     rarityColor: "#a855f7",
     description: "Contrôler plus de 1 500 cases de territoire au cours d'une partie.",
-    xpBonus: 300,
+    xpBonus: 40,
   },
   {
     id: "arcology_builder",
@@ -2289,7 +2289,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Rare",
     rarityColor: "#06b6d4",
     description: "Ériger la Mégastructure Arcologie Cybernétique (3+ niveaux de Villes).",
-    xpBonus: 200,
+    xpBonus: 30,
   },
   {
     id: "industrial_tycoon",
@@ -2298,7 +2298,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Rare",
     rarityColor: "#f59e0b",
     description: "Activer le Complexe Industriel Titan ou accumuler 500k+ Or.",
-    xpBonus: 250,
+    xpBonus: 30,
   },
   {
     id: "grand_admiral",
@@ -2307,7 +2307,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Rare",
     rarityColor: "#06b6d4",
     description: "Activer le Chantier Naval Hégémonique (3+ niveaux de Ports).",
-    xpBonus: 250,
+    xpBonus: 30,
   },
   {
     id: "atomic_master",
@@ -2316,7 +2316,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Épique",
     rarityColor: "#f43f5e",
     description: "Déployer le Centre de Commandement Orbital (2+ niveaux de Silos).",
-    xpBonus: 300,
+    xpBonus: 45,
   },
   {
     id: "iron_sentinel",
@@ -2325,7 +2325,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Rare",
     rarityColor: "#10b981",
     description: "Activer le Dôme Énergétique Continental (4+ Défenses/SAM).",
-    xpBonus: 200,
+    xpBonus: 25,
   },
   {
     id: "directive_operative",
@@ -2334,7 +2334,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Rare",
     rarityColor: "#38bdf8",
     description: "Accomplir au moins 3 Directives Secrètes du QG.",
-    xpBonus: 250,
+    xpBonus: 30,
   },
   {
     id: "cataclysm_survivor",
@@ -2343,7 +2343,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Épique",
     rarityColor: "#a855f7",
     description: "Survivre à au moins 5 Événements Mondiaux Dynamiques.",
-    xpBonus: 300,
+    xpBonus: 40,
   },
   {
     id: "front_veteran",
@@ -2352,7 +2352,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Commun",
     rarityColor: "#38bdf8",
     description: "Disputer au moins 5 parties sur HexaFront.",
-    xpBonus: 200,
+    xpBonus: 20,
   },
   {
     id: "supreme_architect",
@@ -2361,7 +2361,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Légendaire",
     rarityColor: "#f59e0b",
     description: "Contrôler 3 Mégastructures simultanément dans une même partie.",
-    xpBonus: 450,
+    xpBonus: 60,
   },
   {
     id: "hexafront_legend",
@@ -2370,7 +2370,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     rarity: "Légendaire",
     rarityColor: "#f43f5e",
     description: "Atteindre le Niveau 15 de Commandant.",
-    xpBonus: 500,
+    xpBonus: 75,
   },
 ];
 

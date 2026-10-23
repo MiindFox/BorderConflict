@@ -184,15 +184,6 @@ export class DoctrinesModal extends BaseModal {
 
               <button
                 type="button"
-                @click=${this.handleSimulateXp}
-                class="cursor-pointer rounded-xl border border-cyan-400/40 bg-cyan-500/20 hover:bg-cyan-500/30 px-3.5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-cyan-200 transition-all active:scale-95"
-                title="Gagner de l'XP pour tester le déblocage des Doctrines"
-              >
-                ⚡ +550 XP (Simuler)
-              </button>
-
-              <button
-                type="button"
                 @click=${this.handleResetTalents}
                 ?disabled=${spentPoints === 0}
                 class="cursor-pointer rounded-xl border border-rose-400/30 bg-rose-500/15 hover:bg-rose-500/25 disabled:opacity-40 px-3.5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-rose-200 transition-all active:scale-95"
