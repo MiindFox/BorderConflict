@@ -1194,6 +1194,186 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
       );
     },
   },
+  {
+    name: "hypercube_tesseract",
+    label: "Tesseract Hypercube",
+    rarity: "legendary",
+    fn: (x, y) => { const dx = Math.abs(x - 7.5); const dy = Math.abs(y - 7.5); return (dx <= 5 && dy <= 5 && (dx === 5 || dy === 5)) || (dx <= 2 && dy <= 2 && (dx === 2 || dy === 2)) || Math.abs(dx - dy) < 0.8; },
+  },
+  {
+    name: "supernova_blast",
+    label: "Souffle de Supernova",
+    rarity: "legendary",
+    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); const a = Math.atan2(y - 7.5, x - 7.5); return d < 2.0 || Math.sin(a * 10 - d * 0.8) > 0.45; },
+  },
+  {
+    name: "chono_warp_weave",
+    label: "Tissage Chrono-Warp",
+    rarity: "legendary",
+    fn: (x, y) => Math.sin(x * 0.9 + y * 0.4) * Math.cos(x * 0.4 - y * 0.9) > 0.25,
+  },
+  {
+    name: "quantum_fractal_tree",
+    label: "Arbre Fractal Quantique",
+    rarity: "legendary",
+    fn: (x, y) => ((x ^ y) % 5 === 0) || ((x + y * 3) % 7 === 0),
+  },
+  {
+    name: "seraph_sacred_wings",
+    label: "Ailes Séraphiques Sacrées",
+    rarity: "legendary",
+    fn: (x, y) => { const dx = Math.abs(x - 7.5); return (dx < 1.2 && y >= 1) || Math.abs(y - (14 - dx * 1.2)) < 1.2 || (dx >= 3 && Math.abs(y - (10 - dx * 0.8)) < 1.0); },
+  },
+  {
+    name: "singularity_accretion",
+    label: "Disque d'Accrétion",
+    rarity: "legendary",
+    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); return (d >= 2 && d <= 3.2) || (d >= 4.5 && d <= 5.8) || (d >= 6.8 && d <= 7.4); },
+  },
+  {
+    name: "omega_monolith_seal",
+    label: "Sceau du Monolithe Oméga",
+    rarity: "legendary",
+    fn: (x, y) => { const dx = Math.abs(x - 7.5); return (dx <= 3 && y >= 3 && y <= 13) || (dx <= 6 && (y === 3 || y === 13)) || (dx === 6 && y >= 6 && y <= 10); },
+  },
+  {
+    name: "valkyrie_runic_ring",
+    label: "Rune Runique Valkyrie",
+    rarity: "legendary",
+    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); const a = Math.atan2(y - 7.5, x - 7.5); return Math.abs(d - 5) < 1.2 && Math.cos(a * 8) > 0.1; },
+  },
+  {
+    name: "stellar_constellation",
+    label: "Constellation Cosmique",
+    rarity: "legendary",
+    fn: (x, y) => (x % 4 === 1 && y % 4 === 1) || (Math.abs(x - y) === 3) || (x + y === 15),
+  },
+  {
+    name: "apex_predator_scales",
+    label: "Écailles du Prédateur Apex",
+    rarity: "legendary",
+    fn: (x, y) => { const u = (x + (y % 2) * 2) % 4; return u === 1 || u === 2; },
+  },
+  {
+    name: "plasma_lightning_grid",
+    label: "Éclairs de Plasma",
+    rarity: "epic",
+    fn: (x, y) => ((x * 3 + y * 7) % 11 < 3) || (Math.abs(x - 7.5) === Math.abs(y - 7.5)),
+  },
+  {
+    name: "tachyon_circuit",
+    label: "Circuit Tachyon",
+    rarity: "epic",
+    fn: (x, y) => (x % 3 === 0 && y % 2 === 0) || (y % 6 === 0 && x >= 4 && x <= 12),
+  },
+  {
+    name: "hex_honeycomb_pulse",
+    label: "Ruche Cybernétique",
+    rarity: "epic",
+    fn: (x, y) => ((x + (y >> 1)) % 3 === 0 && y % 2 === 0) || (x % 3 === 0 && y % 2 === 1),
+  },
+  {
+    name: "vortex_maelstrom",
+    label: "Maelström Océanique",
+    rarity: "epic",
+    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); return Math.sin(d * 1.5 + Math.atan2(y - 7.5, x - 7.5) * 3) > 0.35; },
+  },
+  {
+    name: "titan_armor_plates",
+    label: "Blindage Titan",
+    rarity: "epic",
+    fn: (x, y) => x === 0 || y === 0 || x === 8 || y === 8 || (x + y) % 6 === 0,
+  },
+  {
+    name: "solar_flare_loops",
+    label: "Boucles Coronales",
+    rarity: "epic",
+    fn: (x, y) => { const dx = x - 7.5; const dy = y - 7.5; return Math.abs(dx * dx + dy * dy - 25) < 7 && Math.abs(dx) > 1; },
+  },
+  {
+    name: "void_interference",
+    label: "Interférence du Néant",
+    rarity: "epic",
+    fn: (x, y) => ((x * y) % 9 < 3) || ((x + y) % 7 === 0),
+  },
+  {
+    name: "bio_matrix_mesh",
+    label: "Treillis Bio-Matrice",
+    rarity: "epic",
+    fn: (x, y) => (x % 4 === 0 && y % 2 === 0) || (x % 2 === 0 && y % 4 === 0),
+  },
+  {
+    name: "cyber_hazard_cross",
+    label: "Croix de Danger Cyber",
+    rarity: "epic",
+    fn: (x, y) => { const dx = Math.abs(x - 7.5); const dy = Math.abs(y - 7.5); return (dx <= 6 && dy <= 2) || (dy <= 6 && dx <= 2); },
+  },
+  {
+    name: "emp_core_rings",
+    label: "Noyau IEM Résonant",
+    rarity: "epic",
+    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); return Math.floor(d) === 2 || Math.floor(d) === 4 || Math.floor(d) === 6; },
+  },
+  {
+    name: "radar_sweep_lines",
+    label: "Balayage Radar",
+    rarity: "rare",
+    fn: (x, y) => { const a = Math.atan2(y - 7.5, x - 7.5); return Math.abs(a - 0.7) < 0.25 || Math.hypot(x - 7.5, y - 7.5) === 5; },
+  },
+  {
+    name: "artillery_crosshairs",
+    label: "Réticule d'Artillerie",
+    rarity: "rare",
+    fn: (x, y) => x === 7 || y === 7 || Math.abs(Math.hypot(x - 7.5, y - 7.5) - 4) < 0.9,
+  },
+  {
+    name: "tactical_camo_digital",
+    label: "Camouflage Digital",
+    rarity: "rare",
+    fn: (x, y) => ((x >> 1) + (y >> 1)) % 3 === 0 || (x % 5 === 0 && y % 3 === 0),
+  },
+  {
+    name: "reinforced_bulkhead",
+    label: "Cloison Cuirassée",
+    rarity: "rare",
+    fn: (x, y) => x === 3 || x === 12 || y === 3 || y === 12 || (x >= 4 && x <= 11 && y >= 4 && y <= 11 && (x === y || x === 15 - y)),
+  },
+  {
+    name: "supply_depot_grid",
+    label: "Grille Logistique",
+    rarity: "rare",
+    fn: (x, y) => (x % 3 === 0 || y % 3 === 0) && !((x % 6 === 0 && y % 6 === 0)),
+  },
+  {
+    name: "energy_shield_lattice",
+    label: "Réseau de Bouclier",
+    rarity: "rare",
+    fn: (x, y) => (Math.abs(x - y) % 4 === 0) || ((x + y) % 4 === 0),
+  },
+  {
+    name: "desert_sand_ripples",
+    label: "Rides de Sable",
+    rarity: "rare",
+    fn: (x, y) => Math.sin(x * 0.6 + Math.sin(y * 0.4) * 1.5) > 0.3,
+  },
+  {
+    name: "arctic_ice_cracks",
+    label: "Fractures de Banquise",
+    rarity: "rare",
+    fn: (x, y) => (x * 2 + y * 3) % 7 === 1 || (x * 3 - y * 2) % 8 === 2,
+  },
+  {
+    name: "naval_anchor_pattern",
+    label: "Motif d'Ancre Marine",
+    rarity: "rare",
+    fn: (x, y) => (x === 7 && y >= 3 && y <= 12) || (y === 11 && Math.abs(x - 7.5) <= 4) || (y === 5 && Math.abs(x - 7.5) <= 3),
+  },
+  {
+    name: "command_diamond_chevron",
+    label: "Chevrons de Commandement",
+    rarity: "rare",
+    fn: (x, y) => { const dx = Math.abs(x - 7.5); return Math.abs(y - dx) < 1.1 || Math.abs(y - (dx + 4)) < 1.1; },
+  }
 ];
 
 interface CrownSpec {
@@ -1406,6 +1586,781 @@ const TWENTY_CROWN_SPECS: CrownSpec[] = [
       <rect x="6" y="50" width="52" height="6" rx="2" fill="#0284c7"/>
     </svg>`,
   },
+  {
+    name: "hyperion_nova_crown",
+    label: "Couronne Nova d'Hypérion",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-hyperion_nova_crown" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-hyperion_nova_crown)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#f59e0b" stroke="#ffffff" stroke-width="3">
+      <animate attributeName="r" values="3.5;6.5;3.5" dur="1.5s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#dc2626">
+      <animate attributeName="fill" values="#dc2626;#fef08a;#dc2626" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#fef08a">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#fef08a">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#fef08a">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#dc2626" stroke="#ffffff" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "void_singularity_diadem",
+    label: "Diadème du Vortex Stellaire",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-void_singularity_diadem" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-void_singularity_diadem)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#6366f1" stroke="#38bdf8" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#1e1b4b">
+      <animate attributeName="fill" values="#1e1b4b;#c084fc;#1e1b4b" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#c084fc">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#c084fc">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#c084fc">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#1e1b4b" stroke="#38bdf8" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "chono_master_halo",
+    label: "Halo Astral de Chronos",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-chono_master_halo" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-chono_master_halo)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#06b6d4" stroke="#ffffff" stroke-width="3">
+      <animateTransform attributeName="transform" type="rotate" from="0 32 30" to="360 32 30" dur="8s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#082f49">
+      <animate attributeName="fill" values="#082f49;#67e8f9;#082f49" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#67e8f9">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#67e8f9">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#67e8f9">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#082f49" stroke="#ffffff" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "plasma_dragon_crest",
+    label: "Cimier du Dragon Éthéré",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-plasma_dragon_crest" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-plasma_dragon_crest)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#ec4899" stroke="#f43f5e" stroke-width="3">
+      <animate attributeName="stroke-width" values="2;4.5;2" dur="1.8s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#831843">
+      <animate attributeName="fill" values="#831843;#fbcfe8;#831843" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#fbcfe8">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#fbcfe8">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#fbcfe8">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#831843" stroke="#f43f5e" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "titan_oblivion_crown",
+    label: "Couronne d'Oblivion Titan",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-titan_oblivion_crown" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-titan_oblivion_crown)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#10b981" stroke="#34d399" stroke-width="3">
+      <animate attributeName="r" values="3.5;6.5;3.5" dur="1.5s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#022c22">
+      <animate attributeName="fill" values="#022c22;#a7f3d0;#022c22" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#a7f3d0">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#a7f3d0">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#a7f3d0">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#022c22" stroke="#34d399" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "solar_monarch_radiance",
+    label: "Rayonnement du Monarque Solaire",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-solar_monarch_radiance" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-solar_monarch_radiance)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#ea580c" stroke="#fde047" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#7c2d12">
+      <animate attributeName="fill" values="#7c2d12;#fed7aa;#7c2d12" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#fed7aa">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#fed7aa">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#fed7aa">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#7c2d12" stroke="#fde047" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "arcane_emperor_crown",
+    label: "Couronne de l'Empereur Arcanique",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-arcane_emperor_crown" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-arcane_emperor_crown)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#8b5cf6" stroke="#a855f7" stroke-width="3">
+      <animate attributeName="stroke-width" values="2;4.5;2" dur="1.8s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#2e1065">
+      <animate attributeName="fill" values="#2e1065;#ddd6fe;#2e1065" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#ddd6fe">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#ddd6fe">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#ddd6fe">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#2e1065" stroke="#a855f7" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "cryo_god_coronet",
+    label: "Diadème du Seigneur Cryo",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-cryo_god_coronet" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-cryo_god_coronet)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#0284c7" stroke="#ffffff" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#082f49">
+      <animate attributeName="fill" values="#082f49;#bae6fd;#082f49" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#bae6fd">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#bae6fd">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#bae6fd">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#082f49" stroke="#ffffff" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "apocalypse_sovereign",
+    label: "Souveraineté de l'Apocalypse",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-apocalypse_sovereign" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-apocalypse_sovereign)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#e11d48" stroke="#fb7185" stroke-width="3">
+      <animate attributeName="r" values="3.5;6.5;3.5" dur="1.5s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#4c0519">
+      <animate attributeName="fill" values="#4c0519;#ffe4e6;#4c0519" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#ffe4e6">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#ffe4e6">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#ffe4e6">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#4c0519" stroke="#fb7185" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "cyber_overlord_apex",
+    label: "Apex du Cyber-Overlord",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-cyber_overlord_apex" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-cyber_overlord_apex)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#14b8a6" stroke="#22d3ee" stroke-width="3">
+      <animate attributeName="stroke-width" values="2;4.5;2" dur="1.8s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#042f2e">
+      <animate attributeName="fill" values="#042f2e;#5eead4;#042f2e" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#5eead4">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#5eead4">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#5eead4">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#042f2e" stroke="#22d3ee" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "storm_bringer_helm",
+    label: "Casque du Faiseur d'Orages",
+    rarity: "epic",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-storm_bringer_helm" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-storm_bringer_helm)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#3b82f6" stroke="#60a5fa" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#1e3a8a">
+      <animate attributeName="fill" values="#1e3a8a;#93c5fd;#1e3a8a" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#93c5fd">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#93c5fd">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#93c5fd">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "vulcan_forge_crown",
+    label: "Couronne de Vulcain",
+    rarity: "epic",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-vulcan_forge_crown" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-vulcan_forge_crown)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#c2410c" stroke="#ea580c" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#431407">
+      <animate attributeName="fill" values="#431407;#fdba74;#431407" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#fdba74">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#fdba74">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#fdba74">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#431407" stroke="#ea580c" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "nebula_queen_tiara",
+    label: "Tiare de la Reine des Nébuleuses",
+    rarity: "epic",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-nebula_queen_tiara" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-nebula_queen_tiara)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#d946ef" stroke="#e879f9" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#4a044e">
+      <animate attributeName="fill" values="#4a044e;#f5d0fe;#4a044e" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#f5d0fe">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#f5d0fe">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#f5d0fe">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#4a044e" stroke="#e879f9" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "iron_bastion_diadem",
+    label: "Diadème du Bastion de Fer",
+    rarity: "epic",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-iron_bastion_diadem" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-iron_bastion_diadem)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#475569" stroke="#94a3b8" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#0f172a">
+      <animate attributeName="fill" values="#0f172a;#cbd5e1;#0f172a" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#cbd5e1">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#cbd5e1">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#cbd5e1">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "emerald_archdruid",
+    label: "Couronne de l'Archidruide",
+    rarity: "epic",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-emerald_archdruid" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-emerald_archdruid)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#059669" stroke="#10b981" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#064e3b">
+      <animate attributeName="fill" values="#064e3b;#6ee7b7;#064e3b" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#6ee7b7">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#6ee7b7">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#6ee7b7">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "gold_valkyrie_wings",
+    label: "Ailes d'Or des Valkyries",
+    rarity: "epic",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-gold_valkyrie_wings" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-gold_valkyrie_wings)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#eab308" stroke="#facc15" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#713f12">
+      <animate attributeName="fill" values="#713f12;#fef08a;#713f12" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#fef08a">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#fef08a">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#fef08a">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#713f12" stroke="#facc15" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "phantom_assassin_cowl",
+    label: "Couronne de l'Assassin Spectral",
+    rarity: "rare",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-phantom_assassin_cowl" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-phantom_assassin_cowl)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#64748b" stroke="#94a3b8" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#1e293b">
+      <animate attributeName="fill" values="#1e293b;#e2e8f0;#1e293b" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#e2e8f0">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#e2e8f0">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#e2e8f0">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "toxic_viper_crown",
+    label: "Couronne de la Vipère Toxique",
+    rarity: "rare",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-toxic_viper_crown" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-toxic_viper_crown)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#65a30d" stroke="#84cc16" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#1a2e05">
+      <animate attributeName="fill" values="#1a2e05;#bef264;#1a2e05" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#bef264">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#bef264">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#bef264">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#1a2e05" stroke="#84cc16" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "blood_vampire_circlet",
+    label: "Diadème Écarlate Sanguin",
+    rarity: "rare",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-blood_vampire_circlet" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-blood_vampire_circlet)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#b91c1c" stroke="#ef4444" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#450a0a">
+      <animate attributeName="fill" values="#450a0a;#fca5a5;#450a0a" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#fca5a5">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#fca5a5">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#fca5a5">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "glacier_shard_crest",
+    label: "Cimier d'Éclat Glaciaire",
+    rarity: "rare",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-glacier_shard_crest" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-glacier_shard_crest)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#0284c7" stroke="#38bdf8" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#0c4a6e">
+      <animate attributeName="fill" values="#0c4a6e;#7dd3fc;#0c4a6e" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#7dd3fc">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#7dd3fc">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#7dd3fc">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#0c4a6e" stroke="#38bdf8" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "desert_sultan_crown",
+    label: "Couronne du Sultan des Dunes",
+    rarity: "rare",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-desert_sultan_crown" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-desert_sultan_crown)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#d97706" stroke="#fbbf24" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#451a03">
+      <animate attributeName="fill" values="#451a03;#fde68a;#451a03" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#fde68a">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#fde68a">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#fde68a">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#451a03" stroke="#fbbf24" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "scout_bronze_circlet",
+    label: "Cercle de Bronze d'Éclaireur",
+    rarity: "uncommon",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-scout_bronze_circlet" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-scout_bronze_circlet)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#b45309" stroke="#d97706" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#78350f">
+      <animate attributeName="fill" values="#78350f;#fcd34d;#78350f" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#fcd34d">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#fcd34d">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#fcd34d">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#78350f" stroke="#d97706" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "steel_legionnaire_crest",
+    label: "Cimier du Légionnaire d'Acier",
+    rarity: "uncommon",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-steel_legionnaire_crest" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-steel_legionnaire_crest)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#475569" stroke="#64748b" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#1e293b">
+      <animate attributeName="fill" values="#1e293b;#cbd5e1;#1e293b" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#cbd5e1">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#cbd5e1">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#cbd5e1">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "sapphire_officer",
+    label: "Diadème de l'Officier Saphir",
+    rarity: "uncommon",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-sapphire_officer" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-sapphire_officer)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#2563eb" stroke="#3b82f6" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#1e3a8a">
+      <animate attributeName="fill" values="#1e3a8a;#93c5fd;#1e3a8a" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#93c5fd">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#93c5fd">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#93c5fd">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  },
+  {
+    name: "copper_vanguard",
+    label: "Couronne de Cuivre de l'Avant-Garde",
+    rarity: "uncommon",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <filter id="glow-copper_vanguard" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#glow-copper_vanguard)">
+    <polygon points="6,48 12,18 24,34 32,8 40,34 52,18 58,48" fill="#c2410c" stroke="#ea580c" stroke-width="3">
+      <animate attributeName="opacity" values="0.75;1;0.75" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="32,18 39,32 32,44 25,32" fill="#7c2d12">
+      <animate attributeName="fill" values="#7c2d12;#fdba74;#7c2d12" dur="2.5s" repeatCount="indefinite"/>
+    </polygon>
+    <circle cx="32" cy="30" r="5" fill="#fdba74">
+      <animate attributeName="r" values="4;6.5;4" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="18" r="3" fill="#fdba74">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="52" cy="18" r="3" fill="#fdba74">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="6" y="50" width="52" height="6" rx="2" fill="#7c2d12" stroke="#ea580c" stroke-width="1.5"/>
+  </g>
+</svg>`,
+  }
 ];
 
 interface FlagSpec {
@@ -1442,6 +2397,31 @@ const TWENTY_FLAG_SPECS: FlagSpec[] = [
   { name: "starlight_federation", label: "Fédération Stellaire", rarity: "epic", bg: "#090d16", accent: "#818cf8", emblemColor: "#e0e7ff", shape: "star" },
   { name: "valkyrie_order", label: "Ordre des Valkyries", rarity: "legendary", bg: "#31102f", accent: "#fcd34d", emblemColor: "#f43f5e", shape: "eagle" },
   { name: "omega_sovereignty", label: "Souveraineté Oméga", rarity: "legendary", bg: "#020617", accent: "#22d3ee", emblemColor: "#fbbf24", shape: "hex" },
+  { name: "stellar_imperium", label: "Imperium Stellaire", rarity: "legendary", bg: "#030712", accent: "#fbbf24", emblemColor: "#38bdf8", shape: "star" },
+  { name: "hyper_void_dominion", label: "Dominion du Néant Absolu", rarity: "legendary", bg: "#0f0728", accent: "#c084fc", emblemColor: "#f43f5e", shape: "hex" },
+  { name: "celestial_valkyries", label: "Légion Céleste", rarity: "legendary", bg: "#1e1b4b", accent: "#fde047", emblemColor: "#ffffff", shape: "eagle" },
+  { name: "solar_sovereignty", label: "Souveraineté Phénix", rarity: "legendary", bg: "#431407", accent: "#ea580c", emblemColor: "#fde047", shape: "sun" },
+  { name: "quantum_vanguard", label: "Avant-Garde Quantique", rarity: "legendary", bg: "#022c22", accent: "#22d3ee", emblemColor: "#34d399", shape: "diamond" },
+  { name: "apocalypse_legion", label: "Légion de l'Apocalypse", rarity: "legendary", bg: "#260505", accent: "#f43f5e", emblemColor: "#ffffff", shape: "cross" },
+  { name: "archangel_crusade", label: "Croisade des Archanges", rarity: "legendary", bg: "#1c1917", accent: "#fbbf24", emblemColor: "#e0f2fe", shape: "shield" },
+  { name: "cyber_dynasty", label: "Dynastie Cybernétique", rarity: "legendary", bg: "#030712", accent: "#06b6d4", emblemColor: "#ec4899", shape: "chevron" },
+  { name: "abyssal_leviathan", label: "Pacte du Léviathan", rarity: "legendary", bg: "#021c24", accent: "#14b8a6", emblemColor: "#67e8f9", shape: "hex" },
+  { name: "omega_order", label: "Ordre Souverain Oméga", rarity: "legendary", bg: "#090d16", accent: "#f59e0b", emblemColor: "#a855f7", shape: "star" },
+  { name: "vulcan_syndicate", label: "Syndicat de Vulcain", rarity: "epic", bg: "#2a0a05", accent: "#f97316", emblemColor: "#fde047", shape: "hex" },
+  { name: "aurora_covenant", label: "Pacte Boréal", rarity: "epic", bg: "#082f49", accent: "#38bdf8", emblemColor: "#a7f3d0", shape: "diamond" },
+  { name: "crimson_vanguard", label: "Avant-Garde Pourpre", rarity: "epic", bg: "#3f0713", accent: "#f43f5e", emblemColor: "#fecdd3", shape: "chevron" },
+  { name: "storm_federation", label: "Fédération des Tempêtes", rarity: "epic", bg: "#0f172a", accent: "#60a5fa", emblemColor: "#ffffff", shape: "cross" },
+  { name: "emerald_dominion", label: "Dominion d'Émeraude", rarity: "epic", bg: "#064e3b", accent: "#10b981", emblemColor: "#d1fae5", shape: "shield" },
+  { name: "obsidian_phantom", label: "Ordre de l'Obsidienne", rarity: "epic", bg: "#09090b", accent: "#71717a", emblemColor: "#e4e4e7", shape: "eagle" },
+  { name: "desert_nomads", label: "Union des Nomades", rarity: "rare", bg: "#451a03", accent: "#d97706", emblemColor: "#fef3c7", shape: "sun" },
+  { name: "glacier_front", label: "Front des Glaciers", rarity: "rare", bg: "#0c4a6e", accent: "#0284c7", emblemColor: "#e0f2fe", shape: "shield" },
+  { name: "toxic_rebellion", label: "Front Bio-Rebelle", rarity: "rare", bg: "#14532d", accent: "#84cc16", emblemColor: "#d9f99d", shape: "diamond" },
+  { name: "plasma_syndicate", label: "Syndicat Plasma", rarity: "rare", bg: "#4c0519", accent: "#db2777", emblemColor: "#fbcfe8", shape: "chevron" },
+  { name: "iron_coalition", label: "Coalition du Fer", rarity: "rare", bg: "#1e293b", accent: "#64748b", emblemColor: "#f1f5f9", shape: "cross" },
+  { name: "frontier_scouts", label: "Éclaireurs de Frontière", rarity: "uncommon", bg: "#1c1917", accent: "#78716c", emblemColor: "#e7e5e4", shape: "chevron" },
+  { name: "coastal_guard", label: "Garde Côtière", rarity: "uncommon", bg: "#172554", accent: "#3b82f6", emblemColor: "#bfdbfe", shape: "shield" },
+  { name: "militia_corps", label: "Corps des Milices", rarity: "uncommon", bg: "#1e1b4b", accent: "#6366f1", emblemColor: "#c7d2fe", shape: "diamond" },
+  { name: "dust_patrol", label: "Patrouille des Sables", rarity: "uncommon", bg: "#292524", accent: "#b45309", emblemColor: "#fed7aa", shape: "star" }
 ];
 
 function renderFactionFlagSvg(spec: FlagSpec): string {
@@ -2703,6 +3683,501 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     },
   };
 
+    // ==========================================================================
+  // 25 EXPANDED NEW SPECIAL EFFECTS
+  // ==========================================================================
+  addEffect("Sillage Nova Lumineux", {
+    name: "nova_lumina_wake",
+    effectType: "transportShipTrail",
+    rarity: "legendary",
+    priceHard: 650,
+    priceSoft: 5800,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#fbbf24",
+            "#f43f5e",
+            "#a855f7",
+            "#ffffff"
+      ],
+      "colorSize": 4,
+      "movementSpeed": 16
+} as any,
+  });
+
+  addEffect("Sillage Tempête IEM", {
+    name: "emp_storm_wake",
+    effectType: "transportShipTrail",
+    rarity: "epic",
+    priceHard: 400,
+    priceSoft: 3500,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#38bdf8",
+            "#818cf8",
+            "#c084fc"
+      ],
+      "colorSize": 5,
+      "movementSpeed": 14
+} as any,
+  });
+
+  addEffect("Sillage Brasier Magmatique", {
+    name: "magma_blaze_wake",
+    effectType: "transportShipTrail",
+    rarity: "epic",
+    priceHard: 380,
+    priceSoft: 3200,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#ea580c",
+            "#dc2626",
+            "#fef08a"
+      ],
+      "colorSize": 5,
+      "movementSpeed": 11
+} as any,
+  });
+
+  addEffect("Sillage Bio-Corrosion", {
+    name: "bio_corrosion_wake",
+    effectType: "transportShipTrail",
+    rarity: "rare",
+    priceHard: 280,
+    priceSoft: 2400,
+    product: null,
+    attributes: {
+      "type": "transition",
+      "colors": [
+            "#84cc16",
+            "#15803d",
+            "#a3e635"
+      ],
+      "frequency": 3.5
+} as any,
+  });
+
+  addEffect("Sillage Furtif Ombre", {
+    name: "stealth_shadow_wake",
+    effectType: "transportShipTrail",
+    rarity: "rare",
+    priceHard: 260,
+    priceSoft: 2200,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#0f172a",
+            "#334155",
+            "#64748b"
+      ],
+      "colorSize": 6,
+      "movementSpeed": 8
+} as any,
+  });
+
+  addEffect("Traînée Rayonnement Oméga", {
+    name: "omega_radiation_nuke_trail",
+    effectType: "nukeTrail",
+    rarity: "legendary",
+    priceHard: 650,
+    priceSoft: 5800,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#fbbf24",
+            "#22d3ee",
+            "#c084fc",
+            "#ffffff"
+      ],
+      "colorSize": 3,
+      "movementSpeed": 18
+} as any,
+  });
+
+  addEffect("Traînée Feu de l'Enfer", {
+    name: "hellfire_nuke_trail",
+    effectType: "nukeTrail",
+    rarity: "epic",
+    priceHard: 420,
+    priceSoft: 3600,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#dc2626",
+            "#f97316",
+            "#fef08a"
+      ],
+      "colorSize": 4,
+      "movementSpeed": 15
+} as any,
+  });
+
+  addEffect("Traînée Foudre d'Arc", {
+    name: "arc_lightning_trail",
+    effectType: "nukeTrail",
+    rarity: "epic",
+    priceHard: 400,
+    priceSoft: 3400,
+    product: null,
+    attributes: {
+      "type": "transition",
+      "colors": [
+            "#38bdf8",
+            "#e0f2fe",
+            "#818cf8"
+      ],
+      "frequency": 5
+} as any,
+  });
+
+  addEffect("Traînée Émeraude Fission", {
+    name: "fission_emerald_trail",
+    effectType: "nukeTrail",
+    rarity: "rare",
+    priceHard: 290,
+    priceSoft: 2500,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#10b981",
+            "#059669",
+            "#6ee7b7"
+      ],
+      "colorSize": 5,
+      "movementSpeed": 12
+} as any,
+  });
+
+  addEffect("Traînée Cryo-Comète", {
+    name: "cryo_comet_trail",
+    effectType: "nukeTrail",
+    rarity: "rare",
+    priceHard: 290,
+    priceSoft: 2500,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#0284c7",
+            "#38bdf8",
+            "#ffffff"
+      ],
+      "colorSize": 5,
+      "movementSpeed": 12
+} as any,
+  });
+
+  addEffect("Dôme Anti-Matière", {
+    name: "antimatter_blast",
+    effectType: "nukeExplosion",
+    rarity: "legendary",
+    priceHard: 750,
+    priceSoft: 6500,
+    product: null,
+    attributes: {
+      "type": "shockwave",
+      "nukeType": "hydro",
+      "colors": [
+            "#a855f7",
+            "#ec4899",
+            "#22d3ee",
+            "#ffffff"
+      ],
+      "size": 45,
+      "speed": 50,
+      "thickness": 4,
+      "transitionSpeed": 4
+} as any,
+  });
+
+  addEffect("Éruption Stellaire Dorée", {
+    name: "golden_stellar_eruption",
+    effectType: "nukeExplosion",
+    rarity: "legendary",
+    priceHard: 750,
+    priceSoft: 6500,
+    product: null,
+    attributes: {
+      "type": "sparkles",
+      "nukeType": "atom",
+      "colors": [
+            "#f59e0b",
+            "#fde047",
+            "#ffffff"
+      ],
+      "size": 42,
+      "speed": 48,
+      "thickness": 3.5,
+      "transitionSpeed": 4,
+      "density": 95
+} as any,
+  });
+
+  addEffect("Cataclysme Toxique", {
+    name: "toxic_cataclysm_blast",
+    effectType: "nukeExplosion",
+    rarity: "epic",
+    priceHard: 450,
+    priceSoft: 3900,
+    product: null,
+    attributes: {
+      "type": "shockwave",
+      "nukeType": "atom",
+      "colors": [
+            "#65a30d",
+            "#14532d",
+            "#d9f99d"
+      ],
+      "size": 36,
+      "speed": 40,
+      "thickness": 3,
+      "transitionSpeed": 3
+} as any,
+  });
+
+  addEffect("Souffle Cyan IEM", {
+    name: "cyan_emp_blast",
+    effectType: "nukeExplosion",
+    rarity: "epic",
+    priceHard: 450,
+    priceSoft: 3900,
+    product: null,
+    attributes: {
+      "type": "sparkles",
+      "nukeType": "mirvWarhead",
+      "colors": [
+            "#06b6d4",
+            "#082f49",
+            "#67e8f9"
+      ],
+      "size": 38,
+      "speed": 42,
+      "thickness": 3.5,
+      "transitionSpeed": 4,
+      "density": 80
+} as any,
+  });
+
+  addEffect("Vague Cryo-Fractale", {
+    name: "cryo_fracture_blast",
+    effectType: "nukeExplosion",
+    rarity: "rare",
+    priceHard: 320,
+    priceSoft: 2800,
+    product: null,
+    attributes: {
+      "type": "shockwave",
+      "nukeType": "atom",
+      "colors": [
+            "#e0f2fe",
+            "#38bdf8",
+            "#0284c7"
+      ],
+      "size": 32,
+      "speed": 38,
+      "thickness": 2.8,
+      "transitionSpeed": 3
+} as any,
+  });
+
+  addEffect("Aura Suprême BorderConflict", {
+    name: "borderconflict_supreme_aura",
+    effectType: "structures",
+    rarity: "legendary",
+    priceHard: 700,
+    priceSoft: 6200,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#22d3ee",
+            "#fbbf24",
+            "#f43f5e",
+            "#a855f7"
+      ],
+      "colorSize": 3,
+      "movementSpeed": 12
+} as any,
+  });
+
+  addEffect("Blindage Électro-Magnétique", {
+    name: "em_shield_grid",
+    effectType: "structures",
+    rarity: "epic",
+    priceHard: 420,
+    priceSoft: 3600,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#60a5fa",
+            "#3b82f6",
+            "#93c5fd"
+      ],
+      "colorSize": 4,
+      "movementSpeed": 10
+} as any,
+  });
+
+  addEffect("Dôme de Force Magma", {
+    name: "magma_force_dome",
+    effectType: "structures",
+    rarity: "epic",
+    priceHard: 400,
+    priceSoft: 3400,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#ea580c",
+            "#dc2626",
+            "#fef08a"
+      ],
+      "colorSize": 4,
+      "movementSpeed": 9
+} as any,
+  });
+
+  addEffect("Réseau Sentinelle Émeraude", {
+    name: "emerald_sentinel_grid",
+    effectType: "structures",
+    rarity: "rare",
+    priceHard: 280,
+    priceSoft: 2400,
+    product: null,
+    attributes: {
+      "type": "transition",
+      "colors": [
+            "#10b981",
+            "#34d399",
+            "#059669"
+      ],
+      "frequency": 3
+} as any,
+  });
+
+  addEffect("Défense Cryo-Renforcée", {
+    name: "cryo_reinforced_hull",
+    effectType: "structures",
+    rarity: "rare",
+    priceHard: 280,
+    priceSoft: 2400,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#0284c7",
+            "#e0f2fe",
+            "#38bdf8"
+      ],
+      "colorSize": 5,
+      "movementSpeed": 8
+} as any,
+  });
+
+  addEffect("Blindage Flotte Céleste", {
+    name: "celestial_fleet_armor",
+    effectType: "warship",
+    rarity: "legendary",
+    priceHard: 650,
+    priceSoft: 5800,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#fbbf24",
+            "#38bdf8",
+            "#ffffff"
+      ],
+      "colorSize": 3,
+      "movementSpeed": 14
+} as any,
+  });
+
+  addEffect("Cuirassé du Néant", {
+    name: "void_dreadnought_hull",
+    effectType: "warship",
+    rarity: "epic",
+    priceHard: 420,
+    priceSoft: 3600,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#2e1065",
+            "#c084fc",
+            "#f472b6"
+      ],
+      "colorSize": 4,
+      "movementSpeed": 10
+} as any,
+  });
+
+  addEffect("Coque Cyber-Plasma", {
+    name: "cyber_plasma_hull",
+    effectType: "warship",
+    rarity: "epic",
+    priceHard: 400,
+    priceSoft: 3500,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#06b6d4",
+            "#22d3ee",
+            "#818cf8"
+      ],
+      "colorSize": 4,
+      "movementSpeed": 11
+} as any,
+  });
+
+  addEffect("Cuirasse Sang de Dragon", {
+    name: "dragon_blood_hull",
+    effectType: "warship",
+    rarity: "rare",
+    priceHard: 280,
+    priceSoft: 2400,
+    product: null,
+    attributes: {
+      "type": "gradient",
+      "colors": [
+            "#991b1b",
+            "#ef4444",
+            "#fca5a5"
+      ],
+      "colorSize": 5,
+      "movementSpeed": 9
+} as any,
+  });
+
+  addEffect("Camouflage Furtif Naval", {
+    name: "stealth_naval_hull",
+    effectType: "warship",
+    rarity: "rare",
+    priceHard: 260,
+    priceSoft: 2200,
+    product: null,
+    attributes: {
+      "type": "transition",
+      "colors": [
+            "#1e293b",
+            "#334155",
+            "#475569"
+      ],
+      "frequency": 2
+} as any,
+  });
+
   cachedCatalog = {
     colorPalettes,
     patterns,
@@ -2714,3 +4189,4 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
 
   return cachedCatalog;
 }
+
