@@ -231,7 +231,6 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
 
   try {
     const session = await stripeClient.checkout.sessions.create({
-      payment_method_types: ["card"],
       mode: "payment",
       customer_email: email,
       line_items: [
@@ -253,7 +252,7 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
       },
       success_url: `${protocol}://${domain}/?payment_success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${protocol}://${domain}/?payment_cancel=true`,
-    });
+    } as any);
 
     return res.json({ ok: true, checkoutUrl: session.url });
   } catch (err: any) {

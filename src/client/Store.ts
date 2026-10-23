@@ -945,7 +945,6 @@ export class StoreModal extends BaseModal {
             if (data.ok && data.paid) {
               showToast("🎉 Paiement validé ! Votre bundle a été crédité à votre compte !", "green", 5000);
               // Refresh user profile
-              commanderStore.syncWithServer();
               this.onUserMe(commanderStore.getLocalUserMeResponse());
             }
           })
@@ -953,7 +952,7 @@ export class StoreModal extends BaseModal {
       } else if (urlParams.get("payment_cancel") === "true") {
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
-        showToast("ℹ️ Paiement annulé.", "blue", 3000);
+        showToast("ℹ️ Paiement annulé.", "green", 3000);
       }
     } catch (e) {
       console.warn("Stripe check redirect error:", e);
@@ -971,7 +970,7 @@ export class StoreModal extends BaseModal {
       return;
     }
 
-    showToast("💳 Préparation du paiement sécurisé Stripe...", "blue", 3000);
+    showToast("💳 Préparation du paiement sécurisé Stripe...", "green", 3000);
 
     try {
       const res = await fetch("/api/stripe/create-checkout-session", {
