@@ -114,7 +114,7 @@ app.set("trust proxy", 3);
 app.use(
   rateLimit({
     windowMs: 1000, // 1 second
-    max: 20, // 20 requests per IP per second
+    max: 100, // 100 requests per IP per second (allow fast parallel asset & map fetches)
   }),
 );
 
