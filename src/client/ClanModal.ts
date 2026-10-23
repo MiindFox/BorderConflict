@@ -805,22 +805,40 @@ export class ClanModal extends BaseModal {
 
     if (!hasClans && !hasRequests) {
       return html`
-        <div class="flex flex-col items-center justify-center p-12 text-center">
-          <p class="text-white/40 text-sm mb-4">
-            ${translateText("clan_modal.no_clans")}
+        <div class="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto">
+          <span class="text-4xl mb-2">🛡️</span>
+          <p class="text-white/60 text-sm mb-4 leading-relaxed">
+            Vous ne faites partie d'aucun Clan pour le moment. Parcourez les clans existants ou fondez votre propre organisation militaire !
           </p>
-          <button
-            @click=${() => this.setActiveTab("browse")}
-            class="px-6 py-2 text-sm font-bold text-white uppercase tracking-wider bg-malibu-blue hover:bg-aquarius active:bg-malibu-blue/80 rounded-lg transition-all"
-          >
-            ${translateText("clan_modal.browse")}
-          </button>
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <button
+              @click=${() => this.setActiveTab("browse")}
+              class="px-5 py-2.5 text-xs font-bold text-white uppercase tracking-wider bg-white/10 hover:bg-white/20 rounded-xl transition-all cursor-pointer"
+            >
+              ${translateText("clan_modal.browse")}
+            </button>
+            <button
+              @click=${() => this.openCreateClanPrompt()}
+              class="px-5 py-2.5 text-xs font-black text-white uppercase tracking-wider bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl shadow-lg transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <span>⚔️ Créer un Clan</span>
+            </button>
+          </div>
         </div>
       `;
     }
 
     return html`
-      <div class="space-y-3">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between px-1">
+          <span class="text-xs uppercase tracking-wider font-extrabold text-white/50">Mes Organisations Tactiques</span>
+          <button
+            @click=${() => this.openCreateClanPrompt()}
+            class="px-3.5 py-1.5 text-xs font-black text-white uppercase tracking-wider bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl shadow transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <span>⚔️ Créer un Clan</span>
+          </button>
+        </div>
         ${hasRequests ? this.renderPendingRequestsButton() : ""}
         ${this.myClans.map(
           (clan) => html`
@@ -834,6 +852,42 @@ export class ClanModal extends BaseModal {
         )}
       </div>
     `;
+  }
+
+  private async openCreateClanPrompt(): Promise<void> {
+    const tag = window.prompt("Tag du Clan (2 à 5 lettres/chiffres, ex: FOX) :")?.trim().toUpperCase();
+    if (!tag) return;
+    const name = window.prompt("Nom officiel du Clan (ex: Force Tactique Fox) :")?.trim();
+    if (!name) return;
+    const desc = window.prompt("Description / Devise du Clan :")?.trim() || "Clan officiel de BorderConflict.";
+
+    const userMe = await getUserMe();
+    const publicId = userMe ? userMe.player.publicId : "cmd-leader";
+    const username = (userMe && userMe.player.username) ? userMe.player.username : "Commandant";
+
+    try {
+      const res = await fetch("/api/clans/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tag,
+          name,
+          description: desc,
+          isOpen: true,
+          creatorPublicId: publicId,
+          creatorUsername: username,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.error || "Erreur lors de la création du clan.");
+        return;
+      }
+      alert(`Félicitations ! Le Clan [${tag}] ${name} a été créé avec succès !`);
+      this.openDetail(tag);
+    } catch (e) {
+      alert("Erreur de connexion au serveur.");
+    }
   }
 
   private renderPendingRequestsButton() {

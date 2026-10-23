@@ -481,13 +481,52 @@ export class AccountModal extends BaseModal {
   }
 
   private renderStatsTab(): TemplateResult {
+    const profile = commanderStore.getProfile();
+    const rank = getCommanderRankTitle(profile.level);
+    const totalGames = profile.gamesPlayed || 0;
+    const wins = profile.victories || 0;
+    const losses = Math.max(0, totalGames - wins);
+    const winRate = totalGames > 0 ? Math.round((wins / totalGames) * 100) : 0;
+
     return html`
       ${this.renderProfileCard("full")}
-      ${this.hasAnyStats()
-        ? html`<player-stats-tree-view
-            .statsTree=${this.statsTree}
-          ></player-stats-tree-view>`
-        : this.renderEmptyState("📊", translateText("account_modal.no_stats"))}
+      <div class="mt-4 flex flex-col gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="rounded-xl border border-cyan-500/20 bg-slate-900/80 p-4 text-center">
+            <span class="text-xs uppercase text-slate-400 font-bold block mb-1">Parties Jouées</span>
+            <span class="text-2xl font-black text-cyan-300 font-mono">${totalGames}</span>
+          </div>
+          <div class="rounded-xl border border-emerald-500/20 bg-slate-900/80 p-4 text-center">
+            <span class="text-xs uppercase text-slate-400 font-bold block mb-1">Victoires</span>
+            <span class="text-2xl font-black text-emerald-400 font-mono">${wins}</span>
+          </div>
+          <div class="rounded-xl border border-rose-500/20 bg-slate-900/80 p-4 text-center">
+            <span class="text-xs uppercase text-slate-400 font-bold block mb-1">Défaites</span>
+            <span class="text-2xl font-black text-rose-400 font-mono">${losses}</span>
+          </div>
+          <div class="rounded-xl border border-amber-500/20 bg-slate-900/80 p-4 text-center">
+            <span class="text-xs uppercase text-slate-400 font-bold block mb-1">Taux de Victoire</span>
+            <span class="text-2xl font-black text-amber-400 font-mono">${winRate}%</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="rounded-xl border border-purple-500/20 bg-slate-900/80 p-4 flex items-center justify-between">
+            <span class="text-xs uppercase text-slate-300 font-bold">Événements Mondiaux Survécus</span>
+            <span class="text-lg font-black text-purple-400 font-mono">${profile.worldEventsSurvived || 0}</span>
+          </div>
+          <div class="rounded-xl border border-blue-500/20 bg-slate-900/80 p-4 flex items-center justify-between">
+            <span class="text-xs uppercase text-slate-300 font-bold">Directives QG Accomplies</span>
+            <span class="text-lg font-black text-blue-400 font-mono">${profile.directivesCompleted || 0}</span>
+          </div>
+        </div>
+
+        ${this.hasAnyStats()
+          ? html`<player-stats-tree-view
+              .statsTree=${this.statsTree}
+            ></player-stats-tree-view>`
+          : nothing}
+      </div>
     `;
   }
 

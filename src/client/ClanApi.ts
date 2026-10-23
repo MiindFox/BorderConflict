@@ -58,6 +58,23 @@ async function clanFetch(
   path: string,
   options?: RequestInit,
 ): Promise<Response> {
+  // If the path starts with /clans, route directly to local server master
+  if (path.startsWith('/clans')) {
+    try {
+      const localUrl = `/api${path}`;
+      const res = await fetch(localUrl, {
+        ...options,
+        headers: {
+          Accept: "application/json",
+          ...options?.headers,
+        },
+      });
+      if (res.ok) return res;
+    } catch {
+      // Fall through
+    }
+  }
+
   const url = `${getApiBase()}${path}`;
   return fetch(url, {
     ...options,
@@ -73,6 +90,16 @@ export async function fetchClanLeaderboard(): Promise<
   ClanLeaderboardResponse | false
 > {
   try {
+    try {
+      const local = await fetch('/api/public/clans/leaderboard');
+      if (local.ok) {
+        const parsed = ClanLeaderboardResponseSchema.safeParse(await local.json());
+        if (parsed.success) return parsed.data;
+      }
+    } catch {
+      // Fall through
+    }
+
     const res = await fetch(`${getApiBase()}/public/clans/leaderboard`, {
       headers: { Accept: "application/json" },
     });

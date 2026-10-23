@@ -2346,6 +2346,16 @@ export async function fetchPlayerLeaderboard(
   page: number,
 ): Promise<RankedLeaderboardResponse | "reached_limit" | false> {
   try {
+    try {
+      const local = await fetch('/api/leaderboard/ranked');
+      if (local.ok) {
+        const parsed = RankedLeaderboardResponseSchema.safeParse(await local.json());
+        if (parsed.success) return parsed.data;
+      }
+    } catch {
+      // Fall through to remote
+    }
+
     const url = new URL(`${getApiBase()}/leaderboard/ranked`);
     url.searchParams.set("page", String(page));
     const res = await fetch(url.toString(), {

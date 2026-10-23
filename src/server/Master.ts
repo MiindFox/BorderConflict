@@ -190,6 +190,61 @@ app.get("/api/public/player/:publicId", (req, res) => {
   return res.json(profile);
 });
 
+// Centralized Leaderboards
+app.get("/api/leaderboard/ranked", (_req, res) => {
+  return res.json(accountDb.getRankedLeaderboard());
+});
+
+app.get("/api/leaderboard/tribes", (_req, res) => {
+  return res.json({ tribes: [] });
+});
+
+app.get("/api/public/clans/leaderboard", (_req, res) => {
+  return res.json(accountDb.getClanLeaderboard());
+});
+
+// Centralized Clans Endpoints
+app.get("/api/clans", (req, res) => {
+  const filter = typeof req.query.filter === "string" ? req.query.filter : "all";
+  const sort = typeof req.query.sort === "string" ? req.query.sort : "memberCount";
+  return res.json(accountDb.getClansBrowse(filter, sort));
+});
+
+app.get("/api/clans/:tag", (req, res) => {
+  const clan = accountDb.getClan(req.params.tag);
+  if (!clan) return res.status(404).json({ error: "Clan not found" });
+  return res.json(clan);
+});
+
+app.post("/api/clans/create", (req, res) => {
+  const { tag, name, description, isOpen, creatorPublicId, creatorUsername } = req.body || {};
+  const result = accountDb.createClan(
+    tag,
+    name,
+    description,
+    isOpen ?? true,
+    creatorPublicId || "cmd-leader",
+    creatorUsername || "Leader"
+  );
+  if (!result.ok) {
+    return res.status(400).json({ ok: false, error: result.error });
+  }
+  return res.json({ ok: true, clan: result.clan });
+});
+
+app.post("/api/clans/:tag/join", (req, res) => {
+  const { publicId, username } = req.body || {};
+  const result = accountDb.joinClan(
+    req.params.tag,
+    publicId || "cmd-member",
+    username || "Membre"
+  );
+  if (!result.ok) {
+    return res.status(400).json({ ok: false, error: result.error });
+  }
+  return res.json({ ok: true, clan: result.clan });
+});
+
 // Start the master process
 export async function startMaster() {
   if (!cluster.isPrimary) {
