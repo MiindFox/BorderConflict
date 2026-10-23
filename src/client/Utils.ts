@@ -294,17 +294,53 @@ export async function copyToClipboard(
   onReset?: () => void,
   timeout = 2000,
 ): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(text);
+  let copied = false;
+
+  // 1. Try modern Async Clipboard API (supported in secure HTTPS or localhost)
+  if (navigator?.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      copied = true;
+    } catch {
+      // Fall through to fallback
+    }
+  }
+
+  // 2. Robust fallback for HTTP, non-secure origins, or restrictive browser permissions
+  if (!copied && typeof document !== "undefined") {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "0";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+      copied = document.execCommand("copy");
+      document.body.removeChild(textarea);
+    } catch (err) {
+      console.warn("Fallback execCommand copy failed:", err);
+    }
+  }
+
+  if (copied) {
     if (onSuccess) onSuccess();
     if (onReset) {
       setTimeout(() => {
         onReset();
       }, timeout);
     }
-  } catch (err) {
-    console.warn("Failed to copy to clipboard", err);
-    throw err;
+  } else {
+    // If automatic copy is blocked, prompt the user with the link
+    if (typeof window !== "undefined" && typeof window.prompt === "function") {
+      window.prompt("Copiez ce lien (Ctrl+C) :", text);
+      if (onSuccess) onSuccess();
+    } else {
+      throw new Error("Clipboard copy not supported");
+    }
   }
 }
 

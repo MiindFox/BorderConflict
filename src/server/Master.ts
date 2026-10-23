@@ -182,6 +182,14 @@ app.post("/api/account/sync", (req, res) => {
   return res.json({ ok: true, profile: result.profile });
 });
 
+app.get("/api/public/player/:publicId", (req, res) => {
+  const profile = accountDb.getPublicProfile(req.params.publicId);
+  if (!profile) {
+    return res.status(404).json({ error: "Player not found" });
+  }
+  return res.json(profile);
+});
+
 // Start the master process
 export async function startMaster() {
   if (!cluster.isPrimary) {

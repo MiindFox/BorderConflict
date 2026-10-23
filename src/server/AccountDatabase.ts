@@ -149,6 +149,38 @@ class AccountDatabase {
 
     return { ok: true, profile: merged };
   }
+
+  public getPublicProfile(publicId: string): any | null {
+    // Look up by publicId or username or email prefix
+    const cleanId = publicId.toLowerCase().replace(/^cmd-/, "");
+    for (const [email, account] of Object.entries(this.db)) {
+      const emailPrefix = email.split("@")[0].toLowerCase().replace(/[^a-zA-Z0-9_-]/g, "");
+      const usernameClean = (account.username || "").toLowerCase().replace(/[^a-zA-Z0-9_-]/g, "");
+      if (
+        cleanId === emailPrefix ||
+        cleanId === usernameClean ||
+        publicId === `cmd-${emailPrefix}`
+      ) {
+        const p = account.profile || {};
+        return {
+          publicId: `cmd-${emailPrefix}`,
+          username: account.username || email.split("@")[0],
+          clans: [],
+          displayClanTag: null,
+          stats: {
+            gamesPlayed: p.gamesPlayed || 0,
+            victories: p.victories || 0,
+            winRate: p.gamesPlayed ? (p.victories || 0) / p.gamesPlayed : 0,
+            worldEventsSurvived: p.worldEventsSurvived || 0,
+            directivesCompleted: p.directivesCompleted || 0,
+            level: p.level || 0,
+            xp: p.xp || 0,
+          },
+        };
+      }
+    }
+    return null;
+  }
 }
 
 export const accountDb = new AccountDatabase();
