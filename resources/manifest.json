@@ -13,13 +13,16 @@
       "type": "image/png"
     }
   ],
-  "orientation": "portrait",
-  "display_override": ["fullscreen", "minimal-ui"],
+  "orientation": "any",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
   "display": "standalone",
   "dir": "auto",
   "lang": "en",
   "name": "BorderConflict",
   "short_name": "BorderConflict",
+  "description": "Tactical Multiplayer Strategy Game",
+  "theme_color": "#111827",
+  "background_color": "#111827",
   "start_url": "/",
   "id": "/"
 }
