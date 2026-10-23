@@ -80,8 +80,9 @@ const DEFAULT_PROFILE: CommanderProfile = {
 };
 
 export function xpRequiredForLevel(level: number): number {
-  if (level <= 0) return 400;
-  return 400 + (level - 1) * 150;
+  if (level <= 0) return 500;
+  // Calibrated for ~200 hours of active competitive play to reach max level 36
+  return Math.floor(500 + Math.pow(level, 1.32) * 49);
 }
 
 export function getCommanderRankTitle(level: number): {
@@ -442,8 +443,9 @@ class CommanderStore {
     ) {
       this.profile.xp -= xpRequiredForLevel(this.profile.level);
       this.profile.level++;
-      this.profile.plutonium += 250;
-      this.profile.caps += 1000;
+      // Level-up reward: modest Caps, very low Plutonium
+      this.profile.plutonium += 5;
+      this.profile.caps += 50;
       leveledUp = true;
     }
     this.save();
@@ -456,10 +458,11 @@ class CommanderStore {
   } {
     this.profile.gamesPlayed++;
     if (won) this.profile.victories++;
-    this.profile.plutonium += won ? 300 : 150;
-    this.profile.caps += won ? 1500 : 800;
-    const baseXp = won ? 650 : 300;
-    const timeBonus = Math.min(600, Math.floor(durationSeconds * 1.5));
+    // Hard grind rewards: 0 plutonium on loss, only 2 plutonium on victory. Modest caps.
+    this.profile.plutonium += won ? 2 : 0;
+    this.profile.caps += won ? 25 : 10;
+    const baseXp = won ? 80 : 35;
+    const timeBonus = Math.min(25, Math.floor(durationSeconds * 0.05));
     const xpGained = baseXp + timeBonus;
     const res = this.addXp(xpGained);
     return { xpGained, leveledUp: res.leveledUp };
@@ -467,17 +470,17 @@ class CommanderStore {
 
   recordWorldEventSurvived(): void {
     this.profile.worldEventsSurvived++;
-    this.profile.plutonium += 40;
-    this.profile.caps += 200;
-    this.addXp(75);
+    this.profile.plutonium += 0;
+    this.profile.caps += 10;
+    this.addXp(15);
     this.checkCareerMedals();
   }
 
-  recordDirectiveCompleted(xpReward: number = 125): void {
+  recordDirectiveCompleted(xpReward: number = 25): void {
     this.profile.directivesCompleted++;
-    this.profile.plutonium += 100;
-    this.profile.caps += 400;
-    this.addXp(xpReward);
+    this.profile.plutonium += 1;
+    this.profile.caps += 15;
+    this.addXp(Math.min(xpReward, 30));
     this.checkCareerMedals();
   }
 

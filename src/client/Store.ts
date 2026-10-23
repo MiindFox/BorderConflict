@@ -629,11 +629,6 @@ export class StoreModal extends BaseModal {
     );
   }
 
-  private handleClaimTestSupply() {
-    commanderStore.addCurrency(1500, 5000);
-    showToast("+1 500 Plutonium & +5 000 Caps crédités !", "green", 2200);
-  }
-
   private renderSupplyCratesSection(): TemplateResult {
     return html`
       <div class="p-4 space-y-5">
@@ -645,24 +640,13 @@ export class StoreModal extends BaseModal {
               ⚡ Ravitaillement Stratégique & Coffres Cosmétiques
             </div>
             <p class="text-xs sm:text-sm text-slate-300 mt-1 flex items-center gap-1.5 flex-wrap">
-              <span>Vous gagnez automatiquement du <strong>Plutonium</strong></span>
-              <plutonium-icon .size=${14}></plutonium-icon>
-              <span>et des <strong>Caps</strong></span>
+              <span>Gagnez des <strong>Caps</strong></span>
               <cap-icon .size=${16}></cap-icon>
-              <span>en jouant, en accomplissant des Directives et en montant de Niveau.</span>
+              <span>en jouant des parties. Le <strong>Plutonium</strong></span>
+              <plutonium-icon .size=${14}></plutonium-icon>
+              <span>est une ressource rare réservée aux victoires épiques et aux packs de ravitaillement.</span>
             </p>
           </div>
-          <button
-            type="button"
-            @click=${this.handleClaimTestSupply}
-            class="cursor-pointer rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 border border-cyan-300/40 px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg transition-all flex items-center gap-1.5"
-          >
-            <span>🎁 +1 500</span>
-            <plutonium-icon .size=${14}></plutonium-icon>
-            <span>& +5 000</span>
-            <cap-icon .size=${16}></cap-icon>
-            <span>(Bonus Ravitaillement)</span>
-          </button>
         </div>
 
         ${this.lastCrateDrops.length > 0
