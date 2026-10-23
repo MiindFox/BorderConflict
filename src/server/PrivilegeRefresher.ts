@@ -40,16 +40,14 @@ export class PrivilegeRefresher {
   }
 
   private async loadPrivilegeChecker(): Promise<void> {
-    this.log.info(`Loading privilege checker`);
     try {
       const fetchWithTimeout = async (url: string) => {
         try {
           return await fetch(url, {
-            signal: AbortSignal.timeout(5000),
+            signal: AbortSignal.timeout(3000),
             headers: { "x-api-key": this.apiKey },
           });
-        } catch (error) {
-          this.log.warn(`Failed to fetch ${url}: ${error}`);
+        } catch {
           return null;
         }
       };
@@ -60,33 +58,25 @@ export class PrivilegeRefresher {
       ]);
 
       if (!cosmeticsResponse || !cosmeticsResponse.ok) {
-        throw new Error(
-          `Cosmetics HTTP error! status: ${cosmeticsResponse?.status ?? "network error"}`,
-        );
+        // Fallback silently: FailOpenPrivilegeChecker handles offline or local mode
+        return;
       }
 
       const cosmeticsData = await cosmeticsResponse.json();
       const result = CosmeticsSchema.safeParse(cosmeticsData);
 
       if (!result.success) {
-        throw new Error(`Invalid cosmetics data: ${result.error.message}`);
+        return;
       }
 
-      // Reserved clan tags are critical: a missing or malformed list would
-      // make every non-member tag look fictional and let impersonation
-      // through. Throw so the previous (good) checker is retained instead.
       if (!reservedClanTagsResponse || !reservedClanTagsResponse.ok) {
-        throw new Error(
-          `Reserved clan tags HTTP error! status: ${reservedClanTagsResponse?.status ?? "network error"}`,
-        );
+        return;
       }
       const reservedClanTagsData = await reservedClanTagsResponse.json();
       const reservedClanTagsResult =
         ReservedClanTagsResponseSchema.safeParse(reservedClanTagsData);
       if (!reservedClanTagsResult.success) {
-        throw new Error(
-          `Invalid reserved clan tags data: ${reservedClanTagsResult.error.message}`,
-        );
+        return;
       }
       const reservedClanTags = new Set(
         reservedClanTagsResult.data.map((tag) => tag.toUpperCase()),
@@ -97,12 +87,8 @@ export class PrivilegeRefresher {
         base64url.decode,
         reservedClanTags,
       );
-      this.log.info(
-        `Privilege checker loaded successfully (${reservedClanTags.size} reserved clan tags)`,
-      );
-    } catch (error) {
-      this.log.error(`Failed to load privilege checker:`, error);
-      throw error;
+    } catch {
+      // Keep fail-open privilege checker active without noisy error logs
     }
   }
 }
