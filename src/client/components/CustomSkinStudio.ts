@@ -1,30 +1,70 @@
-import { html, LitElement, type PropertyValues } from "lit";
+import { html, LitElement, type PropertyValues, type TemplateResult } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 import { commanderStore, COMMANDER_UPDATED_EVENT } from "../CommanderStore";
 import { UserSettings } from "../UserSettings";
 import { showToast } from "../Utils";
 import "./CurrencyDisplay";
+import "./PlutoniumIcon";
+import "./CapIcon";
 
-const PRESET_ICONS = [
+interface PresetIcon {
+  name: string;
+  color: string;
+  renderIcon: () => TemplateResult;
+  rawSvg: string;
+}
+
+const PRESET_ICONS: PresetIcon[] = [
   {
     name: "Tête de Mort Nucléaire",
-    svg: `<svg viewBox="0 0 100 100" fill="#22d3ee"><path d="M50 15 C30 15 20 28 20 45 C20 58 28 66 32 72 L32 82 L42 82 L42 75 L46 75 L46 82 L54 82 L54 75 L58 75 L58 82 L68 82 L68 72 C72 66 80 58 80 45 C80 28 70 15 50 15 Z M35 48 C30 48 30 40 35 40 C40 40 40 48 35 48 Z M65 48 C60 48 60 40 65 40 C70 40 70 48 65 48 Z M50 55 L45 64 L55 64 Z"/></svg>`,
+    color: "#22d3ee",
+    renderIcon: () => html`
+      <svg viewBox="0 0 100 100" class="w-full h-full fill-cyan-400" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 15 C30 15 20 28 20 45 C20 58 28 66 32 72 L32 82 L42 82 L42 75 L46 75 L46 82 L54 82 L54 75 L58 75 L58 82 L68 82 L68 72 C72 66 80 58 80 45 C80 28 70 15 50 15 Z M35 48 C30 48 30 40 35 40 C40 40 40 48 35 48 Z M65 48 C60 48 60 40 65 40 C70 40 70 48 65 48 Z M50 55 L45 64 L55 64 Z" />
+      </svg>
+    `,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#22d3ee"><path d="M50 15 C30 15 20 28 20 45 C20 58 28 66 32 72 L32 82 L42 82 L42 75 L46 75 L46 82 L54 82 L54 75 L58 75 L58 82 L68 82 L68 72 C72 66 80 58 80 45 C80 28 70 15 50 15 Z M35 48 C30 48 30 40 35 40 C40 40 40 48 35 48 Z M65 48 C60 48 60 40 65 40 C70 40 70 48 65 48 Z M50 55 L45 64 L55 64 Z"/></svg>`,
   },
   {
     name: "Aigle Impérial",
-    svg: `<svg viewBox="0 0 100 100" fill="#f59e0b"><path d="M50 10 L44 25 L30 20 L36 34 L18 35 L30 46 L10 56 L30 60 L20 78 L38 72 L36 90 L50 78 L64 90 L62 72 L80 78 L70 60 L90 56 L70 46 L82 35 L64 34 L70 20 L56 25 Z"/></svg>`,
+    color: "#f59e0b",
+    renderIcon: () => html`
+      <svg viewBox="0 0 100 100" class="w-full h-full fill-amber-400" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 10 L44 25 L30 20 L36 34 L18 35 L30 46 L10 56 L30 60 L20 78 L38 72 L36 90 L50 78 L64 90 L62 72 L80 78 L70 60 L90 56 L70 46 L82 35 L64 34 L70 20 L56 25 Z" />
+      </svg>
+    `,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#f59e0b"><path d="M50 10 L44 25 L30 20 L36 34 L18 35 L30 46 L10 56 L30 60 L20 78 L38 72 L36 90 L50 78 L64 90 L62 72 L80 78 L70 60 L90 56 L70 46 L82 35 L64 34 L70 20 L56 25 Z"/></svg>`,
   },
   {
     name: "Foudre Plasma",
-    svg: `<svg viewBox="0 0 100 100" fill="#ec4899"><polygon points="56,5 18,52 46,52 38,95 82,42 54,42"/></svg>`,
+    color: "#ec4899",
+    renderIcon: () => html`
+      <svg viewBox="0 0 100 100" class="w-full h-full fill-pink-500" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="56,5 18,52 46,52 38,95 82,42 54,42" />
+      </svg>
+    `,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#ec4899"><polygon points="56,5 18,52 46,52 38,95 82,42 54,42"/></svg>`,
   },
   {
     name: "Symbole Biohazard",
-    svg: `<svg viewBox="0 0 100 100" fill="#10b981"><circle cx="50" cy="50" r="12"/><path d="M50 20 A22 22 0 0 0 32 30 A24 24 0 1 1 68 30 A22 22 0 0 0 50 20 Z M26 62 A22 22 0 0 0 42 70 A24 24 0 1 1 20 40 A22 22 0 0 0 26 62 Z M74 62 A22 22 0 0 0 80 40 A24 24 0 1 1 58 70 A22 22 0 0 0 74 62 Z"/></svg>`,
+    color: "#10b981",
+    renderIcon: () => html`
+      <svg viewBox="0 0 100 100" class="w-full h-full fill-emerald-400" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="12" />
+        <path d="M50 20 A22 22 0 0 0 32 30 A24 24 0 1 1 68 30 A22 22 0 0 0 50 20 Z M26 62 A22 22 0 0 0 42 70 A24 24 0 1 1 20 40 A22 22 0 0 0 26 62 Z M74 62 A22 22 0 0 0 80 40 A24 24 0 1 1 58 70 A22 22 0 0 0 74 62 Z" />
+      </svg>
+    `,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#10b981"><circle cx="50" cy="50" r="12"/><path d="M50 20 A22 22 0 0 0 32 30 A24 24 0 1 1 68 30 A22 22 0 0 0 50 20 Z M26 62 A22 22 0 0 0 42 70 A24 24 0 1 1 20 40 A22 22 0 0 0 26 62 Z M74 62 A22 22 0 0 0 80 40 A24 24 0 1 1 58 70 A22 22 0 0 0 74 62 Z"/></svg>`,
   },
   {
     name: "Étoile Suprême",
-    svg: `<svg viewBox="0 0 100 100" fill="#38bdf8"><polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36"/></svg>`,
+    color: "#38bdf8",
+    renderIcon: () => html`
+      <svg viewBox="0 0 100 100" class="w-full h-full fill-sky-400" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36" />
+      </svg>
+    `,
+    rawSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="#38bdf8"><polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36"/></svg>`,
   },
 ];
 
@@ -43,8 +83,8 @@ export class CustomSkinStudio extends LitElement {
     return this;
   }
 
-  @query("#previewCanvas") private canvas!: HTMLCanvasElement;
-  @query("#fileInput") private fileInput!: HTMLInputElement;
+  @query("#previewCanvas") private canvas?: HTMLCanvasElement;
+  @query("#fileInput") private fileInput?: HTMLInputElement;
 
   @state() private currentImage: HTMLImageElement | null = null;
   @state() private imageScale = 1.0;
@@ -63,14 +103,14 @@ export class CustomSkinStudio extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    this.style.display = "block";
     window.addEventListener(COMMANDER_UPDATED_EVENT, this.onProfileUpdated);
-    // Load existing custom skin if present
+
     const existingUrl = commanderStore.getCustomSkinUrl();
     if (existingUrl) {
       this.loadImageFromUrl(existingUrl);
     } else {
-      // Load first preset by default
-      this.loadSvgPreset(PRESET_ICONS[0].svg);
+      this.loadSvgPreset(PRESET_ICONS[0].rawSvg);
     }
   }
 
@@ -85,6 +125,11 @@ export class CustomSkinStudio extends LitElement {
 
   protected firstUpdated(_changed: PropertyValues) {
     super.firstUpdated(_changed);
+    requestAnimationFrame(() => this.redrawCanvas());
+  }
+
+  protected updated(_changed: PropertyValues) {
+    super.updated(_changed);
     this.redrawCanvas();
   }
 
@@ -99,15 +144,15 @@ export class CustomSkinStudio extends LitElement {
   }
 
   private loadSvgPreset(svgMarkup: string) {
-    const blob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+    const encoded = encodeURIComponent(svgMarkup);
+    const dataUri = `data:image/svg+xml;utf8,${encoded}`;
     const img = new Image();
+    img.crossOrigin = "anonymous";
     img.onload = () => {
       this.currentImage = img;
-      URL.revokeObjectURL(url);
       this.redrawCanvas();
     };
-    img.src = url;
+    img.src = dataUri;
   }
 
   private onFileChange(e: Event) {
@@ -141,12 +186,13 @@ export class CustomSkinStudio extends LitElement {
   }
 
   private redrawCanvas() {
-    if (!this.canvas) return;
-    const ctx = this.canvas.getContext("2d");
+    const canvas = this.querySelector<HTMLCanvasElement>("#previewCanvas") || this.canvas;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const w = this.canvas.width;
-    const h = this.canvas.height;
+    const w = canvas.width;
+    const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
     const swatch = TERRITORY_SWATCHES[this.territoryColorIndex];
@@ -155,7 +201,7 @@ export class CustomSkinStudio extends LitElement {
     ctx.fillStyle = "#090d16";
     ctx.fillRect(0, 0, w, h);
 
-    // Subtle Hexagonal territory borders
+    // Hexagonal territory borders
     ctx.save();
     ctx.strokeStyle = swatch.border;
     ctx.lineWidth = 2.5;
@@ -203,25 +249,24 @@ export class CustomSkinStudio extends LitElement {
     ctx.setLineDash([8, 8]);
     ctx.strokeRect(20, 20, w - 40, h - 40);
 
-    // Corner targeting marks
     const cl = 20;
     ctx.strokeStyle = "#06b6d4";
     ctx.lineWidth = 3;
     ctx.setLineDash([]);
-    // Top-left
+    // Corners
     ctx.beginPath();
     ctx.moveTo(15, 15 + cl);
     ctx.lineTo(15, 15);
     ctx.lineTo(15 + cl, 15);
-    // Top-right
+
     ctx.moveTo(w - 15 - cl, 15);
     ctx.lineTo(w - 15, 15);
     ctx.lineTo(w - 15, 15 + cl);
-    // Bottom-left
+
     ctx.moveTo(15, h - 15 - cl);
     ctx.lineTo(15, h - 15);
     ctx.lineTo(15 + cl, h - 15);
-    // Bottom-right
+
     ctx.moveTo(w - 15 - cl, h - 15);
     ctx.lineTo(w - 15, h - 15);
     ctx.lineTo(w - 15, h - 15 - cl);
@@ -242,7 +287,6 @@ export class CustomSkinStudio extends LitElement {
     ctx.closePath();
   }
 
-  // Interactive Dragging on Canvas
   private onMouseDown(e: MouseEvent) {
     this.isDragging = true;
     this.dragStartX = e.clientX - this.imageOffsetX;
@@ -279,7 +323,6 @@ export class CustomSkinStudio extends LitElement {
     this.isDragging = false;
   }
 
-  // Baking Final High-Res 1024x1024 PNG for WebGL Skin Atlas
   private generateHighResTexture(): string {
     const offscreen = document.createElement("canvas");
     offscreen.width = 1024;
@@ -292,7 +335,7 @@ export class CustomSkinStudio extends LitElement {
     ctx.clearRect(0, 0, w, h);
 
     ctx.save();
-    const ratio = w / this.canvas.width;
+    const ratio = w / (this.canvas?.width || 600);
     ctx.translate(w / 2 + this.imageOffsetX * ratio, h / 2 + this.imageOffsetY * ratio);
     ctx.rotate((this.imageRotation * Math.PI) / 180);
     ctx.globalAlpha = Math.max(0.1, Math.min(1, this.imageOpacity));
@@ -343,13 +386,12 @@ export class CustomSkinStudio extends LitElement {
         return;
       }
 
-      // Equip skin locally & save to commanderStore
       const skinName = `custom_${publicId}`;
       commanderStore.setCustomSkin(data.skinUrl, skinName);
       this.userSettings.setSelectedPatternName(`skin:${skinName}`);
 
-      showToast("🎉 Skin de Territoire forgé et équipé avec succès ! Vos troupes arborent votre emblème !", "green");
-    } catch (e: any) {
+      showToast("🎉 Skin de Territoire forgé et équipé avec succès !", "green");
+    } catch {
       showToast("Erreur de communication avec le serveur.", "red");
     } finally {
       this.isSaving = false;
@@ -412,7 +454,6 @@ export class CustomSkinStudio extends LitElement {
   render() {
     const hasUnlocked = commanderStore.hasCustomSkinUnlocked();
     const isVip = commanderStore.isVipActive();
-    const profile = commanderStore.getProfile();
 
     return html`
       <div class="w-full flex flex-col gap-6 p-4 md:p-6 text-slate-100 font-sans select-none">
@@ -472,7 +513,7 @@ export class CustomSkinStudio extends LitElement {
             </div>
 
             <!-- Canvas Element -->
-            <div class="relative w-full max-w-[460px] aspect-square rounded-2xl overflow-hidden shadow-2xl border-2 border-cyan-500/30 cursor-grab active:cursor-grabbing">
+            <div class="relative w-full max-w-[460px] aspect-square rounded-2xl overflow-hidden shadow-2xl border-2 border-cyan-500/30 cursor-grab active:cursor-grabbing bg-[#090d16]">
               <canvas
                 id="previewCanvas"
                 width="600"
@@ -529,7 +570,7 @@ export class CustomSkinStudio extends LitElement {
                 />
                 <button
                   type="button"
-                  @click=${() => this.fileInput.click()}
+                  @click=${() => (this.querySelector("#fileInput") as HTMLInputElement)?.click()}
                   class="w-full cursor-pointer rounded-xl border-2 border-dashed border-cyan-500/40 hover:border-cyan-400 bg-cyan-950/20 hover:bg-cyan-950/40 p-4 transition-all flex flex-col items-center justify-center gap-1 group text-center"
                 >
                   <span class="text-2xl group-hover:scale-110 transition-transform">📁</span>
@@ -548,12 +589,12 @@ export class CustomSkinStudio extends LitElement {
                     (p) => html`
                       <button
                         type="button"
-                        @click=${() => this.loadSvgPreset(p.svg)}
+                        @click=${() => this.loadSvgPreset(p.rawSvg)}
                         title=${p.name}
                         class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-white/10 hover:border-cyan-400/50 transition-all flex items-center justify-center hover:scale-105 active:scale-95"
                       >
                         <div class="w-7 h-7 flex items-center justify-center">
-                          ${html([p.svg] as any)}
+                          ${p.renderIcon()}
                         </div>
                       </button>
                     `
