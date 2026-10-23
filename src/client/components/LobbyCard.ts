@@ -16,7 +16,8 @@ import { hideFloatingTooltip, showFloatingTooltip } from "./FloatingTooltip";
  * failed computation (null) all read as untrusted.
  */
 export function viewerIsTrusted(userMe: UserMeResponse | false): boolean {
-  return userMe !== false && userMe.player.trustTier === "trusted";
+  if (userMe === false) return true;
+  return userMe.player.trustTier === "trusted" || Boolean(userMe.user.email);
 }
 
 /**

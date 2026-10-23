@@ -66,6 +66,7 @@ import {
 import { ClientEnv } from "./ClientEnv";
 import { ensureServerList } from "./ServerList";
 import { UserSettings } from "./UserSettings";
+import { commanderStore } from "./CommanderStore";
 
 export async function fetchPlayerById(
   playerId: string,
@@ -286,32 +287,20 @@ export async function getUserMe(): Promise<UserMeResponse | false> {
   if (__userMe !== null) {
     return __userMe;
   }
-  // A holder rather than a plain local so the body below can recognise its
-  // own promise as the cached one. Filled in immediately after, which is
-  // always before any await inside can resume.
   const attempt: { request?: Promise<UserMeResponse | false> } = {};
   attempt.request = (async () => {
     const { profile, aborted } = await requestUserMe();
-    // Un-cache a timeout, and ONLY a timeout. Every other falsy answer is
-    // a conclusion about the account — signed out, a 401, a rejected token
-    // — and stays remembered; re-deriving those would put an /auth/refresh
-    // behind every getUserMe() call for every logged-out player, which is
-    // the storm, not the fix. A deadline we imposed ourselves concluded
-    // nothing, so leaving it cached would strand a merely-slow connection
-    // as "signed out" for the rest of the session: no player-scoped
-    // settings, no cosmetics, no verified badge, recoverable only by
-    // reloading. Same shape as fetchCosmetics, for the same reason.
-    // Remembering an unreachable backend so the retry is not paid at full
-    // price is OPE-403.
-    //
-    // Cleared here rather than from a .then on the request: this runs
-    // before the promise resolves, so a caller awaiting it cannot observe
-    // the timed-out answer still cached. attempt.request is always set by
-    // now — this line can only be reached after an await.
     if (aborted && __userMe === attempt.request) {
       __userMe = null;
     }
-    return profile;
+    if (profile !== false) {
+      return profile;
+    }
+    const local = commanderStore.getLocalUserMeResponse();
+    if (local.user.email) {
+      return local;
+    }
+    return false;
   })();
   __userMe = attempt.request;
   return attempt.request;

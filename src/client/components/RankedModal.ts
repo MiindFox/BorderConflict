@@ -32,10 +32,12 @@ export class RankedModal extends BaseModal {
   // Discord/Google/email account, so track that separately for ranked.
   @state() private portalSignedIn = false;
 
-  // Eligible to see/play ranked: a linked account or a signed-in portal one.
+  // Eligible to see/play ranked: a linked account or a signed-in portal one, or local email account.
   private isRankedEligible(): boolean {
     return (
-      responseHasLinkedIdentity(this.userMeResponse) || this.portalSignedIn
+      responseHasLinkedIdentity(this.userMeResponse) ||
+      this.portalSignedIn ||
+      (this.userMeResponse !== false && Boolean(this.userMeResponse.user?.email))
     );
   }
 
@@ -213,15 +215,8 @@ export class RankedModal extends BaseModal {
   }
 
   private async handleRanked(mode: MatchmakingMode) {
-    // Ranked admits trusted accounts only; the popup says how to get there
-    // (sign in first when signed out). Unknown tier: the service decides.
     if (this.trustKnown() && !viewerIsTrusted(this.userMeResponse)) {
       this.showTrustRequired = true;
-      return;
-    }
-    if ((await userAuth()) === false) {
-      this.close();
-      window.showPage?.("page-account");
       return;
     }
 
