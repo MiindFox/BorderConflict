@@ -231,7 +231,14 @@ class AccountDatabase {
       ownedFlares: Array.from(new Set([...(current.ownedFlares || []), ...(profile.ownedFlares || [])])),
       doctrineMask: profile.doctrineMask !== undefined ? profile.doctrineMask : current.doctrineMask,
       equippedMedal: profile.equippedMedal !== undefined ? profile.equippedMedal : current.equippedMedal,
-      username: profile.username || current.username
+      username: profile.username || current.username,
+      isVip: current.isVip || profile.isVip || false,
+      vipUntil: Math.max(current.vipUntil || 0, profile.vipUntil || 0) || undefined,
+      hasBattlePass: current.hasBattlePass || profile.hasBattlePass || false,
+      battlePassSeason: Math.max(current.battlePassSeason || 0, profile.battlePassSeason || 0) || undefined,
+      hasCustomSkinUnlocked: current.hasCustomSkinUnlocked || profile.hasCustomSkinUnlocked || false,
+      customSkinUrl: profile.customSkinUrl || current.customSkinUrl || undefined,
+      customSkinName: profile.customSkinName || current.customSkinName || undefined,
     };
 
     account.profile = merged;

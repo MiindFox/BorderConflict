@@ -36,3 +36,4 @@ map-generator/map-generator.exe
 .tick-records/
 .tick-baseline/
 cloudflared.exe
+data/

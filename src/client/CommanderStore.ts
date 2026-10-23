@@ -123,6 +123,9 @@ class CommanderStore {
 
   constructor() {
     this.profile = this.load();
+    if (typeof window !== "undefined") {
+      setTimeout(() => this.syncWithServerInBackground(), 50);
+    }
   }
 
   private load(): CommanderProfile {
@@ -152,13 +155,20 @@ class CommanderStore {
         ownedFlares: Array.isArray(parsed.ownedFlares)
           ? parsed.ownedFlares
           : [],
+        isVip: !!parsed.isVip,
+        vipUntil: typeof parsed.vipUntil === "number" ? parsed.vipUntil : undefined,
+        hasBattlePass: !!parsed.hasBattlePass,
+        battlePassSeason: typeof parsed.battlePassSeason === "number" ? parsed.battlePassSeason : undefined,
+        hasCustomSkinUnlocked: !!parsed.hasCustomSkinUnlocked,
+        customSkinUrl: typeof parsed.customSkinUrl === "string" ? parsed.customSkinUrl : undefined,
+        customSkinName: typeof parsed.customSkinName === "string" ? parsed.customSkinName : undefined,
       };
     } catch {
       return { ...DEFAULT_PROFILE };
     }
   }
 
-  private save(): void {
+  private saveLocalAndBroadcast(): void {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.profile));
       if (this.profile.email) {
@@ -176,9 +186,6 @@ class CommanderStore {
       // Ignore storage quota issues
     }
 
-    // Trigger server-side cloud sync in background if signed in
-    this.syncWithServerInBackground();
-
     if (typeof window !== "undefined") {
       window.dispatchEvent(
         new CustomEvent(COMMANDER_UPDATED_EVENT, { detail: this.getProfile() }),
@@ -190,6 +197,65 @@ class CommanderStore {
           cancelable: true,
         }),
       );
+    }
+  }
+
+  private save(): void {
+    this.saveLocalAndBroadcast();
+    // Trigger server-side cloud sync in background if signed in
+    this.syncWithServerInBackground();
+  }
+
+  private applyServerProfile(serverProfile: any): void {
+    if (!serverProfile) return;
+    let changed = false;
+
+    if (typeof serverProfile.plutonium === "number" && serverProfile.plutonium > this.profile.plutonium) {
+      this.profile.plutonium = serverProfile.plutonium;
+      changed = true;
+    }
+    if (typeof serverProfile.caps === "number" && serverProfile.caps > this.profile.caps) {
+      this.profile.caps = serverProfile.caps;
+      changed = true;
+    }
+    if (serverProfile.isVip && !this.profile.isVip) {
+      this.profile.isVip = true;
+      changed = true;
+    }
+    if (typeof serverProfile.vipUntil === "number" && (!this.profile.vipUntil || serverProfile.vipUntil > this.profile.vipUntil)) {
+      this.profile.vipUntil = serverProfile.vipUntil;
+      changed = true;
+    }
+    if (serverProfile.hasBattlePass && !this.profile.hasBattlePass) {
+      this.profile.hasBattlePass = true;
+      changed = true;
+    }
+    if (typeof serverProfile.battlePassSeason === "number" && (!this.profile.battlePassSeason || serverProfile.battlePassSeason > (this.profile.battlePassSeason || 0))) {
+      this.profile.battlePassSeason = serverProfile.battlePassSeason;
+      changed = true;
+    }
+    if (serverProfile.hasCustomSkinUnlocked && !this.profile.hasCustomSkinUnlocked) {
+      this.profile.hasCustomSkinUnlocked = true;
+      changed = true;
+    }
+    if (serverProfile.customSkinUrl && !this.profile.customSkinUrl) {
+      this.profile.customSkinUrl = serverProfile.customSkinUrl;
+      changed = true;
+    }
+    if (serverProfile.customSkinName && !this.profile.customSkinName) {
+      this.profile.customSkinName = serverProfile.customSkinName;
+      changed = true;
+    }
+    if (Array.isArray(serverProfile.ownedFlares)) {
+      const mergedFlares = Array.from(new Set([...this.profile.ownedFlares, ...serverProfile.ownedFlares]));
+      if (mergedFlares.length !== this.profile.ownedFlares.length) {
+        this.profile.ownedFlares = mergedFlares;
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      this.saveLocalAndBroadcast();
     }
   }
 
@@ -207,9 +273,16 @@ class CommanderStore {
         password,
         profile: this.profile,
       }),
-    }).catch(() => {
-      // Silently fall back to offline/local
-    });
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.ok && data?.profile) {
+          this.applyServerProfile(data.profile);
+        }
+      })
+      .catch(() => {
+        // Silently fall back to offline/local
+      });
   }
 
   private loadAccountsDb(): Record<string, StoredEmailAccount> {
