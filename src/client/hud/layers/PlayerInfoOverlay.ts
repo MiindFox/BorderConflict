@@ -39,6 +39,7 @@ import {
   getPlayerIcons,
   IMAGE_ICON_KIND,
 } from "../PlayerIcons";
+import { tacticalInteractions } from "../../TacticalInteractionManager";
 import { ShowPlayerChatEvent } from "./ChatModal";
 import { ShowPlayerEmojiMenuEvent } from "./EmojiTable";
 import { ImmunityBarVisibleEvent } from "./ImmunityTimer";
@@ -616,6 +617,23 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
       ></span>`;
     }
 
+    const bounty = tacticalInteractions.getBounty(player.id());
+    const pna = tacticalInteractions.isPnaActive(player.id());
+    const bountyHtml = bounty
+      ? html`<span
+          class="inline-flex items-center gap-0.5 px-1 rounded-sm bg-red-950/80 border border-red-500/80 text-[10px] text-yellow-300 font-bold shrink-0 animate-pulse"
+          title="Prime: ${bounty.amount} Caps"
+          >🎯 ${bounty.amount}🪙</span
+        >`
+      : null;
+    const pnaHtml = pna.active
+      ? html`<span
+          class="inline-flex items-center gap-0.5 px-1 rounded-sm bg-emerald-950/80 border border-emerald-500/80 text-[10px] text-emerald-300 font-mono font-bold shrink-0"
+          title="Trêve PNA: ${pna.formatted}"
+          >📜 ${pna.formatted}</span
+        >`
+      : null;
+
     const keybinds = this.userSettings.keybinds(Platform.isMac);
 
     return html`
@@ -721,7 +739,7 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
                   >${playerType}</span
                 >`}
             ${this.renderPlayerNameIcons(playerIcons)} ${betrayalHtml ?? ""}
-            ${allianceHtml ?? ""}
+            ${allianceHtml ?? ""} ${bountyHtml ?? ""} ${pnaHtml ?? ""}
           </div>
           <div class="flex gap-0.5 lg:gap-1 items-center mt-0.5">
             ${this.displayUnitCount(player, UnitType.City, cityIcon)}

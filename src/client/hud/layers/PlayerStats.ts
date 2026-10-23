@@ -1,6 +1,7 @@
 import type { EventBus } from "@openfront/shared/EventBus";
 import { customElement } from "lit/decorators.js";
 import { type StatsRow, StatsTable } from "../../components/StatsTable";
+import { tacticalInteractions } from "../../TacticalInteractionManager";
 import { GoToPlayerEvent } from "../../TransformHandler";
 import type { GameView } from "../../view";
 import { type ColumnDef, columnValues } from "./lib/StatsColumns";
@@ -20,20 +21,24 @@ export class PlayerStats extends StatsTable {
     return game
       .playerViews()
       .filter((player) => player.isAlive())
-      .map((player) => ({
-        key: player.id(),
-        name: player.name(),
-        clanTag: player.clanTag(),
-        values: columnValues(player, game, columns),
-        emphasized:
-          myPlayer !== null &&
-          (player === myPlayer || player.isOnSameTeam(myPlayer)),
-        pinned: player === myPlayer,
-        onClick: () => {
-          if (this.eventBus !== null) {
-            this.eventBus.emit(new GoToPlayerEvent(player));
-          }
-        },
-      }));
+      .map((player) => {
+        const bounty = tacticalInteractions.getBounty(player.id());
+        const suffix = bounty ? ` 🎯${bounty.amount}` : "";
+        return {
+          key: player.id(),
+          name: player.name() + suffix,
+          clanTag: player.clanTag(),
+          values: columnValues(player, game, columns),
+          emphasized:
+            myPlayer !== null &&
+            (player === myPlayer || player.isOnSameTeam(myPlayer)),
+          pinned: player === myPlayer,
+          onClick: () => {
+            if (this.eventBus !== null) {
+              this.eventBus.emit(new GoToPlayerEvent(player));
+            }
+          },
+        };
+      });
   }
 }

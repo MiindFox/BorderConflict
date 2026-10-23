@@ -20,6 +20,7 @@ import { html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import Countries from "resources/countries.json" with { type: "json" };
 import { fetchLobbyListed, getUserMe } from "../../Api";
+import { commanderStore } from "../../CommanderStore";
 import "../../components/EquippedCosmeticsRow";
 import "../../components/LevelBadge";
 import { actionButton } from "../../components/ui/ActionButton";
@@ -31,6 +32,7 @@ import {
   SwapRocketDirectionEvent,
 } from "../../InputHandler";
 import { lobbyLevelBadge } from "../../LobbyRosterLevels";
+import { tacticalInteractions } from "../../TacticalInteractionManager";
 import {
   PlayerReportedEvent,
   SendAllianceRequestIntentEvent,
@@ -96,6 +98,7 @@ export class PlayerPanel extends LitElement implements Controller {
   @state() private suppressNextHide: boolean = false;
   @state() private moderationTarget: PlayerView | null = null;
   @state() private reportTarget: PlayerView | null = null;
+  @state() private bountySelectorOpen: boolean = false;
   // clientIDs this client has reported this game (confirmed sent by
   // Transport); the button locks after one.
   private reportedClientIDs = new Set<string>();
@@ -240,6 +243,7 @@ export class PlayerPanel extends LitElement implements Controller {
     this.sendTarget = null;
     this.moderationTarget = null;
     this.reportTarget = null;
+    this.bountySelectorOpen = false;
     this.requestUpdate();
   }
 
@@ -673,6 +677,77 @@ export class PlayerPanel extends LitElement implements Controller {
       </div>
       ${this.renderTraitorBadge(other)}
       ${this.renderRelationPillIfNation(other, my)}
+      ${this.renderTacticalStatus(other, my)}
+    `;
+  }
+
+  private renderTacticalStatus(other: PlayerView, my: PlayerView) {
+    const otherId = String(other.id());
+    const bounty = tacticalInteractions.getBounty(otherId);
+    const pna = tacticalInteractions.isPnaActive(otherId);
+    const hasRoute = tacticalInteractions.hasTradeRoute(otherId);
+    const hasRadar = tacticalInteractions.hasSharedRadar(otherId);
+
+    if (!bounty && !pna.active && !hasRoute && !hasRadar) {
+      return html``;
+    }
+
+    return html`
+      <div class="flex flex-wrap items-center gap-1.5 mt-2">
+        ${bounty
+          ? html`
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-950/60 px-2.5 py-0.5 text-xs font-bold text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.2)]"
+              >
+                <span class="animate-pulse">🎯</span>
+                <span
+                  >PRIME :
+                  <span class="text-yellow-400 font-mono font-black"
+                    >${bounty.amount} 🪙</span
+                  ></span
+                >
+                <span class="text-[10px] text-red-300"
+                  >(${bounty.sponsorName})</span
+                >
+              </span>
+            `
+          : ""}
+        ${pna.active
+          ? html`
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-950/60 px-2.5 py-0.5 text-xs font-bold text-emerald-200 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+              >
+                <span>📜</span>
+                <span
+                  >TRÊVE (PNA) :
+                  <span class="text-white font-mono font-bold"
+                    >${pna.formatted}</span
+                  ></span
+                >
+              </span>
+            `
+          : ""}
+        ${hasRoute
+          ? html`
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/40 bg-cyan-950/60 px-2.5 py-0.5 text-xs font-bold text-cyan-200"
+              >
+                <span>🚢</span>
+                <span>Route Commerciale (+15% 🪙)</span>
+              </span>
+            `
+          : ""}
+        ${hasRadar
+          ? html`
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full border border-indigo-400/40 bg-indigo-950/60 px-2.5 py-0.5 text-xs font-bold text-indigo-200"
+              >
+                <span>🛰️</span>
+                <span>Radar Partagé Actif</span>
+              </span>
+            `
+          : ""}
+      </div>
     `;
   }
 
@@ -1015,7 +1090,286 @@ export class PlayerPanel extends LitElement implements Controller {
               })}
             </div>`
           : ""}
+        ${this.renderTacticalOperations(my, other)}
         ${this.renderModeration(my, other, this.isAdminRole)}
+      </div>
+    `;
+  }
+
+  private renderTacticalOperations(my: PlayerView, other: PlayerView) {
+    if (other === my) return html``;
+
+    const otherId = String(other.id());
+    const isAllied =
+      (my?.isAlliedWith ? my.isAlliedWith(other) : false) ||
+      Boolean(this.actions?.interaction?.canBreakAlliance);
+    const bounty = tacticalInteractions.getBounty(otherId);
+    const pna = tacticalInteractions.isPnaActive(otherId);
+    const hasRoute = tacticalInteractions.hasTradeRoute(otherId);
+    const hasRadar = tacticalInteractions.hasSharedRadar(otherId);
+    const myCaps = commanderStore.getProfile().caps;
+
+    return html`
+      <ui-divider></ui-divider>
+      <div class="flex flex-col gap-2">
+        <div
+          class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-amber-400/90"
+        >
+          <span class="flex items-center gap-1.5">
+            <span class="text-sm">⚡</span>
+            <span>Interactions Tactiques</span>
+          </span>
+          <span class="text-[11px] font-mono font-medium text-zinc-400">
+            Capsules :
+            <span class="text-amber-300 font-bold"
+              >${renderNumber(myCaps)} 🪙</span
+            >
+          </span>
+        </div>
+
+        ${isAllied
+          ? html`
+              <!-- Allié: Route Commerciale & Partage de Radar -->
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  @click=${(e: MouseEvent) => {
+                    e.stopPropagation();
+                    tacticalInteractions.toggleTradeRoute(
+                      other,
+                      my,
+                      this.eventBus,
+                    );
+                    this.requestUpdate();
+                  }}
+                  class="group relative flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-150 ${hasRoute
+                    ? "bg-cyan-950/70 border-cyan-400/60 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.25)]"
+                    : "bg-white/4 border-white/10 hover:bg-white/10 text-zinc-200"}"
+                >
+                  <div class="flex items-center gap-1.5 font-bold text-xs">
+                    <span
+                      class="text-base group-hover:scale-110 transition-transform"
+                      >🚢</span
+                    >
+                    <span
+                      >${hasRoute ? "Route Active" : "Route Commerciale"}</span
+                    >
+                  </div>
+                  <span class="text-[10px] text-zinc-400 mt-0.5">
+                    ${hasRoute ? "Revenu +15% Or actif" : "+15% Or partagé"}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  @click=${(e: MouseEvent) => {
+                    e.stopPropagation();
+                    tacticalInteractions.toggleSharedRadar(
+                      other,
+                      this.eventBus,
+                    );
+                    this.requestUpdate();
+                  }}
+                  class="group relative flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-150 ${hasRadar
+                    ? "bg-indigo-950/70 border-indigo-400/60 text-indigo-200 shadow-[0_0_12px_rgba(99,102,241,0.25)]"
+                    : "bg-white/4 border-white/10 hover:bg-white/10 text-zinc-200"}"
+                >
+                  <div class="flex items-center gap-1.5 font-bold text-xs">
+                    <span
+                      class="text-base group-hover:scale-110 transition-transform"
+                      >🛰️</span
+                    >
+                    <span
+                      >${hasRadar ? "Radar Connecté" : "Partage de Radar"}</span
+                    >
+                  </div>
+                  <span class="text-[10px] text-zinc-400 mt-0.5">
+                    ${hasRadar ? "Détection active" : "Vision partagée"}
+                  </span>
+                </button>
+              </div>
+            `
+          : html`
+              <!-- Non-allié / Ennemi: Assaut Coordonné, Prime, Trêve PNA -->
+              <div class="grid grid-cols-3 gap-1.5">
+                <!-- 1. Assaut Coordonné -->
+                <button
+                  type="button"
+                  @click=${(e: MouseEvent) => {
+                    e.stopPropagation();
+                    tacticalInteractions.startAssaultCountdown(
+                      other.displayName(),
+                      my.displayName(),
+                      this.eventBus,
+                    );
+                    this.hide();
+                  }}
+                  class="group flex flex-col items-center justify-center p-2 rounded-xl bg-red-950/40 border border-red-500/40 hover:bg-red-900/50 hover:border-red-400 text-red-200 transition-all duration-150 shadow-[0_0_10px_rgba(239,68,68,0.15)]"
+                  title="Lancer un compte à rebours sonore et visuel de 5s pour coordonner l'attaque de vos alliés"
+                >
+                  <span
+                    class="text-base group-hover:scale-110 transition-transform"
+                    >⏱️</span
+                  >
+                  <span class="text-xs font-bold leading-tight mt-0.5"
+                    >Assaut (5s)</span
+                  >
+                  <span class="text-[9px] text-red-300/80">Coordonné</span>
+                </button>
+
+                <!-- 2. Placer une prime -->
+                <button
+                  type="button"
+                  @click=${(e: MouseEvent) => {
+                    e.stopPropagation();
+                    this.bountySelectorOpen = !this.bountySelectorOpen;
+                    this.requestUpdate();
+                  }}
+                  class="group flex flex-col items-center justify-center p-2 rounded-xl bg-amber-950/40 border border-amber-500/40 hover:bg-amber-900/50 hover:border-amber-400 text-amber-200 transition-all duration-150 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+                  title="Mettre une prime en Capsules sur la tête de ce joueur"
+                >
+                  <span
+                    class="text-base group-hover:scale-110 transition-transform"
+                    >🎯</span
+                  >
+                  <span class="text-xs font-bold leading-tight mt-0.5">
+                    ${bounty ? `Prime: ${bounty.amount}🪙` : "Prime (Caps)"}
+                  </span>
+                  <span class="text-[9px] text-amber-300/80">
+                    ${bounty ? "+ Augmenter" : "Mettre à prix"}
+                  </span>
+                </button>
+
+                <!-- 3. Pacte de Non-Agression (PNA) -->
+                ${pna.active
+                  ? html`
+                      <button
+                        type="button"
+                        @click=${(e: MouseEvent) => {
+                          e.stopPropagation();
+                          tacticalInteractions.breakPna(otherId, this.eventBus);
+                          this.requestUpdate();
+                        }}
+                        class="group flex flex-col items-center justify-center p-2 rounded-xl bg-rose-950/50 border border-rose-500/60 hover:bg-rose-900/70 text-rose-200 transition-all duration-150 animate-pulse"
+                        title="Rompre la trêve immédiatement"
+                      >
+                        <span
+                          class="text-base group-hover:scale-110 transition-transform"
+                          >🚨</span
+                        >
+                        <span class="text-xs font-bold leading-tight mt-0.5"
+                          >Rompre PNA</span
+                        >
+                        <span class="text-[9px] text-rose-300 font-mono"
+                          >${pna.formatted}</span
+                        >
+                      </button>
+                    `
+                  : html`
+                      <button
+                        type="button"
+                        @click=${(e: MouseEvent) => {
+                          e.stopPropagation();
+                          tacticalInteractions.proposePna(
+                            other,
+                            my,
+                            this.eventBus,
+                            180,
+                          );
+                          this.requestUpdate();
+                        }}
+                        class="group flex flex-col items-center justify-center p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 hover:bg-emerald-900/50 hover:border-emerald-400 text-emerald-200 transition-all duration-150 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                        title="Proposer une trêve diplomatique temporaire de 3 minutes"
+                      >
+                        <span
+                          class="text-base group-hover:scale-110 transition-transform"
+                          >📜</span
+                        >
+                        <span class="text-xs font-bold leading-tight mt-0.5"
+                          >Trêve (PNA)</span
+                        >
+                        <span class="text-[9px] text-emerald-300/80"
+                          >3 minutes</span
+                        >
+                      </button>
+                    `}
+              </div>
+
+              <!-- Bounty Quick Selector Drawer -->
+              ${this.bountySelectorOpen
+                ? html`
+                    <div
+                      class="mt-1 p-3 rounded-xl bg-zinc-800/95 border border-amber-500/50 shadow-xl flex flex-col gap-2"
+                    >
+                      <div
+                        class="flex items-center justify-between text-xs font-bold text-amber-300"
+                      >
+                        <span class="flex items-center gap-1">
+                          <span>🎯</span>
+                          <span
+                            >CONTRAT DE CHASSE : ${other.displayName()}</span
+                          >
+                        </span>
+                        <span class="text-[11px] text-zinc-300 font-mono">
+                          Dispo :
+                          <span class="text-yellow-400 font-bold"
+                            >${myCaps} 🪙</span
+                          >
+                        </span>
+                      </div>
+                      <p class="text-[11.5px] text-zinc-300 leading-snug">
+                        Sélectionnez le montant de Capsules à placer sur sa tête.
+                        Le commandant qui le terrassera empochera la prime !
+                      </p>
+                      <div class="grid grid-cols-4 gap-1.5 mt-0.5">
+                        ${[100, 250, 500, 1000].map(
+                          (amt) => html`
+                            <button
+                              type="button"
+                              ?disabled=${myCaps < amt}
+                              @click=${(e: MouseEvent) => {
+                                e.stopPropagation();
+                                const ok = tacticalInteractions.placeBounty(
+                                  other,
+                                  my,
+                                  amt,
+                                  this.eventBus,
+                                );
+                                if (ok) {
+                                  this.bountySelectorOpen = false;
+                                  this.requestUpdate();
+                                }
+                              }}
+                              class="py-2 px-1 rounded-lg border font-bold text-xs flex flex-col items-center transition-all ${myCaps >=
+                              amt
+                                ? "bg-amber-500/20 hover:bg-amber-500/35 border-amber-500/50 text-amber-200 active:scale-95"
+                                : "bg-zinc-800 border-zinc-700 text-zinc-500 cursor-not-allowed opacity-60"}"
+                            >
+                              <span>+${amt}</span>
+                              <span class="text-[10px] text-yellow-400"
+                                >🪙 Caps</span
+                              >
+                            </button>
+                          `,
+                        )}
+                      </div>
+                      <div class="flex justify-end mt-1">
+                        <button
+                          type="button"
+                          @click=${(e: MouseEvent) => {
+                            e.stopPropagation();
+                            this.bountySelectorOpen = false;
+                            this.requestUpdate();
+                          }}
+                          class="text-[11px] text-zinc-400 hover:text-white px-2 py-1"
+                        >
+                          Fermer
+                        </button>
+                      </div>
+                    </div>
+                  `
+                : ""}
+            `}
       </div>
     `;
   }

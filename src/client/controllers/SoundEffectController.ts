@@ -7,6 +7,7 @@ import { GameUpdateType } from "@openfront/engine-api/game/GameUpdates";
 import { EventBus } from "@openfront/shared/EventBus";
 import { Controller } from "../Controller";
 import { PlaySoundEffectEvent, SoundEffect } from "../sound/Sounds";
+import { tacticalInteractions } from "../TacticalInteractionManager";
 import { SendSpawnIntentEvent } from "../Transport";
 import { GameView, UnitView } from "../view";
 
@@ -89,6 +90,13 @@ export class SoundEffectController implements Controller {
     const myPlayer = this.game.myPlayer();
     if (myPlayer === null) return;
     for (const c of updates[GameUpdateType.ConquestEvent] ?? []) {
+      // Check if conquered player had an active tactical bounty
+      try {
+        tacticalInteractions.checkConquest(c.conquerorId, c.conqueredId, this.game, this.eventBus);
+      } catch (err) {
+        console.warn("Bounty check error:", err);
+      }
+
       if (c.conquerorId === myPlayer.id()) {
         // Battle cue for conquering a real player; the ka-ching payout
         // stays for bots and nations.
