@@ -20,6 +20,7 @@ import { isPreviewableCosmetic } from "./components/CosmeticPreviewBubble";
 import "./components/CosmeticPreviewModal";
 import "./components/CurrencyDisplay";
 import "./components/CustomCurrencyCard";
+import "./components/CustomSkinStudio";
 import "./components/EffectsGrid";
 import type { InlineCheckout } from "./components/InlineCheckout";
 import "./components/NotLoggedInWarning";
@@ -61,6 +62,7 @@ function formatUsdCents(cents: number): string {
 type StoreTab =
   | "cosmetics"
   | "bundles"
+  | "custom_skin"
   | "season_pass"
   | "effects"
   | "packs"
@@ -126,6 +128,7 @@ export class StoreModal extends BaseModal {
     return {
       tabs: [
         { key: "bundles", label: "⭐ Offres & Bundles" },
+        { key: "custom_skin", label: "🎨 Forge de Skin" },
         { key: "season_pass", label: "🎖️ Pass de Saison" },
         { key: "packs", label: "☢️ Plutonium & Caisses" },
         { key: "cosmetics", label: translateText("store.cosmetics") },
@@ -891,7 +894,7 @@ export class StoreModal extends BaseModal {
                   : ""}
               </div>
               <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                Avantages exclusifs en jeu : <strong>Pseudo doré et badge VIP</strong> dans tous les salons et le chat, <strong>+25% de Caps</strong> sur chaque partie, <strong>+2 XP bonus</strong>, hébergement de salons privés sans restriction et création de clan offerte.
+                Avantages exclusifs en jeu : <strong>Forge de skin personnalisé offerte</strong>, <strong>Pseudo doré et badge VIP</strong>, <strong>+25% de Caps</strong> sur chaque partie, <strong>+2 XP bonus</strong> et hébergement de salons privés sans restriction.
               </p>
             </div>
             <div class="shrink-0 w-full md:w-auto">
@@ -901,6 +904,42 @@ export class StoreModal extends BaseModal {
                 class="w-full md:w-56 cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 py-3 text-xs font-black uppercase tracking-wider text-slate-950 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-1.5"
               >
                 <span>${commanderStore.isVipActive() ? "Prolonger (+30 Jours) · 2,99 €" : "Devenir VIP · 2,99 € / mois"}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- NOUVEAU MODULE : FORGE DE SKIN PERSONNALISÉ -->
+          <div
+            class="col-span-full rounded-2xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 via-slate-900/90 to-purple-950/40 p-5 shadow-xl flex flex-col md:flex-row items-center justify-between gap-5"
+          >
+            <div class="space-y-1.5 text-center md:text-left">
+              <div class="flex items-center justify-center md:justify-start gap-2">
+                <span class="text-2xl">🎨</span>
+                <span class="text-sm font-black uppercase tracking-wider text-cyan-300">
+                  Pass Forge de Skin de Territoire Personnalisé (3,99 €)
+                </span>
+                <span class="rounded bg-cyan-400 text-slate-950 text-[10px] font-black px-2 py-0.5 uppercase tracking-widest">
+                  NOUVEAU
+                </span>
+              </div>
+              <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                Importez <strong>votre propre image, logo ou photo</strong> pour remplacer les motifs standards du jeu. Votre skin sera projeté sur votre territoire et <strong>visible par tous les joueurs</strong> en multijoueur ! <em>(Également inclus gratuitement avec l'abonnement VIP)</em>
+              </p>
+            </div>
+            <div class="shrink-0 flex flex-col sm:flex-row gap-2.5 w-full md:w-auto">
+              <button
+                type="button"
+                @click=${() => this.setActiveTab("custom_skin")}
+                class="w-full md:w-44 cursor-pointer rounded-xl bg-slate-800 hover:bg-slate-700 border border-cyan-400/50 py-3 text-xs font-black uppercase tracking-wider text-cyan-300 transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <span>Ouvrir l'Atelier 🎨</span>
+              </button>
+              <button
+                type="button"
+                @click=${() => this.handleBuyStripeBundle("custom_skin_pass")}
+                class="w-full md:w-48 cursor-pointer rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 py-3 text-xs font-black uppercase tracking-wider text-white transition-all shadow-lg active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <span>Acheter le Pass · 3,99 €</span>
               </button>
             </div>
           </div>
@@ -1150,7 +1189,7 @@ export class StoreModal extends BaseModal {
                   : ""}
               </div>
               <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                Avantages exclusifs en jeu : <strong>Pseudo doré et badge VIP</strong> dans tous les salons et le chat, <strong>+25% de Caps</strong> sur chaque partie, <strong>+2 XP bonus</strong>, hébergement de salons privés sans restriction et création de clan offerte.
+                Avantages exclusifs en jeu : <strong>Forge de skin personnalisé offerte</strong>, <strong>Pseudo doré et badge VIP</strong>, <strong>+25% de Caps</strong> sur chaque partie, <strong>+2 XP bonus</strong> et hébergement de salons privés sans restriction.
               </p>
             </div>
             <div class="shrink-0 w-full md:w-auto">
@@ -1160,6 +1199,42 @@ export class StoreModal extends BaseModal {
                 class="w-full md:w-56 cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 py-3 text-xs font-black uppercase tracking-wider text-slate-950 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-1.5"
               >
                 <span>${commanderStore.isVipActive() ? "Prolonger (+30 Jours) · 2,99 €" : "Devenir VIP · 2,99 € / mois"}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- NOUVEAU MODULE : FORGE DE SKIN PERSONNALISÉ -->
+          <div
+            class="col-span-full rounded-2xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 via-slate-900/90 to-purple-950/40 p-5 shadow-xl flex flex-col md:flex-row items-center justify-between gap-5"
+          >
+            <div class="space-y-1.5 text-center md:text-left">
+              <div class="flex items-center justify-center md:justify-start gap-2">
+                <span class="text-2xl">🎨</span>
+                <span class="text-sm font-black uppercase tracking-wider text-cyan-300">
+                  Pass Forge de Skin de Territoire Personnalisé (3,99 €)
+                </span>
+                <span class="rounded bg-cyan-400 text-slate-950 text-[10px] font-black px-2 py-0.5 uppercase tracking-widest">
+                  NOUVEAU
+                </span>
+              </div>
+              <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                Importez <strong>votre propre image, logo ou photo</strong> pour remplacer les motifs standards du jeu. Votre skin sera projeté sur votre territoire et <strong>visible par tous les joueurs</strong> en multijoueur ! <em>(Également inclus gratuitement avec l'abonnement VIP)</em>
+              </p>
+            </div>
+            <div class="shrink-0 flex flex-col sm:flex-row gap-2.5 w-full md:w-auto">
+              <button
+                type="button"
+                @click=${() => this.setActiveTab("custom_skin")}
+                class="w-full md:w-44 cursor-pointer rounded-xl bg-slate-800 hover:bg-slate-700 border border-cyan-400/50 py-3 text-xs font-black uppercase tracking-wider text-cyan-300 transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <span>Ouvrir l'Atelier 🎨</span>
+              </button>
+              <button
+                type="button"
+                @click=${() => this.handleBuyStripeBundle("custom_skin_pass")}
+                class="w-full md:w-48 cursor-pointer rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 py-3 text-xs font-black uppercase tracking-wider text-white transition-all shadow-lg active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <span>Acheter le Pass · 3,99 €</span>
               </button>
             </div>
           </div>
@@ -1232,6 +1307,8 @@ export class StoreModal extends BaseModal {
         return this.renderCosmeticsPanel();
       case "bundles":
         return this.renderBundleGrid();
+      case "custom_skin":
+        return html`<custom-skin-studio></custom-skin-studio>`;
       case "season_pass":
         return this.renderSeasonPassSection();
       case "effects":

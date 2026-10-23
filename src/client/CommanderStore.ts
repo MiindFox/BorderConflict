@@ -41,6 +41,9 @@ export interface CommanderProfile {
   vipUntil?: number;
   hasBattlePass?: boolean;
   battlePassSeason?: number;
+  hasCustomSkinUnlocked?: boolean;
+  customSkinUrl?: string;
+  customSkinName?: string;
 }
 
 interface StoredEmailAccount {
@@ -464,6 +467,35 @@ class CommanderStore {
 
   hasSeasonPass(): boolean {
     return !!this.profile.hasBattlePass;
+  }
+
+  hasCustomSkinUnlocked(): boolean {
+    if (this.isVipActive()) return true;
+    return !!this.profile.hasCustomSkinUnlocked;
+  }
+
+  getCustomSkinUrl(): string | null {
+    return this.profile.customSkinUrl || null;
+  }
+
+  getCustomSkinName(): string | null {
+    return this.profile.customSkinName || null;
+  }
+
+  setCustomSkin(url: string, name: string) {
+    this.profile.customSkinUrl = url;
+    this.profile.customSkinName = name;
+    this.profile.hasCustomSkinUnlocked = true;
+    if (!this.profile.ownedFlares.includes("skin:*")) {
+      this.profile.ownedFlares.push("skin:*");
+    }
+    if (!this.profile.ownedFlares.includes(`skin:${name}`)) {
+      this.profile.ownedFlares.push(`skin:${name}`);
+    }
+    this.save();
+    window.dispatchEvent(
+      new CustomEvent(COMMANDER_UPDATED_EVENT, { detail: this.getProfile() }),
+    );
   }
 
   recordMatchPlayed(won: boolean, durationSeconds: number): {

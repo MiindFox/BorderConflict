@@ -494,6 +494,34 @@ export class InventoryModal extends BaseModal {
     );
     const equippedKey = this.equippedSkin()?.key;
     return html`
+      <!-- Custom Skin Studio Callout -->
+      <div class="mb-3 rounded-2xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 via-slate-900/90 to-purple-950/40 p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🎨</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-black uppercase text-cyan-300">Skin de Territoire Personnalisé</span>
+              ${commanderStore.hasCustomSkinUnlocked()
+                ? html`<span class="rounded bg-emerald-500/20 border border-emerald-400/40 px-1.5 py-0.2 text-[9px] font-black text-emerald-300 uppercase">Actif</span>`
+                : html`<span class="rounded bg-cyan-400 text-slate-950 px-1.5 py-0.2 text-[9px] font-black uppercase">Nouveau</span>`}
+            </div>
+            <p class="text-[11px] text-slate-300 mt-0.5">
+              Importez votre propre logo ou image pour l'afficher sur vos territoires en jeu.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          @click=${() => {
+            this.close();
+            window.location.hash = "#modal=store&tab=custom_skin";
+          }}
+          class="shrink-0 cursor-pointer rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 px-4 py-2 text-xs font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 flex items-center gap-1.5"
+        >
+          <span>Ouvrir l'Atelier 🎨</span>
+        </button>
+      </div>
+
       ${this.hasOwnedCatalogItem(["pattern", "skin"])
         ? null
         : this.renderEmptyState("skins")}

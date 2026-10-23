@@ -40,7 +40,8 @@ const log = logger.child({ comp: "m" });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.json());
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
 // Serve the shared app shell for the root document.
 app.use(async (req, res, next) => {
@@ -219,6 +220,13 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
       description: "1 700 Plutonium pour la boutique et les caisses",
       priceCents: 699, // 6.99 EUR
     },
+
+    // Module Forge de Skin de Territoire Personnalisé
+    custom_skin_pass: {
+      name: "Pass Forge de Skin de Territoire Personnalisé",
+      description: "Débloque la création, l'importation illimitée d'images et l'équipement de votre propre skin de territoire en jeu",
+      priceCents: 399, // 3.99 EUR
+    },
   };
 
   const item = bundleDefinitions[bundleId];
@@ -320,6 +328,19 @@ app.post("/api/account/sync", (req, res) => {
     return res.status(400).json({ ok: false, error: result.error });
   }
   return res.json({ ok: true, profile: result.profile });
+});
+
+// Custom Territory Skin Upload
+app.post("/api/custom-skin/upload", (req, res) => {
+  const { email, imageBase64, publicId } = req.body || {};
+  if (!imageBase64) {
+    return res.status(400).json({ ok: false, error: "Image requise." });
+  }
+  const result = accountDb.saveCustomSkin(email || "", imageBase64, publicId || "cmd");
+  if (!result.ok) {
+    return res.status(400).json({ ok: false, error: result.error });
+  }
+  return res.json({ ok: true, skinUrl: result.skinUrl });
 });
 
 app.get("/api/public/player/:publicId", (req, res) => {

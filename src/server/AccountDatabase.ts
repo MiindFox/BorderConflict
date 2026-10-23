@@ -293,6 +293,11 @@ class AccountDatabase {
       addPlutonium = 600;
     } else if (bundleId === "plutonium_1700") {
       addPlutonium = 1700;
+    } else if (bundleId === "custom_skin_pass") {
+      current.hasCustomSkinUnlocked = true;
+      addPlutonium = 100;
+      addCaps = 2000;
+      addFlares.push("skin:*");
     }
 
     current.plutonium = (current.plutonium || 0) + addPlutonium;
@@ -700,6 +705,73 @@ class AccountDatabase {
       dominationSummary: Object.values(dominationMap).sort((a, b) => b.count - a.count),
       recentActivity,
     };
+  }
+
+  public saveCustomSkin(
+    emailRaw: string,
+    imageBase64: string,
+    publicId: string
+  ): { ok: boolean; error?: string; skinUrl?: string } {
+    const email = emailRaw ? emailRaw.trim().toLowerCase() : "";
+    let account = email ? this.db[email] : null;
+
+    if (!account) {
+      for (const acc of Object.values(this.db)) {
+        if (`cmd-${acc.username}` === publicId || acc.username === publicId) {
+          account = acc;
+          break;
+        }
+      }
+    }
+
+    const current = account?.profile || {};
+    const isVip = current.isVip && current.vipUntil && current.vipUntil > Date.now();
+    const hasUnlocked = current.hasCustomSkinUnlocked || isVip;
+
+    if (account && !hasUnlocked) {
+      if ((current.plutonium || 0) >= 750) {
+        current.plutonium -= 750;
+        current.hasCustomSkinUnlocked = true;
+      } else {
+        return {
+          ok: false,
+          error: "Débloquez la Forge de Skin (3,99 € ou 750 Plutonium, ou devenez VIP) pour sauvegarder votre skin.",
+        };
+      }
+    }
+
+    try {
+      const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64Data, "base64");
+
+      const customSkinsDir = path.join(process.cwd(), "static", "skins", "custom");
+      if (!fs.existsSync(customSkinsDir)) {
+        fs.mkdirSync(customSkinsDir, { recursive: true });
+      }
+
+      const safeId = (publicId || account?.username || "commander").replace(/[^a-zA-Z0-9_-]/g, "_");
+      const filename = `skin_${safeId}.png`;
+      const filePath = path.join(customSkinsDir, filename);
+      fs.writeFileSync(filePath, buffer);
+
+      const skinUrl = `/static/skins/custom/${filename}`;
+      if (account) {
+        current.customSkinUrl = skinUrl;
+        current.customSkinName = `custom_${safeId}`;
+        current.hasCustomSkinUnlocked = true;
+        current.ownedFlares = Array.from(
+          new Set([...(current.ownedFlares || []), "skin:*", `skin:${current.customSkinName}`])
+        );
+        account.profile = current;
+        account.updatedAt = Date.now();
+        this.save();
+      }
+
+      return { ok: true, skinUrl };
+    } catch (e: any) {
+      console.error("saveCustomSkin error:", e);
+      return { ok: false, error: "Erreur lors de la sauvegarde de l'image." };
+    }
   }
 }
 

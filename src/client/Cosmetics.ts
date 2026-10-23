@@ -1578,22 +1578,29 @@ export async function getPlayerCosmeticsRefs(
   let skinName = userSettings.getSelectedSkinName() ?? undefined;
   let skinDenied = false;
   if (skinName) {
-    const skin = cosmetics?.skins?.[skinName];
-    if (!skin) {
-      skinName = undefined;
-      if (cosmetics) {
+    if (skinName.startsWith("custom_")) {
+      if (!commanderStore.hasCustomSkinUnlocked()) {
+        skinName = undefined;
         skinDenied = true;
       }
     } else {
-      if (userMe) {
-        const flares = userMe.player.flares ?? [];
-        const hasWildcard = flares.includes("skin:*");
-        if (!hasWildcard && !flares.includes(`skin:${skin.name}`)) {
-          skinName = undefined;
+      const skin = cosmetics?.skins?.[skinName];
+      if (!skin) {
+        skinName = undefined;
+        if (cosmetics) {
           skinDenied = true;
         }
       } else {
-        skinName = undefined;
+        if (userMe) {
+          const flares = userMe.player.flares ?? [];
+          const hasWildcard = flares.includes("skin:*");
+          if (!hasWildcard && !flares.includes(`skin:${skin.name}`)) {
+            skinName = undefined;
+            skinDenied = true;
+          }
+        } else {
+          skinName = undefined;
+        }
       }
     }
     if (skinDenied) {
@@ -1695,10 +1702,18 @@ export async function getPlayerCosmetics(
     }
   }
 
-  if (refs.skinName && cosmetics) {
-    const skin = cosmetics.skins?.[refs.skinName];
-    if (skin) {
-      result.skin = { name: refs.skinName, url: skin.url };
+  if (refs.skinName) {
+    if (refs.skinName.startsWith("custom_")) {
+      const customUrl = commanderStore.getCustomSkinUrl();
+      result.skin = {
+        name: refs.skinName,
+        url: customUrl || `/static/skins/custom/${refs.skinName.replace("custom_", "skin_")}.png`,
+      };
+    } else if (cosmetics) {
+      const skin = cosmetics.skins?.[refs.skinName];
+      if (skin) {
+        result.skin = { name: refs.skinName, url: skin.url };
+      }
     }
   }
 
