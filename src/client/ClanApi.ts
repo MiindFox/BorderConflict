@@ -130,6 +130,18 @@ export async function fetchClanLeaderboard(): Promise<
   }
 }
 
+export async function fetchClanConquestMap(): Promise<any> {
+  try {
+    const res = await fetch("/api/clans/conquest-map");
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn("fetchClanConquestMap: request failed", err);
+  }
+  return null;
+}
+
 const CLAN_BROWSE_SEED_KEY = "clanBrowseSeed";
 
 // Seeds the browse list's default shuffle. Signed in, the public id, so the

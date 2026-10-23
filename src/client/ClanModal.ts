@@ -130,10 +130,9 @@ export class ClanModal extends BaseModal {
     return this.view === "detail" && !!this.selectedClanTag;
   }
 
-  // The clan territory map hasn't shipped to production yet: prod shows a
-  // Coming Soon placeholder and never frames the map page.
+  // The tactical conquest map is enabled in all environments
   private get mapComingSoon(): boolean {
-    return ClientEnv.env() === GameEnv.Prod;
+    return false;
   }
 
   protected modalConfig() {

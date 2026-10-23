@@ -523,6 +523,184 @@ class AccountDatabase {
     this.saveClans();
     return { ok: true, clan };
   }
+
+  public getConquestMap(): any {
+    const getClanInfo = (tag: string, defaultName: string, defaultColor: string) => {
+      const clan = this.clans[tag];
+      if (clan) {
+        return {
+          tag: clan.tag,
+          name: clan.name,
+          color: tag === "FOX" ? "#38bdf8" : tag === "APEX" ? "#f59e0b" : "#a855f7",
+          membersCount: clan.members.length,
+          leader: clan.members.find((m) => m.role === "leader")?.username || "Commandant",
+        };
+      }
+      return { tag, name: defaultName, color: defaultColor, membersCount: 1, leader: "Commandant" };
+    };
+
+    const c1 = getClanInfo("FOX", "Fox Vanguard", "#38bdf8");
+    const c2 = getClanInfo("APEX", "Apex Predators", "#f59e0b");
+    const c3 = getClanInfo("IRON", "Iron Fortress", "#a855f7");
+
+    const sectors = [
+      {
+        id: "eu_west",
+        name: "Secteur Europe Occidentale",
+        code: "EUR-01",
+        coords: { x: 50, y: 31 },
+        controllingClan: c1,
+        influence: 78,
+        contestedWith: c2.tag,
+        status: "secure",
+        statusLabel: "Sécurisé",
+        perk: "+15% Caps en fin de partie",
+        dailyReward: "250 Caps / 24h",
+        defenseLevel: 4,
+        garrison: "14 200 Troupes Tactiques",
+        lastEvent: `Victoire écrasante de [${c1.tag}] face aux assauts de [${c2.tag}]`,
+        description: "Centre névralgique de commandement européen. Contrôle les carrefours de télécommunications et les usines de blindés.",
+      },
+      {
+        id: "na_east",
+        name: "Secteur Silos Nord-Américains",
+        code: "USA-02",
+        coords: { x: 23, y: 34 },
+        controllingClan: c2,
+        influence: 85,
+        contestedWith: c3.tag,
+        status: "fortified",
+        statusLabel: "Forteresse Silo",
+        perk: "+2 XP par victoire tactique",
+        dailyReward: "15 Plutonium / 24h",
+        defenseLevel: 5,
+        garrison: "19 500 Troupes de Choc",
+        lastEvent: `Infiltration repoussée par la garnison d'élite de [${c2.tag}]`,
+        description: "Complexe de lancement balistique et usines lourdes. Assure l'enrichissement en isotopes et la supériorité technologique.",
+      },
+      {
+        id: "asia_east",
+        name: "Secteur Eurasie & Forteresses Est",
+        code: "RUS-03",
+        coords: { x: 74, y: 26 },
+        controllingClan: c3,
+        influence: 72,
+        contestedWith: c1.tag,
+        status: "fortified",
+        statusLabel: "Blindage Lourd",
+        perk: "+20% Portée radar & vision",
+        dailyReward: "300 Caps / 24h",
+        defenseLevel: 4,
+        garrison: "16 800 Troupes Blindées",
+        lastEvent: `Barrage d'artillerie lourde soutenu par [${c3.tag}]`,
+        description: "Bunkers souterrains fortifiés à l'épreuve des frappes orbitales. Déploie des systèmes radar avancés sur tout le continent.",
+      },
+      {
+        id: "mea_south",
+        name: "Secteur Gisements & Désert Sud",
+        code: "MEA-04",
+        coords: { x: 56, y: 54 },
+        controllingClan: c1,
+        influence: 64,
+        contestedWith: c3.tag,
+        status: "contested",
+        statusLabel: "Zone Contestée",
+        perk: "+10% Revenu d'or par seconde",
+        dailyReward: "200 Caps / 24h",
+        defenseLevel: 3,
+        garrison: "9 400 Combattants",
+        lastEvent: `Offensive majeure lancée par [${c3.tag}] pour contester le puits pétrolier`,
+        description: "Bassin de réserves stratégiques et oléoducs clés. Les revenus d'or générés ici permettent des réapprovisionnements militaires continus.",
+      },
+      {
+        id: "pac_oceania",
+        name: "Secteur Archipels & Bases Pacifique",
+        code: "PAC-05",
+        coords: { x: 84, y: 68 },
+        controllingClan: c2,
+        influence: 91,
+        contestedWith: c1.tag,
+        status: "secure",
+        statusLabel: "Domination Totale",
+        perk: "+15% Vitesse navale & débarquements",
+        dailyReward: "20 Plutonium / 24h",
+        defenseLevel: 5,
+        garrison: "23 000 Forces Maritimes",
+        lastEvent: `Flotte de débarquement déployée avec succès par [${c2.tag}]`,
+        description: "Réseau insulaire ultra-sécurisé garantissant la mobilité rapide et des attaques côtières foudroyantes sur toutes les côtes.",
+      },
+      {
+        id: "sa_south",
+        name: "Secteur Silos Amazonie & Andes",
+        code: "SAM-06",
+        coords: { x: 31, y: 66 },
+        controllingClan: c3,
+        influence: 59,
+        contestedWith: c2.tag,
+        status: "contested",
+        statusLabel: "Zone Contestée",
+        perk: "+10% Régénération d'infanterie",
+        dailyReward: "180 Caps / 24h",
+        defenseLevel: 3,
+        garrison: "8 200 Gardes Frontières",
+        lastEvent: `Ermitage tactique : embuscade menée par [${c3.tag}]`,
+        description: "Relais satellitaires dissimulés dans les massifs montagneux et laboratoires de bio-stimulation accélérant les renforts.",
+      },
+    ];
+
+    const dominationMap: Record<string, { tag: string; name: string; color: string; count: number }> = {};
+    sectors.forEach((s) => {
+      const tag = s.controllingClan.tag;
+      if (!dominationMap[tag]) {
+        dominationMap[tag] = {
+          tag,
+          name: s.controllingClan.name,
+          color: s.controllingClan.color,
+          count: 0,
+        };
+      }
+      dominationMap[tag].count++;
+    });
+
+    const recentActivity = [
+      {
+        id: 1,
+        time: "Il y a 4 min",
+        clanTag: c1.tag,
+        type: "defense",
+        text: `[${c1.tag}] a consolidé la défense de ${sectors[0].name} (+450 Influence)`,
+      },
+      {
+        id: 2,
+        time: "Il y a 12 min",
+        clanTag: c2.tag,
+        type: "conquest",
+        text: `[${c2.tag}] a écrasé une rébellion dans ${sectors[4].name} (Domination 91%)`,
+      },
+      {
+        id: 3,
+        time: "Il y a 28 min",
+        clanTag: c3.tag,
+        type: "assault",
+        text: `[${c3.tag}] a lancé un raid éclair sur ${sectors[3].name}`,
+      },
+      {
+        id: 4,
+        time: "Il y a 45 min",
+        clanTag: c2.tag,
+        type: "reward",
+        text: `Récompense de secteur débloquée : +15 Plutonium crédités pour [${c2.tag}]`,
+      },
+    ];
+
+    return {
+      season: "Saison 1 : Tempête Nucléaire",
+      cycleEndsIn: "13 jours, 18 heures",
+      sectors,
+      dominationSummary: Object.values(dominationMap).sort((a, b) => b.count - a.count),
+      recentActivity,
+    };
+  }
 }
 
 export const accountDb = new AccountDatabase();

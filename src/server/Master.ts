@@ -343,6 +343,14 @@ app.get("/api/public/clans/leaderboard", (_req, res) => {
   return res.json(accountDb.getClanLeaderboard());
 });
 
+app.get("/api/clans/conquest-map", (_req, res) => {
+  return res.json(accountDb.getConquestMap());
+});
+
+app.get("/api/public/clans/conquest-map", (_req, res) => {
+  return res.json(accountDb.getConquestMap());
+});
+
 // Centralized Clans Endpoints
 app.get("/api/clans", (req, res) => {
   const filter = typeof req.query.filter === "string" ? req.query.filter : "all";
