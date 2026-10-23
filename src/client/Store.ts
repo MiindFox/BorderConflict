@@ -917,9 +917,6 @@ export class StoreModal extends BaseModal {
         gridClass: "flex flex-wrap gap-4 justify-center",
         cardClass: "w-[calc(50%-0.5rem)] sm:w-48",
         previewSize: "detail",
-        trailingContent: html`<custom-currency-card
-          class="w-[calc(50%-0.5rem)] sm:w-48"
-        ></custom-currency-card>`,
       })}
     `;
   }
