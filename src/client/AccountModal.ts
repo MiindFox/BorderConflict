@@ -1187,12 +1187,12 @@ export class AccountModal extends BaseModal {
 
     const result =
       this.authMode === "register"
-        ? commanderStore.registerWithEmail(
+        ? await commanderStore.registerWithEmail(
             this.email,
             this.password,
             this.usernameField,
           )
-        : commanderStore.loginWithEmail(this.email, this.password);
+        : await commanderStore.loginWithEmail(this.email, this.password);
 
     if (!result.ok) {
       this.authFeedback = {

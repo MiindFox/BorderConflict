@@ -147,9 +147,39 @@ app.get(
   },
 );
 
+import { accountDb } from "./AccountDatabase";
+
 app.use("/api", (_req, res, next) => {
   setNoStoreHeaders(res);
   next();
+});
+
+// Centralized Account & Progression Endpoints
+app.post("/api/account/register", (req, res) => {
+  const { email, password, username } = req.body || {};
+  const result = accountDb.register(email, password, username);
+  if (!result.ok) {
+    return res.status(400).json({ ok: false, error: result.error });
+  }
+  return res.json({ ok: true, profile: result.account?.profile });
+});
+
+app.post("/api/account/login", (req, res) => {
+  const { email, password } = req.body || {};
+  const result = accountDb.login(email, password);
+  if (!result.ok) {
+    return res.status(401).json({ ok: false, error: result.error });
+  }
+  return res.json({ ok: true, profile: result.account?.profile });
+});
+
+app.post("/api/account/sync", (req, res) => {
+  const { email, password, profile } = req.body || {};
+  const result = accountDb.syncProfile(email, password, profile);
+  if (!result.ok) {
+    return res.status(400).json({ ok: false, error: result.error });
+  }
+  return res.json({ ok: true, profile: result.profile });
 });
 
 // Start the master process

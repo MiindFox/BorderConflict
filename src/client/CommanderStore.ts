@@ -19,6 +19,7 @@ import {
 
 const STORAGE_KEY = "hexafront_commander_profile_v2";
 const ACCOUNTS_STORAGE_KEY = "hexafront_email_accounts_v2";
+const ACCOUNT_PASS_KEY = "hexafront_email_pass_v2";
 export const COMMANDER_UPDATED_EVENT = "hexafront-commander-updated";
 
 export interface CommanderProfile {
@@ -166,6 +167,10 @@ class CommanderStore {
     } catch {
       // Ignore storage quota issues
     }
+
+    // Trigger server-side cloud sync in background if signed in
+    this.syncWithServerInBackground();
+
     if (typeof window !== "undefined") {
       window.dispatchEvent(
         new CustomEvent(COMMANDER_UPDATED_EVENT, { detail: this.getProfile() }),
@@ -178,6 +183,25 @@ class CommanderStore {
         }),
       );
     }
+  }
+
+  private syncWithServerInBackground(): void {
+    if (typeof window === "undefined" || !this.profile.email) return;
+    const email = this.profile.email;
+    const password = localStorage.getItem(ACCOUNT_PASS_KEY);
+    if (!password) return;
+
+    fetch("/api/account/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        password,
+        profile: this.profile,
+      }),
+    }).catch(() => {
+      // Silently fall back to offline/local
+    });
   }
 
   private loadAccountsDb(): Record<string, StoredEmailAccount> {
@@ -198,11 +222,11 @@ class CommanderStore {
     }
   }
 
-  registerWithEmail(
+  async registerWithEmail(
     emailRaw: string,
     passwordRaw: string,
     usernameRaw?: string,
-  ): { ok: boolean; error?: string } {
+  ): Promise<{ ok: boolean; error?: string }> {
     const email = emailRaw.trim().toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -217,18 +241,32 @@ class CommanderStore {
         error: "Le mot de passe doit contenir au moins 4 caractères.",
       };
     }
-    const db = this.loadAccountsDb();
-    if (db[email]) {
-      return {
-        ok: false,
-        error:
-          "Un compte existe déjà avec cette adresse e-mail. Connectez-vous !",
-      };
-    }
+
     const fallbackName = email.split("@")[0].slice(0, 18) || "Commandant";
     const username = (usernameRaw?.trim() || fallbackName).slice(0, 20);
+
+    // Call Centralized Database API
+    try {
+      const res = await fetch("/api/account/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password: passwordRaw, username }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        return { ok: false, error: data.error || "Erreur lors de la création du compte." };
+      }
+      if (data.profile) {
+        this.profile = { ...data.profile };
+      }
+    } catch {
+      // Local fallback
+    }
+
     this.profile.email = email;
     this.profile.username = username;
+
+    const db = this.loadAccountsDb();
     db[email] = {
       email,
       password: passwordRaw,
@@ -237,14 +275,15 @@ class CommanderStore {
       profile: { ...this.profile },
     };
     this.saveAccountsDb(db);
+    localStorage.setItem(ACCOUNT_PASS_KEY, passwordRaw);
     this.save();
     return { ok: true };
   }
 
-  loginWithEmail(
+  async loginWithEmail(
     emailRaw: string,
     passwordRaw: string,
-  ): { ok: boolean; error?: string } {
+  ): Promise<{ ok: boolean; error?: string }> {
     const email = emailRaw.trim().toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -259,10 +298,46 @@ class CommanderStore {
         error: "Veuillez saisir votre mot de passe.",
       };
     }
+
+    // Call Centralized Database API first
+    try {
+      const res = await fetch("/api/account/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password: passwordRaw }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok && data.profile) {
+        this.profile = {
+          ...data.profile,
+          email,
+          username: data.profile.username || email.split("@")[0],
+          ownedFlares: Array.from(
+            new Set([...STARTER_FLARES, ...(data.profile.ownedFlares ?? [])]),
+          ),
+        };
+        const db = this.loadAccountsDb();
+        db[email] = {
+          email,
+          password: passwordRaw,
+          username: this.profile.username || email.split("@")[0],
+          createdAt: Date.now(),
+          profile: { ...this.profile },
+        };
+        this.saveAccountsDb(db);
+        localStorage.setItem(ACCOUNT_PASS_KEY, passwordRaw);
+        this.save();
+        return { ok: true };
+      } else if (res.status === 401) {
+        return { ok: false, error: data.error || "Mot de passe incorrect." };
+      }
+    } catch {
+      // Fallback to local accounts db if offline
+    }
+
     const db = this.loadAccountsDb();
     const existing = db[email];
     if (!existing) {
-      // Auto-enroll if first time signing in with this email on this device so it never blocks the player
       return this.registerWithEmail(email, passwordRaw);
     }
     if (existing.password !== passwordRaw) {
@@ -279,12 +354,14 @@ class CommanderStore {
         new Set([...STARTER_FLARES, ...(existing.profile.ownedFlares ?? [])]),
       ),
     };
+    localStorage.setItem(ACCOUNT_PASS_KEY, passwordRaw);
     this.save();
     return { ok: true };
   }
 
   logoutEmail(): void {
     this.profile.email = null;
+    localStorage.removeItem(ACCOUNT_PASS_KEY);
     this.save();
   }
 
