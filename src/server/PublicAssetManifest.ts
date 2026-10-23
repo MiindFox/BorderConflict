@@ -395,6 +395,8 @@ const ROOT_FILE_TYPES: Record<string, string> = {
   "": "text/plain; charset=utf-8",
   ".html": "text/html; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
