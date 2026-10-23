@@ -1,0 +1,1339 @@
+import { GameMapType, GameType } from "@openfront/engine-api/game/GameTypes";
+import { UserMeResponse } from "@openfront/shared/ApiSchemas";
+import { PublicGameInfo, PublicGames } from "@openfront/shared/WireSchemas";
+import { html, LitElement, nothing, type TemplateResult } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { ClientEnv } from "src/client/ClientEnv";
+import { getDesktopSessionState } from "./Auth";
+import "./components/IOSAddToHomeScreenBanner";
+import {
+  canJoinTrustedLobby,
+  lobbyCard,
+  mapAspectRatios,
+  trustLockIcon,
+  trustRequiredDialog,
+  viewerIsSignedIn,
+  viewerIsTrusted,
+} from "./components/LobbyCard";
+import {
+  getDesktopUpdateState,
+  isDesktopShell,
+  multiplayerAllowed,
+  multiplayerAllowedForSession,
+  type DesktopSessionState,
+  type DesktopUpdateState,
+} from "./DesktopShell";
+import { gamePortal } from "./GamePortal";
+import type { HostLobbyModal } from "./HostLobbyModal";
+import { showInGameAlert } from "./InGameModal";
+import type { JoinLobbyModal } from "./JoinLobbyModal";
+import { whenModalLoaded } from "./LazyModals";
+import { PublicLobbySocket } from "./LobbySocket";
+import { JoinLobbyEvent } from "./Main";
+import {
+  backendUnreachableConfirmed,
+  isPinnedToAVersion,
+  MANUAL_RETRY_COOLDOWN_MS,
+  manualRetryAvailable,
+  refreshServerList,
+  retryServerList,
+  type BackendReachabilityDetail,
+} from "./ServerList";
+import type { SinglePlayerModal } from "./SinglePlayerModal";
+import { lastUserMeResponse } from "./UserMeBroadcast";
+import { UsernameInput } from "./UsernameInput";
+import {
+  calculateServerTimeOffset,
+  getGameModeLabel,
+  getGamesPlayed,
+  getSecondsUntilServerTimestamp,
+  reloadForUpdate,
+  renderDuration,
+  showToast,
+  translateText,
+} from "./Utils";
+import { isReplayShellHost } from "./VersionedReplay";
+
+const PRIMARY_ACTION =
+  "bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 border border-cyan-300/35 active:opacity-90 shadow-[0_6px_24px_rgba(6,182,212,0.32)] hover:shadow-[0_8px_32px_rgba(6,182,212,0.5)] hover:-translate-y-0.5 font-extrabold";
+const SECONDARY_ACTION =
+  "bg-slate-900/85 backdrop-blur-xl border border-cyan-500/20 hover:border-cyan-400/60 hover:bg-slate-800/90 active:brightness-[0.95] hover:-translate-y-0.5 shadow-[0_6px_20px_rgba(0,0,0,0.4)] hover:shadow-[0_8px_26px_rgba(6,182,212,0.22)] font-bold";
+const DISABLED = "opacity-50 cursor-not-allowed pointer-events-none";
+/** Tutorial card: the panel's gold, dark text for contrast. */
+const TUTORIAL_ACTION =
+  "bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 border border-amber-200/40 active:opacity-90 !text-slate-950 font-extrabold shadow-[0_6px_20px_rgba(245,158,11,0.28)] hover:-translate-y-0.5";
+
+/** The Tutorial card shows beside Solo until the player has played this many games. */
+const TUTORIAL_CARD_MAX_GAMES = 5;
+
+/**
+ * THE REACHABILITY RULE (OPE-439). Stated once, here; every other call site
+ * in this feature points back at this comment rather than restating it.
+ *
+ * The backend-reachability signal is the health of ONE thing: the server-list
+ * API (`/cluster.json`), as observed by ServerList's heartbeat. It is not a
+ * general "is the internet up" light, and in particular it says nothing about
+ * whether any given GAME server is up.
+ *
+ * So it may gate exactly one category of action: the ones that cannot even
+ * begin without that API answering first, because nothing has yet told the
+ * client which server to talk to.
+ *
+ *   GATED (API-dependent): creating/hosting a lobby, entering matchmaking,
+ *   opening the join-by-code modal. Each has to resolve a server for
+ *   something the client has heard nothing about, so a dead list API really
+ *   does mean the click cannot work. These dim, and refuse with
+ *   reportMultiplayerRefusal.
+ *
+ *   NOT GATED (socket-sourced): anything whose target arrived over a live
+ *   game-server socket -- every card in the public lobby feed, in both the
+ *   homepage selector and the detailed browser -- and every join that reaches
+ *   Main's funnel (shouldBlockJoin). The card's very existence is proof that
+ *   the game server behind it is up and talking to us, which is the only
+ *   liveness that join needs. Refusing there could only ever reject a join
+ *   that is already under way, over the health of an unrelated API. These
+ *   neither dim nor refuse on reachability: they call
+ *   shouldBlockSocketSourcedAction, which is the same predicate with the
+ *   reachability input nailed shut.
+ *
+ * The other two inputs (desktop update state, desktop session state) apply to
+ * both categories, which is why the two predicates differ only in this one
+ * argument.
+ *
+ * ---
+ *
+ * Whether multiplayer should be available given what we know about the
+ * backend.
+ *
+ * The parameter is ServerList.backendUnreachableConfirmed(), NOT the raw
+ * backendReachable(), and the difference is load-bearing. That accessor is
+ * already false for the two states this must never gate:
+ *
+ *   - before the first attempt settles. A page is in that state for its first
+ *     few hundred milliseconds, and gating there would lock every player out
+ *     of multiplayer on every load over a suspicion we have not tested yet.
+ *   - after a single missed heartbeat. The cached list is still serving and
+ *     the next request would very likely have worked; taking the game away
+ *     for a retry interval over one blip is worse than the blip.
+ *
+ * It is also false when the API answered with anything short of a 5xx -- a
+ * 404 for a site with no list is a reachable backend.
+ */
+export function multiplayerAllowedForBackend(backendOutage: boolean): boolean {
+  return !backendOutage;
+}
+
+/**
+ * Whether a multiplayer entry point should refuse to act. Exported for tests
+ * and kept free of component state so the rule is checkable in isolation.
+ * A null update/session means that bridge is absent (the web build), so it
+ * gates nothing; any one of the three alone is enough to block.
+ *
+ * `backendOutage` is the only one of the three that also applies on the web,
+ * which is why it is a required parameter rather than an optional one: an
+ * entry point that forgets to pass it would silently stay ungated, and a
+ * compile error is the cheapest way to notice. Pass
+ * backendUnreachableConfirmed() only from an API-dependent entry point; a
+ * socket-sourced one calls shouldBlockSocketSourcedAction instead, so that
+ * "reachability does not apply here" is a named decision rather than a
+ * `false` literal someone has to interpret.
+ */
+export function shouldBlockMultiplayerAction(
+  update: DesktopUpdateState | null,
+  session: DesktopSessionState | null,
+  backendOutage: boolean,
+): boolean {
+  if (update !== null && !multiplayerAllowed(update)) return true;
+  if (session !== null && !multiplayerAllowedForSession(session)) return true;
+  if (!multiplayerAllowedForBackend(backendOutage)) return true;
+  return false;
+}
+
+/**
+ * Whether the public-lobby feed should be closed rather than kept open.
+ *
+ * A gated desktop session refuses every join the feed could offer, so keeping
+ * the socket open only spends a connection on cards nobody can use and shows
+ * a spinner that never resolves into anything playable. Close it and say
+ * "offline" instead; it reopens when the session comes back.
+ *
+ * Reachability is deliberately NOT an input, by the rule at the top of this
+ * file: the feed is socket-sourced, and the list API's health says nothing
+ * about the game server behind it. The update state is not either -- a
+ * pending update is not "offline".
+ */
+export function lobbyFeedSuspended(
+  session: DesktopSessionState | null,
+): boolean {
+  return session !== null && !multiplayerAllowedForSession(session);
+}
+
+/**
+ * The same gate for an action whose target arrived over a live game-server
+ * socket: a public or hosted lobby card, in either browser, and every join
+ * that reaches Main's funnel (shouldBlockJoin below wraps this).
+ *
+ * Reachability is not an input, by the rule at the top of this file: the card
+ * is in front of the player because a game server sent it over a socket that
+ * is still open, so the server-list API's health cannot make joining it
+ * wrong. The desktop update and session states still apply -- they are
+ * statements about this client, not about any server.
+ *
+ * A function rather than `shouldBlockMultiplayerAction(u, s, false)` at four
+ * call sites so the dimming and the click-through of a given control cannot
+ * drift apart, and so grep finds every place the rule is exercised.
+ */
+export function shouldBlockSocketSourcedAction(
+  update: DesktopUpdateState | null,
+  session: DesktopSessionState | null,
+): boolean {
+  return shouldBlockMultiplayerAction(update, session, false);
+}
+
+/**
+ * Tells the player why a multiplayer action was refused -- and, on the web,
+ * acts as the retry it tells them to make.
+ *
+ * On desktop the status bar is already showing the reason and its remedy, so
+ * the click lands there as a wiggle rather than as a message that would say
+ * the same thing twice. The web has no status bar, so an unreachable backend
+ * would refuse in complete silence -- which reads as a broken button -- and
+ * gets a transient message instead.
+ *
+ * Only reachability needs the web half: every other reason to refuse here is
+ * desktop-only, and on desktop the bar always carries it.
+ *
+ * The refused click also PROBES on the web, and that is the point rather than
+ * a nicety. Desktop has a Retry button; the web has nothing, so without this
+ * the only way out of the gated state is the heartbeat's own next beat --
+ * which backs off to as much as RETRY_MAX_MS once an outage has run a while.
+ * A message reading "try again" over a button where trying again provably did
+ * nothing is worse than no message. So the click the player makes IS the
+ * retry, and the message is true.
+ *
+ * Throttled by ServerList.manualRetryAvailable(), the same policy (and the
+ * same clock) as the desktop button's disabled state: nothing while an
+ * attempt is already out, nothing for MANUAL_RETRY_COOLDOWN_MS after the last
+ * one. A player clicking at an outage gets the message every time and a
+ * request at most every few seconds. Nothing is rendered from the result: a
+ * successful probe flips the reachability signal, which is what un-dims the
+ * buttons -- the feedback is the gate going away.
+ */
+export function reportMultiplayerRefusal(backendOutage: boolean): void {
+  // Optional-call the method rather than dispatching an event: the bar is a
+  // sibling custom element that may not have upgraded yet, and `?.wiggle?.()`
+  // degrades to a silent no-op in that case instead of firing an event with
+  // no listener.
+  (
+    document.querySelector("desktop-status-bar") as
+      | (HTMLElement & { wiggle?: () => void })
+      | null
+  )?.wiggle?.();
+  // Keyed on the shell, not on the element: <desktop-status-bar> is in
+  // index.html on every build and simply renders nothing on the web, so its
+  // presence proves nothing about whether the player can see a reason.
+  if (!isDesktopShell() && backendOutage) {
+    if (manualRetryAvailable()) {
+      retryServerList().catch((err: unknown) => {
+        // retryServerList never rejects; belt and braces, so a change there
+        // cannot surface as an unhandled rejection from a click handler.
+        console.warn("server list retry from a refused click failed", err);
+      });
+    }
+    showToast(translateText("common.backend_unreachable"), "red");
+  }
+}
+
+/**
+ * Whether the multiplayer gate applies to a given join at all. Single-player
+ * runs entirely in-client and a replay simulates from an archived record, so
+ * neither needs a session, an up-to-date build, or a backend that is up.
+ * getTurnstileToken in Main.ts exempts the same pair (alongside two
+ * conditions irrelevant here), and calls this so the two cannot drift.
+ * Exported for tests and kept free of component state, like
+ * shouldBlockMultiplayerAction above.
+ */
+export function joinIsGateable(lobby: JoinLobbyEvent): boolean {
+  return (
+    lobby.gameStartInfo?.config.gameType !== GameType.Singleplayer &&
+    lobby.gameRecord === undefined
+  );
+}
+
+/**
+ * The whole gate decision for one join, as a pure function so it is testable
+ * without mounting Main's client. Main adds only the shell check (which
+ * decides whether the two desktop states are even read) and the refusal
+ * feedback around it. Both halves it does weigh -- the update state and the
+ * session state -- are desktop-only.
+ *
+ * Backend reachability is deliberately NOT an input here -- the rule at the
+ * top of this file, which is why this defers to
+ * shouldBlockSocketSourcedAction. Every source that dispatches a join has
+ * already reached a server to produce it: "private" only after
+ * checkActiveLobby read `exists` from the game's own server, "host" only
+ * after createLobby minted the id, "public" from a lobby list arriving over a
+ * live server socket, and "matchmaking" only after the queue matched and
+ * checkGame confirmed the game exists. The outage signal tracks the separate
+ * server-list API, whose health says nothing about those servers, so refusing
+ * here could only reject a join that is already under way. Worst case it
+ * ejects a player mid-game: a reload during a list-API blip proves the game
+ * is live, then the refusal closes the join modal, which leaves the lobby and
+ * resets the URL.
+ *
+ * The controls one step earlier in the funnel -- the lobby cards in this
+ * component and in DetailedGameViewModal, which are where a "public" join
+ * comes from -- hold to the same rule for the same reason, so a card is
+ * neither dimmed nor refused over a list-API outage.
+ */
+export function shouldBlockJoin(
+  lobby: JoinLobbyEvent,
+  update: DesktopUpdateState | null,
+  session: DesktopSessionState | null,
+): boolean {
+  if (!joinIsGateable(lobby)) return false;
+  return shouldBlockSocketSourcedAction(update, session);
+}
+
+@customElement("game-mode-selector")
+export class GameModeSelector extends LitElement {
+  @state() private activeTab: "ffa" | "team" | "solo" | "ranked" = "ffa";
+  @state() private lobbies: PublicGames | null = null;
+  @state() private inputValid: boolean = true;
+  @state() private desktopUpdateState: DesktopUpdateState | null = null;
+  @state() private viewerTrusted: boolean = false;
+  @state() private viewerSignedIn: boolean = false;
+  @state() private showTrustRequired: boolean = false;
+  @state() private desktopSessionState: DesktopSessionState | null = null;
+  // The DEBOUNCED outage signal, not the raw per-attempt one: see
+  // multiplayerAllowedForBackend for why one missed heartbeat must not dim
+  // these buttons.
+  @state() private backendOutage = false;
+  private serverTimeOffset: number = 0;
+  private defaultLobbyTime: number = 0;
+
+  // True from join-lobby until leave-lobby: the player is waiting in (or
+  // loading into) a lobby. This socket is NOT scoped to the homepage — Main.ts
+  // only stops it when a game actually starts (prestart/join), so it is still
+  // listening during the whole lobby wait.
+  private inLobby = false;
+  // Whether Main wants the feed open at all (false from game start until the
+  // player is back at the menu). Kept apart from the socket's own state so a
+  // session change can close and reopen the feed without forgetting that.
+  private feedWanted = false;
+  // The socket ran out of fast attempts and is only re-dialing slowly;
+  // cleared by the next start() or snapshot.
+  @state() private feedGaveUp = false;
+  // Held for the same cooldown as the other Retry affordances, on this
+  // component's own clock: refreshServerList fires a real request per press
+  // (past its 1s floor), so this is what stops a player leaning on it.
+  @state() private retryCoolingDown = false;
+  private retryCooldownTimer: number | undefined;
+  // An update/drain signal arrived during a lobby wait; prompt on leave-lobby.
+  private updateDeferred = false;
+
+  private lobbySocket = new PublicLobbySocket(
+    (lobbies) => this.handleLobbiesUpdate(lobbies),
+    {
+      onUpdateAvailable: () => this.handleUpdateAvailable(),
+      onGaveUp: () => {
+        // Nothing is loading any more, and cards from a feed that has died
+        // are lobbies the player cannot join.
+        this.feedGaveUp = true;
+        this.lobbies = null;
+      },
+    },
+  );
+
+  private handleUpdateAvailable() {
+    // The desktop shell runs the bundle from a local overlay and updates it
+    // itself (download, stage, then its own reload button, see
+    // DesktopUpdateBar). Reloading here would only re-run the old overlay,
+    // reconnect, and trigger this again until the download finishes.
+    if (isDesktopShell()) return;
+    // A versioned replay shell is pinned to the archived game's build on
+    // purpose (VersionedReplay.ts), but its baked-in serverHost points at a
+    // live deployment running a newer build — so the lobby socket's commit
+    // compare (or a drain signal) fires on every load. "Update" is
+    // meaningless here, and reloading re-serves the same immutable shell,
+    // which would loop the prompt forever.
+    if (isReplayShellHost(window.location.hostname)) return;
+    // A page pinned under /v/<commit>/ is on that build because the game it
+    // opened runs there (redirectToGameVersion), and its build's servers are
+    // draining by definition -- so the lobby feed's drain signal fires on
+    // every load. Reloading would strip the pin, land on latest, and be
+    // re-pinned straight back: the same loop as the replay shell, closed the
+    // same way. Leaving to the menu goes to the version-free root anyway.
+    if (isPinnedToAVersion()) return;
+    // A blocking reload prompt during a lobby wait would eject the player
+    // from a lobby the draining deployment deliberately lets finish — and a
+    // private lobby's members are all pinned to the same deployment, so they
+    // would all be prompted out at once. Defer until they leave the lobby;
+    // if the game starts instead, Main.ts stops this socket, and every exit
+    // from a started game is a full navigation that picks up the new shell
+    // anyway.
+    if (this.inLobby) {
+      this.updateDeferred = true;
+      return;
+    }
+    showInGameAlert(translateText("update_available.message")).then(() => {
+      reloadForUpdate();
+    });
+  }
+
+  createRenderRoot() {
+    return this;
+  }
+
+  // Silent backstop; the buttons are already disabled while input is invalid.
+  private validateUsername(): boolean {
+    const usernameInput = document.querySelector(
+      "username-input",
+    ) as UsernameInput | null;
+    return usernameInput ? usernameInput.canPlay() : true;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.defaultLobbyTime = ClientEnv.gameCreationRate() / 1000;
+    window.addEventListener(
+      "username-validity-change",
+      this.handleValidityChange,
+    );
+    document.addEventListener(
+      "desktop-update-state",
+      this.onDesktopUpdateState,
+    );
+    document.addEventListener("userMeResponse", this.onUserMe);
+    // play-page renders this after Main may already have broadcast.
+    const last = lastUserMeResponse();
+    if (last !== null) this.applyUserMe(last.response);
+    if (isDesktopShell()) {
+      // Seed BOTH from their current values. This element is rendered by
+      // <play-page> on a Lit microtask, so it cannot exist yet when the status
+      // bar dispatches the update bridge's synchronous replay -- without the
+      // seed the update half of the gate stays null and silently never
+      // applies (OPE-396).
+      this.desktopUpdateState = getDesktopUpdateState();
+      this.desktopSessionState = getDesktopSessionState();
+    }
+    // After the session seed above: a shell that already knows it has no
+    // session must not open a feed it will close on the next tick.
+    this.start();
+    document.addEventListener(
+      "desktop-session-state",
+      this.onDesktopSessionState,
+    );
+    // Seeded unconditionally, unlike the two above: the backend is just as
+    // unreachable on the web, and the heartbeat's first attempts often settle
+    // before this element exists (it is started in Main's initialize, we are
+    // rendered by <play-page> later), so the event alone would miss them.
+    this.backendOutage = backendUnreachableConfirmed();
+    document.addEventListener(
+      "backend-reachability",
+      this.onBackendReachability,
+    );
+    document.addEventListener("join-lobby", this.onJoinLobby);
+    document.addEventListener("leave-lobby", this.onLeaveLobby);
+    // Pick up the current value in case username-input validated before us.
+    const usernameInput = document.querySelector(
+      "username-input",
+    ) as UsernameInput | null;
+    if (usernameInput) {
+      this.inputValid = usernameInput.canPlay();
+    }
+  }
+
+  disconnectedCallback() {
+    this.stop();
+    window.clearTimeout(this.retryCooldownTimer);
+    this.retryCoolingDown = false;
+    window.removeEventListener(
+      "username-validity-change",
+      this.handleValidityChange,
+    );
+    document.removeEventListener(
+      "desktop-update-state",
+      this.onDesktopUpdateState,
+    );
+    document.removeEventListener("userMeResponse", this.onUserMe);
+    document.removeEventListener(
+      "desktop-session-state",
+      this.onDesktopSessionState,
+    );
+    document.removeEventListener(
+      "backend-reachability",
+      this.onBackendReachability,
+    );
+    document.removeEventListener("join-lobby", this.onJoinLobby);
+    document.removeEventListener("leave-lobby", this.onLeaveLobby);
+    super.disconnectedCallback();
+  }
+
+  private onJoinLobby = () => {
+    this.inLobby = true;
+  };
+
+  private onLeaveLobby = () => {
+    this.inLobby = false;
+    if (this.updateDeferred) {
+      this.updateDeferred = false;
+      this.handleUpdateAvailable();
+    }
+  };
+
+  private handleValidityChange = (e: Event) => {
+    this.inputValid = (e as CustomEvent).detail?.isValid ?? true;
+  };
+
+  private onDesktopUpdateState = (e: Event) => {
+    this.desktopUpdateState = (e as CustomEvent<DesktopUpdateState>).detail;
+  };
+
+  private onUserMe = (e: Event) => {
+    this.applyUserMe((e as CustomEvent<UserMeResponse | false>).detail);
+  };
+
+  private applyUserMe(me: UserMeResponse | false): void {
+    this.viewerSignedIn = viewerIsSignedIn(me);
+    this.viewerTrusted = viewerIsTrusted(me);
+    // A portal sign-in surfaces as a userMeResponse without a linked
+    // identity, so re-read the SDK profile alongside it.
+    if (gamePortal.isOnGamePortal()) {
+      void gamePortal.getUserProfile().then((user) => {
+        if (user !== null) this.viewerSignedIn = true;
+      });
+    }
+  }
+
+  private onDesktopSessionState = (e: Event) => {
+    const next = (e as CustomEvent<DesktopSessionState>).detail;
+    const wasSuspended = lobbyFeedSuspended(this.desktopSessionState);
+    this.desktopSessionState = next;
+    const suspended = lobbyFeedSuspended(next);
+    if (suspended === wasSuspended || !this.feedWanted) return;
+    if (suspended) {
+      this.closeLobbyFeed();
+    } else {
+      this.feedGaveUp = false;
+      this.lobbySocket.start();
+    }
+  };
+
+  private onBackendReachability = (e: Event) => {
+    this.backendOutage = (
+      e as CustomEvent<BackendReachabilityDetail>
+    ).detail.confirmed;
+  };
+
+  public stop() {
+    this.feedWanted = false;
+    this.lobbySocket.stop();
+  }
+
+  // Also drops the snapshot: a card from a feed we have closed is a lobby the
+  // player cannot join, and the hero slot reads `null` as "show why".
+  private closeLobbyFeed() {
+    this.lobbySocket.stop();
+    this.lobbies = null;
+  }
+
+  /**
+   * Re-open the public-lobby socket after stop().
+   *
+   * connectedCallback() used to be the only caller of lobbySocket.start(),
+   * which was fine while every exit from a started game reloaded the page. It
+   * is not fine for an exit that leaves in place (openInvite, OPE-255): this
+   * element is never disconnected, so connectedCallback never runs again and
+   * the lobby list stayed frozen on whatever it last received.
+   *
+   * Safe to call when already running -- PublicLobbySocket.start() closes any
+   * existing socket before opening a new one -- but callers should still only
+   * use it to undo a stop(), since a needless reconnect drops the cached
+   * snapshot and re-primes the list from the server.
+   */
+  public start() {
+    this.openLobbyFeed();
+  }
+
+  private openLobbyFeed(refreshList = false) {
+    this.feedWanted = true;
+    this.feedGaveUp = false;
+    if (lobbyFeedSuspended(this.desktopSessionState)) {
+      // The session may have dropped while Main had the feed stopped, in
+      // which case the snapshot from before the game is still here and its
+      // cards would render as joinable.
+      this.lobbies = null;
+      return;
+    }
+    this.lobbySocket.start({ refreshList });
+  }
+
+  /**
+   * Whether an empty hero slot should say "offline" instead of spinning. The
+   * feed is closed on a gated session, so nothing is loading; on a confirmed
+   * outage it may still be connecting, but a spinner that the status bar
+   * contradicts reads as broken, and the feed reconnects on its own if the
+   * server answers.
+   */
+  private offlineForLobbies(): boolean {
+    return (
+      lobbyFeedSuspended(this.desktopSessionState) ||
+      this.backendOutage ||
+      this.feedGaveUp
+    );
+  }
+
+  private renderLobbiesUnavailable() {
+    // A gated desktop session has its remedy in the status bar, and the feed
+    // stays closed until it is taken, so a Retry here could only do nothing.
+    const canRetry = !lobbyFeedSuspended(this.desktopSessionState);
+    // "Offline" is only ever said of a gated desktop session. An outage is
+    // our servers not answering, which is not the player being offline.
+    const message = !canRetry
+      ? "mode_selector.offline_lobbies"
+      : this.backendOutage
+        ? "mode_selector.servers_unreachable"
+        : "mode_selector.lobbies_unreachable";
+    return html`
+      <div
+        class="relative flex flex-col items-center justify-center gap-4 h-56 sm:h-72 w-full rounded-2xl bg-gradient-to-br from-slate-950/95 via-slate-900/95 to-slate-950/95 backdrop-blur-xl border border-cyan-500/25 p-6 text-center shadow-[0_12px_36px_rgba(0,0,0,0.5)] overflow-hidden"
+      >
+        <!-- Subtle tactical ambient glow -->
+        <div
+          class="absolute -top-12 -right-12 size-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"
+        ></div>
+        <div
+          class="absolute -bottom-12 -left-12 size-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"
+        ></div>
+
+        <!-- Animated radar disc -->
+        <div class="relative flex items-center justify-center size-14 rounded-2xl bg-slate-900 border border-cyan-400/40 text-2xl shadow-[0_0_20px_rgba(6,182,212,0.25)] shrink-0">
+          <span class="animate-pulse">📡</span>
+          <span class="absolute inset-0 rounded-2xl border border-cyan-400/40 animate-ping opacity-25 pointer-events-none"></span>
+        </div>
+
+        <!-- Typography -->
+        <div class="flex flex-col gap-1 max-w-md z-10">
+          <div class="flex items-center justify-center gap-1.5">
+            <span class="inline-block size-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span class="text-[11px] font-mono font-black uppercase tracking-widest text-amber-300">
+              Serveurs BorderConflict
+            </span>
+          </div>
+          <h4 class="text-sm sm:text-base font-black text-white uppercase tracking-wide">
+            ${translateText(message)}
+          </h4>
+          <p class="text-xs text-slate-300/80 leading-relaxed">
+            Vérifiez votre connexion internet ou relancez la détection du réseau de jeu.
+          </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2.5 flex-wrap justify-center z-10 pt-1">
+          ${canRetry
+            ? html`<button
+                type="button"
+                class="group flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_4px_16px_rgba(6,182,212,0.35)] hover:shadow-[0_6px_24px_rgba(6,182,212,0.55)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer border border-cyan-200/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                ?disabled=${this.retryCoolingDown}
+                @click=${this.retryLobbies}
+              >
+                <span class=${this.retryCoolingDown ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}>🔄</span>
+                <span>${translateText("mode_selector.retry_lobbies")}</span>
+              </button>`
+            : nothing}
+          <button
+            type="button"
+            @click=${() => (this.activeTab = "solo")}
+            class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/15 hover:border-cyan-400/40 text-slate-200 hover:text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-sm"
+          >
+            <span>⚔️</span>
+            <span>Jouer en Solo (IA)</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  private retryLobbies = () => {
+    if (this.retryCoolingDown) return;
+    this.retryCoolingDown = true;
+    this.retryCooldownTimer = window.setTimeout(() => {
+      this.retryCoolingDown = false;
+    }, MANUAL_RETRY_COOLDOWN_MS);
+    // Only a feed that gave up is reopened: one still inside its fast
+    // attempts is already dialing, and restarting it would throw that attempt
+    // away. The socket refreshes the list itself before it dials.
+    if (this.feedGaveUp && this.feedWanted) {
+      this.openLobbyFeed(true);
+      return;
+    }
+    // Shown over a feed that has not given up, this is a confirmed outage,
+    // which only an answer from the list API clears.
+    void refreshServerList();
+  };
+
+  private handleLobbiesUpdate(lobbies: PublicGames) {
+    this.lobbies = lobbies;
+    this.feedGaveUp = false;
+    this.serverTimeOffset = calculateServerTimeOffset(lobbies.serverTime);
+    document.dispatchEvent(
+      new CustomEvent("public-lobbies-update", {
+        detail: { payload: lobbies },
+      }),
+    );
+    this.requestUpdate();
+
+    const allGames = Object.values(lobbies.games ?? {}).flat();
+    for (const game of allGames) {
+      mapAspectRatios.ensure(game.gameConfig?.gameMap as GameMapType, () =>
+        this.requestUpdate(),
+      );
+    }
+  }
+
+  render() {
+    const ffa = this.lobbies?.games?.["ffa"]?.[0];
+    const teams = this.lobbies?.games?.["team"]?.[0];
+    const special = this.lobbies?.games?.["special"]?.[0];
+
+    return html`
+      <div class="flex flex-col gap-3.5 w-full">
+        <ios-add-to-home-screen-banner
+          class="no-game-portal [&:empty]:hidden"
+        ></ios-add-to-home-screen-banner>
+
+        <!-- Modern Tactical Mode Selection Tabs -->
+        <div
+          class="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1.5 rounded-2xl bg-slate-950/90 backdrop-blur-xl border border-cyan-500/25 shadow-lg w-full"
+        >
+          <button
+            type="button"
+            @click=${() => (this.activeTab = "ffa")}
+            class="flex flex-col items-center justify-center gap-1 py-2 sm:py-2.5 px-1.5 rounded-xl text-center transition-all duration-200 cursor-pointer select-none min-h-[58px] ${this
+              .activeTab === "ffa"
+              ? "bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.45)] border border-cyan-300/40 scale-[1.02]"
+              : "bg-slate-900/80 text-slate-200 hover:text-white hover:bg-slate-800/90 border border-white/10 hover:border-cyan-500/30"}"
+          >
+            <span class="text-base sm:text-lg shrink-0 leading-none">🚀</span>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
+              Bataille Royale
+            </span>
+          </button>
+          <button
+            type="button"
+            @click=${() => (this.activeTab = "team")}
+            class="flex flex-col items-center justify-center gap-1 py-2 sm:py-2.5 px-1.5 rounded-xl text-center transition-all duration-200 cursor-pointer select-none min-h-[58px] ${this
+              .activeTab === "team"
+              ? "bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.45)] border border-cyan-300/40 scale-[1.02]"
+              : "bg-slate-900/80 text-slate-200 hover:text-white hover:bg-slate-800/90 border border-white/10 hover:border-cyan-500/30"}"
+          >
+            <span class="text-base sm:text-lg shrink-0 leading-none">🛡️</span>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
+              Équipes
+            </span>
+          </button>
+          <button
+            type="button"
+            @click=${() => (this.activeTab = "solo")}
+            class="flex flex-col items-center justify-center gap-1 py-2 sm:py-2.5 px-1.5 rounded-xl text-center transition-all duration-200 cursor-pointer select-none min-h-[58px] ${this
+              .activeTab === "solo"
+              ? "bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.45)] border border-cyan-300/40 scale-[1.02]"
+              : "bg-slate-900/80 text-slate-200 hover:text-white hover:bg-slate-800/90 border border-white/10 hover:border-cyan-500/30"}"
+          >
+            <span class="text-base sm:text-lg shrink-0 leading-none">⚔️</span>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
+              Solo (IA)
+            </span>
+          </button>
+          <button
+            type="button"
+            @click=${this.openRankedMenu}
+            class="flex flex-col items-center justify-center gap-1 py-2 sm:py-2.5 px-1.5 rounded-xl text-center transition-all duration-200 cursor-pointer relative select-none min-h-[58px] ${this
+              .activeTab === "ranked"
+              ? "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-[0_0_20px_rgba(245,158,11,0.45)] border border-amber-300/40 scale-[1.02]"
+              : "bg-slate-900/80 text-slate-200 hover:text-white hover:bg-slate-800/90 border border-white/10 hover:border-amber-500/30"}"
+          >
+            <span class="text-base sm:text-lg shrink-0 leading-none">🎯</span>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
+              ${translateText("mode_selector.ranked_title")}
+            </span>
+            ${this.viewerTrusted
+              ? trustLockIcon(true, {
+                  tooltipTitle: translateText(
+                    "mode_selector.ranked_trust_tooltip_title",
+                  ),
+                  position: "top-1 right-1",
+                  small: true,
+                })
+              : nothing}
+          </button>
+        </div>
+
+        <!-- Dynamic Hero Mode Hub -->
+        ${this.renderHeroMode(ffa, teams, special)}
+
+        <!-- Tactical Quick Dock -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full">
+          <button
+            type="button"
+            @click=${this.openHostLobby}
+            ?disabled=${!this.inputValid}
+            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800/95 border border-cyan-500/30 hover:border-cyan-400 text-slate-100 hover:text-white transition-all duration-200 shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden select-none min-h-[68px]"
+          >
+            <span class="text-cyan-400 text-xl shrink-0 group-hover:scale-110 transition-transform leading-none">➕</span>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
+              Créer Salon
+            </span>
+          </button>
+          <button
+            type="button"
+            @click=${this.openJoinLobby}
+            ?disabled=${!this.inputValid}
+            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800/95 border border-cyan-500/30 hover:border-cyan-400 text-slate-100 hover:text-white transition-all duration-200 shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden select-none min-h-[68px]"
+          >
+            <span class="text-cyan-400 text-xl shrink-0 group-hover:scale-110 transition-transform leading-none">🔑</span>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
+              Code Privé
+            </span>
+            ${this.hostedLobbyCount() > 0
+              ? html`<span
+                  class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-cyan-500/25 border border-cyan-400/40 text-cyan-200 text-[9px] font-mono font-black tracking-wider leading-none shadow-sm pointer-events-none"
+                  >${this.hostedLobbyCount()}</span
+                >`
+              : ""}
+          </button>
+          <button
+            type="button"
+            @click=${this.startTutorial}
+            ?disabled=${!this.inputValid}
+            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-400/40 hover:border-amber-400 text-amber-200 hover:text-white transition-all duration-200 shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden select-none min-h-[68px]"
+          >
+            <span class="text-amber-400 text-xl shrink-0 group-hover:scale-110 transition-transform leading-none">🎓</span>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
+              Tutoriel
+            </span>
+            <span
+              class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-amber-400/30 border border-amber-400/40 text-amber-300 text-[9px] font-black tracking-wider leading-none shadow-sm pointer-events-none"
+              >+XP</span
+            >
+          </button>
+          <button
+            type="button"
+            @click=${this.openDetailedView}
+            ?disabled=${!this.inputValid}
+            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800/95 border border-cyan-500/30 hover:border-cyan-400 text-slate-100 hover:text-white transition-all duration-200 shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden select-none min-h-[68px]"
+          >
+            <span class="text-cyan-400 text-xl shrink-0 group-hover:scale-110 transition-transform leading-none">🌐</span>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
+              Tous Salons
+            </span>
+            <span
+              class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-cyan-500/25 border border-cyan-400/40 text-cyan-200 text-[10px] font-mono font-black tracking-wider leading-none shadow-sm pointer-events-none"
+              >${this.advertisedLobbyCount()}</span
+            >
+          </button>
+        </div>
+
+        <!-- Secondary Upcoming Lobbies Strip -->
+        ${this.renderUpcomingStrip(ffa, teams, special)}
+
+        ${this.showTrustRequired
+          ? trustRequiredDialog(
+              this.viewerSignedIn,
+              () => (this.showTrustRequired = false),
+            )
+          : nothing}
+      </div>
+    `;
+  }
+
+  private renderHeroMode(
+    ffa: PublicGameInfo | undefined,
+    teams: PublicGameInfo | undefined,
+    special: PublicGameInfo | undefined,
+  ): TemplateResult {
+    if (this.activeTab === "ffa") {
+      if (ffa) {
+        return html`
+          <div class="flex flex-col gap-3">
+            <div class="h-56 sm:h-72 w-full">
+              ${this.renderLobbyCard(ffa, getGameModeLabel(ffa.gameConfig!))}
+            </div>
+            <button
+              type="button"
+              @click=${() => this.validateAndJoin(ffa)}
+              ?disabled=${!this.inputValid}
+              class="group relative flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:via-sky-400 hover:to-indigo-500 text-white font-black text-base sm:text-xl uppercase tracking-widest shadow-[0_8px_32px_rgba(6,182,212,0.45)] hover:shadow-[0_12px_44px_rgba(6,182,212,0.65)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer overflow-hidden border border-cyan-200/40"
+            >
+              <span
+                class="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-25deg] -translate-x-full group-hover:translate-x-[400%] transition-transform duration-1000"
+              ></span>
+              <span class="text-2xl animate-pulse">⚡</span>
+              <span class="tracking-widest">DÉPLOIEMENT RAPIDE</span>
+              <span
+                class="text-xs font-mono font-extrabold px-2 py-0.5 rounded-full bg-slate-950/50 border border-white/20 text-cyan-200"
+              >
+                ${ffa.gameConfig?.maxPlayers
+                  ? `${ffa.numClients}/${ffa.gameConfig.maxPlayers}`
+                  : `${ffa.numClients}👥`}
+              </span>
+            </button>
+          </div>
+        `;
+      }
+      if (this.offlineForLobbies()) {
+        return this.renderLobbiesUnavailable();
+      }
+      return html`
+        <div
+          class="flex flex-col items-center justify-center gap-3 h-56 sm:h-72 rounded-2xl bg-slate-950/60 border border-cyan-500/20"
+        >
+          <span
+            class="size-16 rounded-full border-4 border-cyan-500/30 border-t-cyan-400 animate-spin"
+          ></span>
+          <span
+            class="text-xs font-mono font-bold text-cyan-300 uppercase tracking-widest"
+          >
+            Recherche du meilleur front FFA...
+          </span>
+        </div>
+      `;
+    }
+
+    if (this.activeTab === "team") {
+      if (teams) {
+        return html`
+          <div class="flex flex-col gap-3">
+            <div class="h-56 sm:h-72 w-full">
+              ${this.renderLobbyCard(teams, getGameModeLabel(teams.gameConfig!))}
+            </div>
+            <button
+              type="button"
+              @click=${() => this.validateAndJoin(teams)}
+              ?disabled=${!this.inputValid}
+              class="group relative flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:via-sky-400 hover:to-indigo-500 text-white font-black text-base sm:text-xl uppercase tracking-widest shadow-[0_8px_32px_rgba(6,182,212,0.45)] hover:shadow-[0_12px_44px_rgba(6,182,212,0.65)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer overflow-hidden border border-cyan-200/40"
+            >
+              <span class="text-2xl">🤝</span>
+              <span class="tracking-widest">REJOINDRE L'ALLIANCE</span>
+              <span
+                class="text-xs font-mono font-extrabold px-2 py-0.5 rounded-full bg-slate-950/50 border border-white/20 text-cyan-200"
+              >
+                ${teams.gameConfig?.maxPlayers
+                  ? `${teams.numClients}/${teams.gameConfig.maxPlayers}`
+                  : `${teams.numClients}👥`}
+              </span>
+            </button>
+          </div>
+        `;
+      }
+      if (this.offlineForLobbies()) {
+        return this.renderLobbiesUnavailable();
+      }
+      return html`
+        <div
+          class="flex flex-col items-center justify-center gap-3 p-6 text-center h-56 sm:h-72 rounded-2xl bg-slate-950/80 border border-cyan-500/20"
+        >
+          <span class="text-4xl">🛡️</span>
+          <h3 class="text-base font-extrabold uppercase text-white">
+            Guerre des Factions (Équipes)
+          </h3>
+          <p class="text-xs text-slate-400 max-w-sm">
+            Aucun salon d'équipe n'est en attente. Créez votre propre alliance
+            tactique 2v2, 3v3 ou 50v50 !
+          </p>
+          <button
+            type="button"
+            @click=${this.openHostLobby}
+            class="mt-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-extrabold text-xs uppercase tracking-wider shadow-md hover:scale-105 transition-all cursor-pointer"
+          >
+            ➕ Créer un Salon d'Équipe
+          </button>
+        </div>
+      `;
+    }
+
+    if (this.activeTab === "solo") {
+      return html`
+        <div
+          class="relative flex flex-col justify-between overflow-hidden p-6 sm:p-8 h-56 sm:h-72 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border border-cyan-500/30 shadow-xl"
+        >
+          <div
+            class="absolute -right-10 -bottom-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"
+          ></div>
+          <div class="relative z-10 flex flex-col gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[10px] font-mono font-bold uppercase"
+                >🤖 IA Tactique</span
+              >
+              <span
+                class="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-[10px] font-mono font-bold uppercase"
+                >🗺️ 15+ Cartes</span
+              >
+              <span
+                class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-mono font-bold uppercase"
+                >💾 Sauvegarde Incluse</span
+              >
+            </div>
+            <h3 class="text-xl sm:text-2xl font-black uppercase text-white tracking-wide">
+              Conquête Mondiale Solo
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-300 max-w-lg leading-relaxed">
+              Affrontez jusqu'à 50 nations contrôlées par l'IA sur toutes les
+              cartes de la planète. Testez vos doctrines de combat et perfectionnez
+              votre art militaire en toute sérénité !
+            </p>
+          </div>
+          <button
+            type="button"
+            @click=${this.openSinglePlayerModal}
+            class="relative z-10 group flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:via-sky-400 hover:to-indigo-500 text-white font-black text-base sm:text-xl uppercase tracking-widest shadow-[0_8px_32px_rgba(6,182,212,0.45)] hover:shadow-[0_12px_44px_rgba(6,182,212,0.65)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer overflow-hidden border border-cyan-200/40"
+          >
+            <span class="text-2xl">⚔️</span>
+            <span class="tracking-widest">LANCER LA CONQUÊTE SOLO</span>
+          </button>
+        </div>
+      `;
+    }
+
+    // ranked tab
+    return html`
+      <div
+        class="relative flex flex-col justify-between overflow-hidden p-6 sm:p-8 h-56 sm:h-72 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border border-amber-500/30 shadow-xl"
+      >
+        <div
+          class="absolute -right-10 -bottom-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"
+        ></div>
+        <div class="relative z-10 flex flex-col gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span
+              class="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] font-mono font-bold uppercase"
+              >🏆 Matchmaking ELO</span
+            >
+            <span
+              class="px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-400/40 text-orange-300 text-[10px] font-mono font-bold uppercase"
+              >🏅 Médailles de Guerre</span
+            >
+            <span
+              class="px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 text-[10px] font-mono font-bold uppercase"
+              >👑 Rang Suprême</span
+            >
+          </div>
+          <h3 class="text-xl sm:text-2xl font-black uppercase text-white tracking-wide">
+            Arène de Compétition Classée
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-300 max-w-lg leading-relaxed">
+            Mesurez votre sens stratégique contre les commandants les plus aguerris
+            de la planète. Gravissez les échelons du classement mondial et remportez
+            des récompenses saisonnières exclusives !
+          </p>
+        </div>
+        <button
+          type="button"
+          @click=${this.openRankedMenu}
+          class="relative z-10 group flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-base sm:text-xl uppercase tracking-widest shadow-[0_8px_32px_rgba(245,158,11,0.45)] hover:shadow-[0_12px_44px_rgba(245,158,11,0.65)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer overflow-hidden border border-amber-200/40"
+        >
+          <span class="text-2xl">🎯</span>
+          <span class="tracking-widest">ENTRER DANS L'ARÈNE CLASSÉE</span>
+        </button>
+      </div>
+    `;
+  }
+
+  private renderUpcomingStrip(
+    ffa: PublicGameInfo | undefined,
+    teams: PublicGameInfo | undefined,
+    special: PublicGameInfo | undefined,
+  ): TemplateResult | typeof nothing {
+    const alternateLobbies: PublicGameInfo[] = [];
+    if (this.activeTab !== "ffa" && ffa) alternateLobbies.push(ffa);
+    if (this.activeTab !== "team" && teams) alternateLobbies.push(teams);
+    if (special) alternateLobbies.push(special);
+
+    if (alternateLobbies.length === 0) return nothing;
+
+    return html`
+      <div class="flex flex-col gap-2 w-full pt-1">
+        <div class="flex items-center justify-between px-1">
+          <span
+            class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400"
+          >
+            🔥 Autres Salons en cours
+          </span>
+          <button
+            type="button"
+            @click=${this.openDetailedView}
+            class="text-xs font-bold text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer"
+          >
+            Voir tous les salons (${this.advertisedLobbyCount()}) →
+          </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          ${alternateLobbies
+            .slice(0, 2)
+            .map((lobby) =>
+              this.renderLobbyCard(lobby, getGameModeLabel(lobby.gameConfig!)),
+            )}
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Refuses an API-DEPENDENT action (Create, Ranked, Join by code) and tells
+   * the player why. Returns true when the caller should stop.
+   *
+   * The reachability half applies here -- see the rule at the top of this
+   * file: none of these three can resolve a server without the list API. A
+   * lobby card goes through blockedFromLobbyJoin below instead.
+   *
+   * Deliberately NOT implemented with the `disabled` attribute the way
+   * renderSmallActionCard handles invalid input: a disabled control (and
+   * `pointer-events-none` alongside it) swallows the click, leaving nothing to
+   * trigger the wiggle -- and, on the web, nothing to trigger the retry that
+   * reportMultiplayerRefusal makes of it. The button stays clickable and
+   * merely stops being actionable.
+   */
+  private blockedFromApiAction(): boolean {
+    if (
+      !shouldBlockMultiplayerAction(
+        this.desktopUpdateState,
+        this.desktopSessionState,
+        this.backendOutage,
+      )
+    )
+      return false;
+    reportMultiplayerRefusal(this.backendOutage);
+    return true;
+  }
+
+  /**
+   * The same, for the public-lobby card: the desktop states still refuse, a
+   * list-API outage never does. Its lobby came over a live game-server socket
+   * (the rule at the top of this file), so there is no reachability reason to
+   * refuse and nothing to retry -- hence `false` to the refusal report, which
+   * leaves the desktop wiggle as the only feedback.
+   */
+  private blockedFromLobbyJoin(): boolean {
+    if (
+      !shouldBlockSocketSourcedAction(
+        this.desktopUpdateState,
+        this.desktopSessionState,
+      )
+    )
+      return false;
+    reportMultiplayerRefusal(false);
+    return true;
+  }
+
+  private openRankedMenu = () => {
+    if (this.blockedFromApiAction()) return;
+    if (!this.validateUsername()) return;
+    window.showPage?.("page-ranked");
+  };
+
+  private openDetailedView = () => {
+    if (!this.validateUsername()) return;
+    window.showPage?.("page-detailed-view");
+  };
+
+  private openSinglePlayerModal = () => {
+    if (!this.validateUsername()) return;
+    whenModalLoaded("single-player-modal", () =>
+      (
+        document.querySelector("single-player-modal") as SinglePlayerModal
+      )?.open(),
+    );
+  };
+
+  // Handled in Main, which also serves the help page's tutorial button.
+  private startTutorial = () => {
+    if (!this.validateUsername()) return;
+    document.dispatchEvent(new CustomEvent("start-tutorial"));
+  };
+
+  private openHostLobby = () => {
+    if (this.blockedFromApiAction()) return;
+    if (!this.validateUsername()) return;
+    whenModalLoaded("host-lobby-modal", () =>
+      (document.querySelector("host-lobby-modal") as HostLobbyModal)?.open(),
+    );
+  };
+
+  private openJoinLobby = () => {
+    if (this.blockedFromApiAction()) return;
+    if (!this.validateUsername()) return;
+    whenModalLoaded("join-lobby-modal", () =>
+      (document.querySelector("join-lobby-modal") as JoinLobbyModal)?.open(),
+    );
+  };
+
+  // Number of open hosted lobbies waiting in the browser; shown as a chip
+  // on the Join button.
+  /**
+   * The heading over the upcoming column, and the way to the lobby browser now
+   * that the Detailed View button is gone. Heading and link are one control:
+   * side by side they were two runs of small uppercase text, and neither read
+   * as clickable. A heading may hold a button, so the h2 survives.
+   *
+   * Dims and stops responding on an invalid username, as the button it
+   * replaces did: openDetailedView's own check is a silent backstop that
+   * assumes its control already looks disabled.
+   */
+  /** Heading over the upcoming column; also the link to the lobby browser. */
+  private renderUpcomingHeading() {
+    const count = this.advertisedLobbyCount();
+    return html`
+      <h2 class="min-w-0 sm:row-start-1">
+        <button
+          @click=${this.openDetailedView}
+          ?disabled=${!this.inputValid}
+          class="group/upcoming flex w-full items-center justify-between gap-2 rounded-xl border border-cyan-500/20 bg-slate-950/80 backdrop-blur-md py-2 pl-3 pr-2 transition-all hover:border-cyan-400/60 hover:bg-slate-900/90 shadow-md ${this
+            .inputValid
+            ? ""
+            : DISABLED}"
+        >
+          <span
+            class="truncate text-xs sm:text-sm font-extrabold uppercase tracking-widest text-slate-300 group-hover/upcoming:text-cyan-200"
+            >${translateText("public_lobby.upcoming")}</span
+          >
+          <span
+            class="flex shrink-0 items-center gap-0.5 rounded-lg bg-gradient-to-r from-cyan-500 to-indigo-600 py-1 pl-2.5 pr-1.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-[0_0_12px_rgba(6,182,212,0.3)] group-hover/upcoming:from-cyan-400 group-hover/upcoming:to-indigo-500"
+          >
+            ${count > 0
+              ? translateText("public_lobby.see_all", { count })
+              : nothing}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="size-4"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </span>
+        </button>
+      </h2>
+    `;
+  }
+
+  /** Every lobby the browser lists, hosted included. */
+  private advertisedLobbyCount(): number {
+    return Object.values(this.lobbies?.games ?? {}).flat().length;
+  }
+
+  private hostedLobbyCount(): number {
+    return this.lobbies?.games?.hosted?.length ?? 0;
+  }
+
+  private renderSmallActionCard(
+    title: string,
+    onClick: () => void,
+    bgClass: string = SECONDARY_ACTION,
+    badge?: number,
+    // Only the three multiplayer action cards (create/ranked/join) pass this;
+    // the solo card is never gated (see openSinglePlayerModal) and must never
+    // show as disabled here.
+    gated: boolean = false,
+    adornment: TemplateResult | typeof nothing = nothing,
+  ) {
+    const blocked =
+      gated &&
+      shouldBlockMultiplayerAction(
+        this.desktopUpdateState,
+        this.desktopSessionState,
+        this.backendOutage,
+      );
+    return html`
+      <button
+        @click=${onClick}
+        ?disabled=${!this.inputValid}
+        aria-disabled=${blocked}
+        class="relative flex items-center justify-center w-full h-full rounded-xl ${bgClass} transition-all duration-200 text-sm lg:text-base text-white uppercase tracking-wider text-center ${!this
+          .inputValid
+          ? DISABLED
+          : blocked
+            ? "opacity-50 cursor-not-allowed"
+            : ""}"
+      >
+        ${title}
+        ${badge
+          ? html`<span
+              class="absolute -top-2 -right-2 min-w-[1.375rem] h-[1.375rem] px-1.5 flex items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold tracking-normal"
+              >${badge}</span
+            >`
+          : nothing}
+        ${adornment}
+      </button>
+    `;
+  }
+
+  private renderLobbyCard(
+    lobby: PublicGameInfo,
+    titleContent: string | TemplateResult,
+  ) {
+    const timeRemaining = lobby.startsAt
+      ? getSecondsUntilServerTimestamp(lobby.startsAt, this.serverTimeOffset)
+      : undefined;
+
+    let timeDisplay: string;
+    let timeDisplayUppercase = false;
+    if (timeRemaining === undefined) {
+      timeDisplay = renderDuration(this.defaultLobbyTime);
+    } else if (timeRemaining > 0) {
+      timeDisplay = renderDuration(timeRemaining);
+    } else {
+      timeDisplay = translateText("public_lobby.starting_game");
+      timeDisplayUppercase = true;
+    }
+
+    // Gated, not disabled: `disabled` (which the option below sets, together
+    // with pointer-events-none) swallows the click, and the click is what
+    // makes the update bar wiggle. `blocked` only dims and reports
+    // aria-disabled; validateAndJoin does the refusing.
+    //
+    // Socket-sourced, so a list-API outage neither dims this nor refuses it:
+    // the same predicate validateAndJoin uses, for the reason in the rule at
+    // the top of this file.
+    return lobbyCard({
+      lobby,
+      subtitle: titleContent,
+      timeDisplay,
+      timeDisplayUppercase,
+      disabled: !this.inputValid,
+      blocked: shouldBlockSocketSourcedAction(
+        this.desktopUpdateState,
+        this.desktopSessionState,
+      ),
+      viewerTrusted: this.viewerTrusted,
+      onClick: () => this.validateAndJoin(lobby),
+    });
+  }
+
+  private validateAndJoin(lobby: PublicGameInfo) {
+    if (this.blockedFromLobbyJoin()) return;
+    if (!this.validateUsername()) return;
+    if (!canJoinTrustedLobby(lobby, this.viewerTrusted)) {
+      this.showTrustRequired = true;
+      return;
+    }
+
+    this.dispatchEvent(
+      new CustomEvent("join-lobby", {
+        detail: {
+          gameID: lobby.gameID,
+          source: "public",
+          publicLobbyInfo: lobby,
+        } as JoinLobbyEvent,
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+}

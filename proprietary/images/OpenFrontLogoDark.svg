@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1364 259" fill="none">
+  <defs>
+    <linearGradient id="hexGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+    <linearGradient id="textGradDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#cbd5e1" />
+    </linearGradient>
+    <linearGradient id="accentGradDark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(45, 22)">
+    <polygon
+      points="107,0 200,54 200,161 107,215 14,161 14,54"
+      fill="rgba(15, 23, 42, 0.9)"
+      stroke="url(#hexGradDark)"
+      stroke-width="12"
+      stroke-linejoin="round"
+    />
+    <polygon points="107,26 176,66 107,107" fill="#38bdf8" opacity="0.9" />
+    <polygon points="176,66 176,148 107,107" fill="#06b6d4" opacity="0.75" />
+    <polygon points="176,148 107,189 107,107" fill="#4f46e5" opacity="0.85" />
+    <polygon points="107,189 38,148 107,107" fill="#6366f1" opacity="0.6" />
+    <polygon points="38,148 38,66 107,107" fill="#0284c7" opacity="0.8" />
+    <polygon points="38,66 107,26 107,107" fill="#7dd3fc" opacity="0.95" />
+    <circle cx="107" cy="107" r="18" fill="#0f172a" stroke="#38bdf8" stroke-width="6" />
+    <circle cx="107" cy="107" r="7" fill="#22d3ee" />
+  </g>
+
+  <g font-family="'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="900" font-size="162" letter-spacing="8">
+    <text x="285" y="186" fill="url(#textGradDark)">HEXA</text>
+    <text x="775" y="186" fill="url(#accentGradDark)">FRONT</text>
+  </g>
+
+  <rect x="292" y="208" width="455" height="6" rx="3" fill="#334155" />
+  <rect x="775" y="208" width="540" height="6" rx="3" fill="url(#accentGradDark)" />
+</svg>
