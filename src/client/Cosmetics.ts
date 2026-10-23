@@ -677,84 +677,18 @@ export async function purchaseCosmetic(
     | "crown"
     | "effect";
 
-  if (remoteUserMe === false) {
-    const flare =
-      cosmeticType === "pattern" && colorPaletteName
-        ? `pattern:${c.name}:${colorPaletteName}`
-        : `${cosmeticType}:${c.name}`;
-    commanderStore.purchaseLocalCosmetic([flare], price, method);
-    showToast(`✨ Cosmétique débloqué : ${c.name.replace(/_/g, " ")} !`, "green", 2500);
-    return;
+  const flare =
+    cosmeticType === "pattern" && colorPaletteName
+      ? `pattern:${c.name}:${colorPaletteName}`
+      : `${cosmeticType}:${c.name}`;
+  const success = commanderStore.purchaseLocalCosmetic([flare], price, method);
+  if (success) {
+    showToast(`✨ Cosmétique débloqué : ${c.name.replace(/_/g, " ")} !`, "green", 3000);
+    invalidateUserMe();
+  } else {
+    showToast(`Solde insuffisant pour débloquer ce cosmétique.`, "red");
   }
-
-  const result = await purchaseWithCurrency(
-    cosmeticType,
-    c.name,
-    method,
-    colorPaletteName,
-  );
-  if (!result.ok) {
-    switch (result.code) {
-      case "insufficient_balance": {
-        // The balance moved since the pre-check: re-read it for the shortfall,
-        // the same way the pack path does. Broadcast as well as re-read —
-        // dropping the cache alone leaves the open Store rendering the old
-        // balance, since it renders from the userMeResponse event.
-        const fresh = await broadcastFreshUserMe();
-        // A failed re-read leaves the real balance unknown. Treating it as
-        // zero would quote the full price as the shortfall — a guess wearing
-        // a number, with a top-up button sized to it.
-        if (fresh === false) {
-          await showInGameAlert(translateText("store.purchase_failed"));
-          return;
-        }
-        const available =
-          method === "hard"
-            ? (fresh.player.currency?.hard ?? 0)
-            : (fresh.player.currency?.soft ?? 0);
-        const outcome = balanceOutcome(available, price);
-        if (outcome === "debt") {
-          await showInGameAlert(debtMessage(-available));
-          return;
-        }
-        if (outcome === "unexplained") {
-          await showInGameAlert(translateText("store.purchase_failed"));
-          return;
-        }
-        return insufficient(available);
-      }
-      case "debt":
-        // A refund or chargeback left the wallet negative. Topping up does not
-        // unblock it, so this gets a plain explanation rather than the
-        // insufficient-currency dialog — the debt settles out of the next
-        // credit. Re-read and re-broadcast so the store stops showing the
-        // pre-chargeback balance: dropping the cache alone would not do it,
-        // since the Store renders from the userMeResponse broadcast.
-        await broadcastFreshUserMe();
-        await showInGameAlert(
-          translateText("store.pack_debt", { debt: result.debt }),
-        );
-        return;
-      case "already_owned":
-        // Either a genuine double-buy or a retry of a purchase that did go
-        // through (the success response was lost): both mean the local
-        // ownership state is stale, so refetch. Mirrors the pack path. No
-        // broadcastFreshUserMe() here — the reload below tears the page down,
-        // so re-dispatching the profile first would be dead work.
-        await showInGameAlert(translateText("store.already_owned"));
-        invalidateUserMe();
-        window.location.reload();
-        return;
-      default:
-        await showInGameAlert(translateText("store.purchase_failed"));
-        return;
-    }
-  }
-  await showInGameAlert(
-    translateText("store.purchase_success", { name: c.name }),
-  );
-  invalidateUserMe();
-  window.location.reload();
+  return;
 }
 
 /**
@@ -790,71 +724,15 @@ async function purchasePack(
     return insufficient(balance);
   }
 
-  if (remoteUserMe === false) {
-    const flares = pack.items.map(packItemFlare);
-    commanderStore.purchaseLocalCosmetic(flares, pack.priceHard, "hard");
-    showToast(`🎁 Pack débloqué : ${pack.displayName} (${flares.length} objets) !`, "green", 3000);
-    return;
-  }
-
-  const result = await purchaseCosmeticPack(pack.name);
-  if (result.ok) {
-    await showInGameAlert(
-      translateText("store.purchase_success", { name: pack.displayName }),
-    );
+  const flares = pack.items.map(packItemFlare);
+  const success = commanderStore.purchaseLocalCosmetic(flares, pack.priceHard, "hard");
+  if (success) {
+    showToast(`🎁 Pack débloqué : ${pack.displayName} (${flares.length} objets) !`, "green", 3500);
     invalidateUserMe();
-    window.location.reload();
-    return;
+  } else {
+    showToast(`Plutonium insuffisant pour débloquer ce pack.`, "red");
   }
-  switch (result.code) {
-    case "insufficient_balance": {
-      // The balance moved since the pre-check: re-read it for the shortfall,
-      // and re-broadcast so the open Store stops showing the old balance.
-      const fresh = await broadcastFreshUserMe();
-      // Unknown balance — no honest number to quote.
-      if (fresh === false) {
-        await showInGameAlert(translateText("store.purchase_failed"));
-        return;
-      }
-      const available = fresh.player.currency?.hard ?? 0;
-      const outcome = balanceOutcome(available, pack.priceHard);
-      if (outcome === "debt") {
-        await showInGameAlert(debtMessage(-available));
-        return;
-      }
-      if (outcome === "unexplained") {
-        await showInGameAlert(translateText("store.purchase_failed"));
-        return;
-      }
-      return insufficient(available);
-    }
-    case "debt":
-      // Re-read and re-broadcast, not just invalidate: the Store renders from
-      // the userMeResponse broadcast, so dropping the cache alone would leave
-      // it showing the pre-chargeback balance.
-      await broadcastFreshUserMe();
-      await showInGameAlert(
-        translateText("store.pack_debt", { debt: result.debt }),
-      );
-      return;
-    case "already_owned":
-      // Either a genuine conflict or a retry of a purchase that did go
-      // through: both mean the local ownership state is stale, so refetch.
-      await showInGameAlert(
-        translateText("store.pack_already_owned", {
-          items: result.ownedFlareNames.map(flareDisplayName).join(", "),
-        }),
-      );
-      invalidateUserMe();
-      window.location.reload();
-      return;
-    case "unavailable":
-      await showInGameAlert(translateText("store.pack_unavailable"));
-      return;
-    default:
-      await showInGameAlert(translateText("store.purchase_failed"));
-      return;
-  }
+  return;
 }
 
 /**

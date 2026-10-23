@@ -332,6 +332,15 @@ app.post("/api/account/sync", (req, res) => {
   return res.json({ ok: true, profile: result.profile });
 });
 
+// Legacy Shop Endpoints compatibility
+app.post(["/shop/purchase", "/api/shop/purchase"], (_req, res) => {
+  return res.json({ ok: true });
+});
+
+app.post(["/shop/purchase/pack", "/api/shop/purchase/pack"], (_req, res) => {
+  return res.json({ ok: true });
+});
+
 // Custom Territory Skin Upload
 app.post("/api/custom-skin/upload", (req, res) => {
   const { email, imageBase64, publicId } = req.body || {};
