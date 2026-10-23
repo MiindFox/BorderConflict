@@ -273,6 +273,26 @@ class AccountDatabase {
       addPlutonium = 950;
       addCaps = 15000;
       addFlares.push("crown:supernova_royale", "nuke_impact:mirv_custom");
+    } else if (bundleId === "battle_pass_s1") {
+      current.hasBattlePass = true;
+      current.battlePassSeason = 1;
+      addPlutonium = 250;
+      addCaps = 5000;
+      addFlares.push("crown:atomic_conqueror", "pattern:nuclear_hazard:rad_active");
+    } else if (bundleId === "vip_status_30d") {
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      const currentExpiry = current.vipUntil && current.vipUntil > now ? current.vipUntil : now;
+      current.vipUntil = currentExpiry + thirtyDaysMs;
+      current.isVip = true;
+      addPlutonium = 150;
+      addCaps = 3000;
+    } else if (bundleId === "plutonium_250") {
+      addPlutonium = 250;
+    } else if (bundleId === "plutonium_600") {
+      addPlutonium = 600;
+    } else if (bundleId === "plutonium_1700") {
+      addPlutonium = 1700;
     }
 
     current.plutonium = (current.plutonium || 0) + addPlutonium;

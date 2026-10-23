@@ -61,6 +61,7 @@ function formatUsdCents(cents: number): string {
 type StoreTab =
   | "cosmetics"
   | "bundles"
+  | "season_pass"
   | "effects"
   | "packs"
   | "subscriptions"
@@ -124,10 +125,11 @@ export class StoreModal extends BaseModal {
     }
     return {
       tabs: [
-        { key: "bundles", label: translateText("store.bundles") },
+        { key: "bundles", label: "⭐ Offres & Bundles" },
+        { key: "season_pass", label: "🎖️ Pass de Saison" },
+        { key: "packs", label: "☢️ Plutonium & Caisses" },
         { key: "cosmetics", label: translateText("store.cosmetics") },
         { key: "effects", label: translateText("store.effects") },
-        { key: "packs", label: "🎁 Coffres & Devises" },
       ],
     };
   }
@@ -696,6 +698,91 @@ export class StoreModal extends BaseModal {
             `
           : ""}
 
+        <!-- DIRECT PLUTONIUM PACKS (Point 5) -->
+        <div class="mt-8 mb-2">
+          <div class="text-xs font-black uppercase tracking-widest text-emerald-400 flex items-center gap-2">
+            <plutonium-icon .size=${16}></plutonium-icon>
+            <span>Recharges Immédiates de Plutonium (Stripe)</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Ajoutez du Plutonium instantanément pour débloquer coffres et cosmétiques sans délai.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <!-- 250 PLUTONIUM -->
+          <div
+            class="rounded-2xl border border-slate-700 bg-slate-900/90 p-4 flex flex-col justify-between shadow-md hover:border-emerald-400/50 transition-all"
+          >
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">☢️</span>
+                <span class="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300">
+                  1,49 €
+                </span>
+              </div>
+              <h4 class="mt-2 text-base font-black text-white">250 Plutonium</h4>
+              <p class="text-[11px] text-slate-300 mt-1">Réserve rapide pour ouvrir 1 coffre ou personnaliser votre profil.</p>
+            </div>
+            <button
+              type="button"
+              @click=${() => this.handleBuyStripeBundle("plutonium_250")}
+              class="mt-4 w-full cursor-pointer rounded-xl bg-emerald-600 hover:bg-emerald-500 py-2.5 text-xs font-black uppercase text-white shadow"
+            >
+              Acheter · 1,49 €
+            </button>
+          </div>
+
+          <!-- 600 PLUTONIUM -->
+          <div
+            class="rounded-2xl border border-indigo-500/50 bg-slate-900/95 p-4 flex flex-col justify-between shadow-lg relative overflow-hidden"
+          >
+            <div class="absolute -right-8 top-3 rotate-45 bg-indigo-600 text-[9px] font-black uppercase px-8 text-white">
+              BEST-SELLER
+            </div>
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">☢️</span>
+                <span class="rounded bg-indigo-500/20 px-2 py-0.5 text-xs font-bold text-indigo-300">
+                  2,99 €
+                </span>
+              </div>
+              <h4 class="mt-2 text-base font-black text-white">600 Plutonium</h4>
+              <p class="text-[11px] text-slate-300 mt-1">Idéal pour coffre Cyber-Élite + cosmétiques de navires.</p>
+            </div>
+            <button
+              type="button"
+              @click=${() => this.handleBuyStripeBundle("plutonium_600")}
+              class="mt-4 w-full cursor-pointer rounded-xl bg-indigo-600 hover:bg-indigo-500 py-2.5 text-xs font-black uppercase text-white shadow"
+            >
+              Acheter · 2,99 €
+            </button>
+          </div>
+
+          <!-- 1700 PLUTONIUM -->
+          <div
+            class="rounded-2xl border border-amber-400/50 bg-slate-900/95 p-4 flex flex-col justify-between shadow-lg hover:border-amber-300 transition-all"
+          >
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">☢️🔥</span>
+                <span class="rounded bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-300">
+                  6,99 €
+                </span>
+              </div>
+              <h4 class="mt-2 text-base font-black text-amber-300">1 700 Plutonium</h4>
+              <p class="text-[11px] text-slate-300 mt-1">1 500 + 200 Plutonium OFFERTS. Le plein pour les coffres Suprêmes.</p>
+            </div>
+            <button
+              type="button"
+              @click=${() => this.handleBuyStripeBundle("plutonium_1700")}
+              class="mt-4 w-full cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 py-2.5 text-xs font-black uppercase text-slate-950 shadow"
+            >
+              Acheter · 6,99 €
+            </button>
+          </div>
+        </div>
+
         <!-- 3 SUPPLY CRATE TIERS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div
@@ -786,6 +873,36 @@ export class StoreModal extends BaseModal {
               <plutonium-icon .size=${16}></plutonium-icon>
               <span>Plutonium</span>
             </button>
+          </div>
+          <!-- VIP STATUS PASS (Point 2) -->
+          <div
+            class="col-span-full rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-slate-900/90 to-amber-950/40 p-5 shadow-xl flex flex-col md:flex-row items-center justify-between gap-5"
+          >
+            <div class="space-y-1.5 text-center md:text-left">
+              <div class="flex items-center justify-center md:justify-start gap-2">
+                <span class="text-2xl">🌟</span>
+                <span class="text-sm font-black uppercase tracking-wider text-amber-300">
+                  Statut VIP Commandant · Abonnement Mensuel Confort (2,99 € / mois)
+                </span>
+                ${commanderStore.isVipActive()
+                  ? html`<span class="rounded bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 uppercase tracking-widest">
+                      ACTIF
+                    </span>`
+                  : ""}
+              </div>
+              <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                Avantages exclusifs en jeu : <strong>Pseudo doré et badge VIP</strong> dans tous les salons et le chat, <strong>+25% de Caps</strong> sur chaque partie, <strong>+2 XP bonus</strong>, hébergement de salons privés sans restriction et création de clan offerte.
+              </p>
+            </div>
+            <div class="shrink-0 w-full md:w-auto">
+              <button
+                type="button"
+                @click=${() => this.handleBuyStripeBundle("vip_status_30d")}
+                class="w-full md:w-56 cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 py-3 text-xs font-black uppercase tracking-wider text-slate-950 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <span>${commanderStore.isVipActive() ? "Prolonger (+30 Jours) · 2,99 €" : "Devenir VIP · 2,99 € / mois"}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1020,6 +1137,36 @@ export class StoreModal extends BaseModal {
               <span>Acheter · 4,99 €</span>
             </button>
           </div>
+          <!-- VIP STATUS PASS (Point 2) -->
+          <div
+            class="col-span-full rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-slate-900/90 to-amber-950/40 p-5 shadow-xl flex flex-col md:flex-row items-center justify-between gap-5"
+          >
+            <div class="space-y-1.5 text-center md:text-left">
+              <div class="flex items-center justify-center md:justify-start gap-2">
+                <span class="text-2xl">🌟</span>
+                <span class="text-sm font-black uppercase tracking-wider text-amber-300">
+                  Statut VIP Commandant · Abonnement Mensuel Confort (2,99 € / mois)
+                </span>
+                ${commanderStore.isVipActive()
+                  ? html`<span class="rounded bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 uppercase tracking-widest">
+                      ACTIF
+                    </span>`
+                  : ""}
+              </div>
+              <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                Avantages exclusifs en jeu : <strong>Pseudo doré et badge VIP</strong> dans tous les salons et le chat, <strong>+25% de Caps</strong> sur chaque partie, <strong>+2 XP bonus</strong>, hébergement de salons privés sans restriction et création de clan offerte.
+              </p>
+            </div>
+            <div class="shrink-0 w-full md:w-auto">
+              <button
+                type="button"
+                @click=${() => this.handleBuyStripeBundle("vip_status_30d")}
+                class="w-full md:w-56 cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 py-3 text-xs font-black uppercase tracking-wider text-slate-950 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <span>${commanderStore.isVipActive() ? "Prolonger (+30 Jours) · 2,99 €" : "Devenir VIP · 2,99 € / mois"}</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -1089,6 +1236,8 @@ export class StoreModal extends BaseModal {
         return this.renderCosmeticsPanel();
       case "bundles":
         return this.renderBundleGrid();
+      case "season_pass":
+        return this.renderSeasonPassSection();
       case "effects":
         return this.renderEffectGrid();
       case "subscriptions":
@@ -1099,6 +1248,129 @@ export class StoreModal extends BaseModal {
       default:
         return this.renderPackGrid();
     }
+  }
+
+  private renderSeasonPassSection(): TemplateResult {
+    const hasPass = commanderStore.hasSeasonPass();
+    const profile = commanderStore.getProfile();
+    const currentLevel = profile.level;
+    const maxSeasonLevel = 30;
+
+    const milestones = [
+      { lvl: 1, free: "500 Caps", premium: "Couronne Atomic Conqueror" },
+      { lvl: 5, free: "Titre Recrue", premium: "+150 Plutonium" },
+      { lvl: 10, free: "1 000 Caps", premium: "Motif Rad-Active Néon" },
+      { lvl: 15, free: "Caisse Standard", premium: "Sillage Missile Plasma" },
+      { lvl: 20, free: "1 500 Caps", premium: "+350 Plutonium" },
+      { lvl: 25, free: "Titre Stratège", premium: "Caisse Cyber-Élite" },
+      { lvl: 30, free: "3 000 Caps", premium: "Couronne Animée Singularity Lord" },
+    ];
+
+    return html`
+      <div class="p-4 space-y-6">
+        <!-- HEADER BANNER -->
+        <div
+          class="rounded-3xl border border-red-500/40 bg-gradient-to-r from-red-950/60 via-slate-900/90 to-amber-950/50 p-6 shadow-2xl relative overflow-hidden"
+        >
+          <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center lg:text-left">
+              <div class="inline-flex items-center gap-2 rounded-full bg-red-500/20 border border-red-400/40 px-3 py-1 text-xs font-black uppercase tracking-wider text-red-300">
+                <span>🔥 SAISON 1</span>
+                <span>•</span>
+                <span>TEMPÊTE NUCLÉAIRE</span>
+              </div>
+              <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
+                Pass de Saison Stratégique
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+                Montez de niveau en jouant des batailles multijoueur. Débloquez 30 paliers de butin : chaque palier offre une récompense gratuite, et la voie <strong>Premium</strong> débloque l'arsenal atomique complet.
+              </p>
+            </div>
+
+            <div class="shrink-0 flex flex-col items-center gap-3">
+              ${hasPass
+                ? html`
+                    <div class="rounded-2xl border border-emerald-400/40 bg-emerald-500/20 px-6 py-4 text-center">
+                      <span class="text-emerald-300 text-xs font-black uppercase tracking-widest block">
+                        ✓ PASS PREMIUM ACTIF
+                      </span>
+                      <span class="text-white text-xs mt-1 block">Toutes les récompenses débloquées au fil de vos niveaux</span>
+                    </div>
+                  `
+                : html`
+                    <div class="text-center">
+                      <span class="text-xs text-slate-400 block mb-1">Accès illimité à la voie Premium</span>
+                      <button
+                        type="button"
+                        @click=${() => this.handleBuyStripeBundle("battle_pass_s1")}
+                        class="cursor-pointer rounded-2xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 hover:from-red-500 hover:to-amber-400 px-8 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-[0_0_30px_rgba(239,68,68,0.35)] transition-all active:scale-95 flex items-center justify-center gap-2"
+                      >
+                        <span>Débloquer le Pass · 4,99 €</span>
+                      </button>
+                    </div>
+                  `}
+            </div>
+          </div>
+
+          <!-- PROGRESS BAR -->
+          <div class="mt-6 pt-5 border-t border-white/10">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-300 mb-2">
+              <span>Progression Saisonnière : Niveau ${currentLevel} / ${maxSeasonLevel}</span>
+              <span class="text-amber-400">${Math.min(100, Math.round((currentLevel / maxSeasonLevel) * 100))}% complété</span>
+            </div>
+            <div class="w-full bg-slate-950/80 rounded-full h-3 border border-white/10 overflow-hidden">
+              <div
+                class="bg-gradient-to-r from-red-500 via-orange-500 to-amber-400 h-full transition-all duration-500"
+                style="width: ${Math.min(100, (currentLevel / maxSeasonLevel) * 100)}%"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 30 TIERS MILESTONES PREVIEW -->
+        <div class="space-y-3">
+          <div class="text-xs font-black uppercase tracking-widest text-slate-300 flex items-center gap-2">
+            <span>🏆 Paliers Clés de la Saison 1</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            ${milestones.map(
+              (m) => html`
+                <div
+                  class="rounded-2xl border ${currentLevel >= m.lvl
+                    ? "border-amber-400/50 bg-slate-900/90"
+                    : "border-slate-800 bg-slate-950/70"} p-4 flex flex-col justify-between shadow transition-all"
+                >
+                  <div class="flex items-center justify-between">
+                    <span class="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-black uppercase text-slate-300">
+                      NIVEAU ${m.lvl}
+                    </span>
+                    ${currentLevel >= m.lvl
+                      ? html`<span class="text-[10px] font-black text-emerald-400">ATTEINT</span>`
+                      : html`<span class="text-[10px] font-black text-slate-500">VERROUILLÉ</span>`}
+                  </div>
+
+                  <div class="mt-3 space-y-2 text-xs">
+                    <div class="p-2 rounded-lg bg-slate-950/60 border border-white/5">
+                      <span class="text-[10px] font-bold uppercase text-slate-400 block">Piste Gratuite</span>
+                      <span class="font-extrabold text-slate-200">${m.free}</span>
+                    </div>
+
+                    <div class="p-2 rounded-lg ${hasPass ? "bg-amber-500/10 border border-amber-400/30" : "bg-red-950/30 border border-red-500/20"}">
+                      <span class="text-[10px] font-bold uppercase text-amber-400 block flex items-center justify-between">
+                        <span>Piste Premium</span>
+                        ${!hasPass ? html`<span class="text-[9px] text-red-400">🔒 Pass Requis</span>` : ""}
+                      </span>
+                      <span class="font-extrabold text-amber-300">${m.premium}</span>
+                    </div>
+                  </div>
+                </div>
+              `,
+            )}
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   private renderTribeGrid(): TemplateResult {

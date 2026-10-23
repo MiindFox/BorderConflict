@@ -37,6 +37,10 @@ export interface CommanderProfile {
   plutonium: number;
   caps: number;
   ownedFlares: string[];
+  isVip?: boolean;
+  vipUntil?: number;
+  hasBattlePass?: boolean;
+  battlePassSeason?: number;
 }
 
 interface StoredEmailAccount {
@@ -452,18 +456,30 @@ class CommanderStore {
     return { leveledUp, newLevel: this.profile.level };
   }
 
+  isVipActive(): boolean {
+    if (!this.profile.isVip) return false;
+    if (!this.profile.vipUntil) return true;
+    return Date.now() < this.profile.vipUntil;
+  }
+
+  hasSeasonPass(): boolean {
+    return !!this.profile.hasBattlePass;
+  }
+
   recordMatchPlayed(won: boolean, durationSeconds: number): {
     xpGained: number;
     leveledUp: boolean;
   } {
     this.profile.gamesPlayed++;
     if (won) this.profile.victories++;
-    // Hard grind rewards: 0 plutonium on loss, 1 on victory. Very scarce caps.
+    const isVip = this.isVipActive();
+    // Hard grind rewards: 0 plutonium on loss, 1 on victory. Very scarce caps. VIP gets +25% caps & +2 bonus XP
+    const capsGained = won ? (isVip ? 7 : 5) : (isVip ? 2 : 1);
     this.profile.plutonium += won ? 1 : 0;
-    this.profile.caps += won ? 5 : 1;
+    this.profile.caps += capsGained;
     const baseXp = won ? 18 : 6;
     const timeBonus = Math.min(6, Math.floor(durationSeconds * 0.015));
-    const xpGained = baseXp + timeBonus;
+    const xpGained = baseXp + timeBonus + (isVip ? 2 : 0);
     const res = this.addXp(xpGained);
     return { xpGained, leveledUp: res.leveledUp };
   }

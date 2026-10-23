@@ -172,6 +172,7 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
     string,
     { name: string; description: string; priceCents: number }
   > = {
+    // 3 Starter Bundles
     bundle_recrue: {
       name: "Kit de Recrue Stratégique",
       description: "120 Plutonium + 1 500 Caps + Couronne Vanguard d'Argent",
@@ -186,6 +187,37 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
       name: "Édition Suprême Commandant",
       description: "950 Plutonium + 15 000 Caps + Couronne Animée Supernova Royale + Impact MIRV",
       priceCents: 499, // 4.99 EUR
+    },
+
+    // Point 1: Pass de Saison (Battle Pass)
+    battle_pass_s1: {
+      name: "Pass de Saison 1 : Tempête Nucléaire",
+      description: "Débloque la voie Premium du Pass de Saison : couronnes légendaires, caisses et bonus exclusifs",
+      priceCents: 499, // 4.99 EUR
+    },
+
+    // Point 2: Statut VIP / Vétéran
+    vip_status_30d: {
+      name: "Abonnement Statut VIP Commandant (30 Jours)",
+      description: "Pseudo doré, Badge VIP, +25% de Caps par partie, création de clan débloquée, hébergement prioritaire",
+      priceCents: 299, // 2.99 EUR
+    },
+
+    // Point 5: Recharges directes de Plutonium
+    plutonium_250: {
+      name: "Réserve de 250 Plutonium",
+      description: "250 Plutonium pour la boutique et les caisses",
+      priceCents: 149, // 1.49 EUR
+    },
+    plutonium_600: {
+      name: "Cargaison de 600 Plutonium",
+      description: "600 Plutonium pour la boutique et les caisses",
+      priceCents: 299, // 2.99 EUR
+    },
+    plutonium_1700: {
+      name: "Stock Stratégique de 1 700 Plutonium (1500 + 200 Offerts)",
+      description: "1 700 Plutonium pour la boutique et les caisses",
+      priceCents: 699, // 6.99 EUR
     },
   };
 
