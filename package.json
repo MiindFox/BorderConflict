@@ -131,6 +131,8 @@
     "nanoid": "^5.1.16",
     "node-html-parser": "^7.1.0",
     "obscenity": "^0.4.6",
+    "ssh2": "^1.17.0",
+    "stripe": "^23.0.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.4",
     "winston": "^3.19.0",

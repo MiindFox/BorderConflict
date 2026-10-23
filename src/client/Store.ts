@@ -138,6 +138,7 @@ export class StoreModal extends BaseModal {
 
   connectedCallback() {
     super.connectedCallback();
+    this.checkStripeRedirectReturn();
     document.addEventListener("userMeResponse", this.onUserMeEvent);
     window.addEventListener(COMMANDER_UPDATED_EVENT, this.onCommanderUpdated);
     // The store loads on demand, usually after Main's broadcast went out.
@@ -806,8 +807,226 @@ export class StoreModal extends BaseModal {
     `;
   }
 
+  private checkStripeRedirectReturn() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentSuccess = urlParams.get("payment_success");
+      const sessionId = urlParams.get("session_id");
+
+      if (paymentSuccess === "true" && sessionId) {
+        // Clean up URL without reload
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+
+        fetch("/api/stripe/verify-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId }),
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.ok && data.paid) {
+              showToast("🎉 Paiement validé ! Votre bundle a été crédité à votre compte !", "green", 5000);
+              // Refresh user profile
+              commanderStore.syncWithServer();
+              this.onUserMe(commanderStore.getLocalUserMeResponse());
+            }
+          })
+          .catch((e) => console.error("Stripe verify failed:", e));
+      } else if (urlParams.get("payment_cancel") === "true") {
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+        showToast("ℹ️ Paiement annulé.", "blue", 3000);
+      }
+    } catch (e) {
+      console.warn("Stripe check redirect error:", e);
+    }
+  }
+
+  private async handleBuyStripeBundle(bundleId: string) {
+    const email =
+      this.userMeResponse !== false && this.userMeResponse.user?.email
+        ? this.userMeResponse.user.email
+        : commanderStore.getEmail();
+
+    if (!email) {
+      showToast("⚠️ Veuillez d'abord vous connecter avec votre adresse email (Menu Compte).", "red", 3500);
+      return;
+    }
+
+    showToast("💳 Préparation du paiement sécurisé Stripe...", "blue", 3000);
+
+    try {
+      const res = await fetch("/api/stripe/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bundleId, email }),
+      });
+      const data = await res.json();
+      if (!data.ok || !data.checkoutUrl) {
+        showToast(`⚠️ Erreur : ${data.error || "Impossible de joindre Stripe"}`, "red", 3500);
+        return;
+      }
+      window.location.href = data.checkoutUrl;
+    } catch (err: any) {
+      showToast(`⚠️ Erreur réseau : ${err.message}`, "red", 3500);
+    }
+  }
+
+  private renderStripeBundlesSection(): TemplateResult {
+    return html`
+      <div class="p-4 space-y-5">
+        <div
+          class="rounded-2xl border border-indigo-500/40 bg-gradient-to-r from-slate-900/95 via-indigo-950/40 to-slate-900/95 p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl"
+        >
+          <div>
+            <div class="text-xs font-black uppercase tracking-widest text-indigo-400">
+              ⭐ Bundles Officiels du Commandant · Paiement Sécurisé Stripe
+            </div>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1">
+              Soutenez le développement de BorderConflict et débloquez du Plutonium, des cosmétiques rares et des couronnes animées légendaires.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 text-xs font-bold text-slate-400">
+            <span>🔒 Carte Bancaire / Apple Pay / Google Pay</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- BUNDLE 1 : 0.99 EUR -->
+          <div
+            class="rounded-2xl border border-slate-700 hover:border-emerald-500/60 bg-slate-900/90 p-5 flex flex-col justify-between shadow-lg transition-all"
+          >
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">🎖️</span>
+                <span
+                  class="rounded-md bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 text-xs font-black uppercase text-emerald-300"
+                >
+                  0,99 €
+                </span>
+              </div>
+              <h3 class="mt-3 text-lg font-black text-white uppercase">
+                Kit de Recrue Stratégique
+              </h3>
+              <p class="mt-1 text-xs text-slate-300 leading-relaxed">
+                Le pack découverte idéal pour démarrer avec style :
+              </p>
+              <ul class="mt-2.5 space-y-1.5 text-xs text-slate-200 font-medium">
+                <li class="flex items-center gap-1.5">
+                  <plutonium-icon .size=${14}></plutonium-icon>
+                  <span><strong>+120 Plutonium</strong></span>
+                </li>
+                <li class="flex items-center gap-1.5">
+                  <cap-icon .size=${14}></cap-icon>
+                  <span><strong>+1 500 Caps</strong></span>
+                </li>
+                <li>👑 <strong>Couronne Vanguard d'Argent</strong></li>
+                <li>🏷️ Titre de profil <em>« Recrue d'Élite »</em></li>
+              </ul>
+            </div>
+            <button
+              type="button"
+              @click=${() => this.handleBuyStripeBundle("bundle_recrue")}
+              class="mt-5 w-full cursor-pointer rounded-xl bg-emerald-600 hover:bg-emerald-500 py-3 text-xs font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
+            >
+              <span>Acheter · 0,99 €</span>
+            </button>
+          </div>
+
+          <!-- BUNDLE 2 : 2.99 EUR -->
+          <div
+            class="rounded-2xl border border-indigo-500/50 hover:border-indigo-400 bg-slate-900/95 p-5 flex flex-col justify-between shadow-[0_0_24px_rgba(99,102,241,0.2)] transition-all relative overflow-hidden"
+          >
+            <div class="absolute -right-12 top-4 rotate-45 bg-indigo-600 text-[10px] font-black uppercase tracking-widest text-white py-1 px-12 shadow">
+              POPULAIRE
+            </div>
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">⚡</span>
+                <span
+                  class="rounded-md bg-indigo-500/20 border border-indigo-400/40 px-2 py-0.5 text-xs font-black uppercase text-indigo-300"
+                >
+                  2,99 €
+                </span>
+              </div>
+              <h3 class="mt-3 text-lg font-black text-indigo-200 uppercase">
+                Pack Officier de Terrain
+              </h3>
+              <p class="mt-1 text-xs text-slate-300 leading-relaxed">
+                Le meilleur rapport valeur/prix pour régner sur le front :
+              </p>
+              <ul class="mt-2.5 space-y-1.5 text-xs text-slate-200 font-medium">
+                <li class="flex items-center gap-1.5">
+                  <plutonium-icon .size=${14}></plutonium-icon>
+                  <span><strong>+450 Plutonium</strong></span>
+                </li>
+                <li class="flex items-center gap-1.5">
+                  <cap-icon .size=${14}></cap-icon>
+                  <span><strong>+6 000 Caps</strong></span>
+                </li>
+                <li>✨ <strong>Couronne Animée Plasma Pulsar</strong></li>
+                <li>🌊 <strong>Sillage de Navire Plasma</strong></li>
+                <li>📦 <strong>1 Caisse Cyber-Élite</strong> offerte</li>
+              </ul>
+            </div>
+            <button
+              type="button"
+              @click=${() => this.handleBuyStripeBundle("bundle_officier")}
+              class="mt-5 w-full cursor-pointer rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 py-3 text-xs font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
+            >
+              <span>Acheter · 2,99 €</span>
+            </button>
+          </div>
+
+          <!-- BUNDLE 3 : 4.99 EUR -->
+          <div
+            class="rounded-2xl border border-amber-400/60 hover:border-amber-300 bg-slate-900/95 p-5 flex flex-col justify-between shadow-[0_0_30px_rgba(245,158,11,0.25)] transition-all"
+          >
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">👑</span>
+                <span
+                  class="rounded-md bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 text-xs font-black uppercase text-amber-300"
+                >
+                  4,99 €
+                </span>
+              </div>
+              <h3 class="mt-3 text-lg font-black text-amber-300 uppercase">
+                Édition Suprême Commandant
+              </h3>
+              <p class="mt-1 text-xs text-slate-300 leading-relaxed">
+                L'arsenal ultime réservé aux commandants légendaires :
+              </p>
+              <ul class="mt-2.5 space-y-1.5 text-xs text-slate-200 font-medium">
+                <li class="flex items-center gap-1.5">
+                  <plutonium-icon .size=${14}></plutonium-icon>
+                  <span><strong>+950 Plutonium</strong></span>
+                </li>
+                <li class="flex items-center gap-1.5">
+                  <cap-icon .size=${14}></cap-icon>
+                  <span><strong>+15 000 Caps</strong></span>
+                </li>
+                <li>🌟 <strong>Couronne Animée Supernova Royale</strong></li>
+                <li>💥 <strong>Effet d'Impact MIRV Personnalisé</strong></li>
+                <li>🏆 <strong>1 Caisse Suprême Singularity</strong> offerte</li>
+              </ul>
+            </div>
+            <button
+              type="button"
+              @click=${() => this.handleBuyStripeBundle("bundle_supreme")}
+              class="mt-5 w-full cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 py-3 text-xs font-black uppercase tracking-wider text-slate-950 transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
+            >
+              <span>Acheter · 4,99 €</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   private renderBundleGrid(): TemplateResult {
-    return html`${this.renderBrowser(this.visibleGroups, {
+    return html`${this.renderStripeBundlesSection()}${this.renderBrowser(this.visibleGroups, {
       emptyTranslationKey: "store.no_bundles",
     })}${this.openedPack && !this.previewingCosmetic
       ? // The dialog is portaled above the modal's stacking context, so a

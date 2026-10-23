@@ -148,6 +148,114 @@ app.get(
 );
 
 import { accountDb } from "./AccountDatabase";
+import Stripe from "stripe";
+
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripeClient = stripeSecretKey
+  ? new Stripe(stripeSecretKey, {
+      apiVersion: "2024-06-20" as any,
+    })
+  : null;
+
+// Stripe Checkout Session Creation for 3 Bundles
+app.post("/api/stripe/create-checkout-session", async (req, res) => {
+  if (!stripeClient) {
+    return res.status(500).json({ error: "Stripe non configuré sur ce serveur." });
+  }
+
+  const { bundleId, email } = req.body || {};
+  if (!email || !bundleId) {
+    return res.status(400).json({ error: "Email et bundleId requis." });
+  }
+
+  const bundleDefinitions: Record<
+    string,
+    { name: string; description: string; priceCents: number }
+  > = {
+    bundle_recrue: {
+      name: "Kit de Recrue Stratégique",
+      description: "120 Plutonium + 1 500 Caps + Couronne Vanguard d'Argent",
+      priceCents: 99, // 0.99 EUR
+    },
+    bundle_officier: {
+      name: "Pack Officier de Terrain",
+      description: "450 Plutonium + 6 000 Caps + Couronne Animée Plasma Pulsar + Sillage Plasma",
+      priceCents: 299, // 2.99 EUR
+    },
+    bundle_supreme: {
+      name: "Édition Suprême Commandant",
+      description: "950 Plutonium + 15 000 Caps + Couronne Animée Supernova Royale + Impact MIRV",
+      priceCents: 499, // 4.99 EUR
+    },
+  };
+
+  const item = bundleDefinitions[bundleId];
+  if (!item) {
+    return res.status(400).json({ error: "Bundle inconnu." });
+  }
+
+  const domain = process.env.DOMAIN || "borderconflict.cloud";
+  const protocol = domain.includes("localhost") ? "http" : "https";
+
+  try {
+    const session = await stripeClient.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      customer_email: email,
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: `BorderConflict : ${item.name}`,
+              description: item.description,
+            },
+            unit_amount: item.priceCents,
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        email,
+        bundleId,
+      },
+      success_url: `${protocol}://${domain}/?payment_success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${protocol}://${domain}/?payment_cancel=true`,
+    });
+
+    return res.json({ ok: true, checkoutUrl: session.url });
+  } catch (err: any) {
+    console.error("Stripe Checkout Error:", err);
+    return res.status(500).json({ error: err.message || "Erreur de création de session Stripe." });
+  }
+});
+
+// Verify & credit session upon redirect or query
+app.post("/api/stripe/verify-session", async (req, res) => {
+  if (!stripeClient) {
+    return res.status(500).json({ error: "Stripe non configuré." });
+  }
+  const { sessionId } = req.body || {};
+  if (!sessionId) {
+    return res.status(400).json({ error: "sessionId manquant." });
+  }
+
+  try {
+    const session = await stripeClient.checkout.sessions.retrieve(sessionId);
+    if (session.payment_status === "paid") {
+      const email = session.metadata?.email;
+      const bundleId = session.metadata?.bundleId;
+      if (email && bundleId) {
+        const creditRes = accountDb.creditBundle(email, bundleId);
+        return res.json({ ok: true, paid: true, granted: creditRes.granted });
+      }
+    }
+    return res.json({ ok: true, paid: false });
+  } catch (err: any) {
+    console.error("Stripe Verify Error:", err);
+    return res.status(500).json({ error: err.message });
+  }
+});
 
 app.use("/api", (_req, res, next) => {
   setNoStoreHeaders(res);

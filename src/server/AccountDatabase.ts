@@ -244,6 +244,59 @@ class AccountDatabase {
     return { ok: true, profile: merged };
   }
 
+  public getAccountByEmail(emailRaw: string): StoredServerAccount | null {
+    const email = emailRaw.trim().toLowerCase();
+    return this.db[email] || null;
+  }
+
+  public creditBundle(emailRaw: string, bundleId: string): { ok: boolean; error?: string; granted?: any } {
+    const email = emailRaw.trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) {
+      return { ok: false, error: "Compte introuvable." };
+    }
+
+    const current = account.profile || {};
+    let addPlutonium = 0;
+    let addCaps = 0;
+    const addFlares: string[] = [];
+
+    if (bundleId === "bundle_recrue") {
+      addPlutonium = 120;
+      addCaps = 1500;
+      addFlares.push("crown:vanguard_silver");
+    } else if (bundleId === "bundle_officier") {
+      addPlutonium = 450;
+      addCaps = 6000;
+      addFlares.push("crown:plasma_pulsar", "boat_trail:electric_plasma");
+    } else if (bundleId === "bundle_supreme") {
+      addPlutonium = 950;
+      addCaps = 15000;
+      addFlares.push("crown:supernova_royale", "nuke_impact:mirv_custom");
+    }
+
+    current.plutonium = (current.plutonium || 0) + addPlutonium;
+    current.caps = (current.caps || 0) + addCaps;
+    current.ownedFlares = Array.from(new Set([...(current.ownedFlares || []), ...addFlares]));
+
+    account.profile = current;
+    account.updatedAt = Date.now();
+    this.save();
+
+    return {
+      ok: true,
+      granted: {
+        plutonium: addPlutonium,
+        caps: addCaps,
+        flares: addFlares,
+        newBalance: {
+          plutonium: current.plutonium,
+          caps: current.caps,
+        },
+      },
+    };
+  }
+
   public getPublicProfile(publicId: string): any | null {
     const cleanId = publicId.toLowerCase().replace(/^cmd-/, "");
     for (const [email, account] of Object.entries(this.db)) {
