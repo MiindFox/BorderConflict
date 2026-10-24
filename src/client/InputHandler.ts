@@ -749,19 +749,6 @@ export class InputHandler {
           return;
         }
 
-        // Quick attack ratio presets: 1 -> 20%, 2 -> 50%, 3 -> 75%, 4 -> 100%
-        if (!e.repeat && !this.emojiTableOpen && !isTextInput) {
-          let presetRatio: number | null = null;
-          if (e.code === "Digit1" || e.code === "Numpad1" || e.key === "1" || e.key === "&") presetRatio = 0.2;
-          else if (e.code === "Digit2" || e.code === "Numpad2" || e.key === "2" || e.key === "é") presetRatio = 0.5;
-          else if (e.code === "Digit3" || e.code === "Numpad3" || e.key === "3" || e.key === '"') presetRatio = 0.75;
-          else if (e.code === "Digit4" || e.code === "Numpad4" || e.key === "4" || e.key === "'") presetRatio = 1.0;
-
-          if (presetRatio !== null) {
-            this.eventBus.emit(new SetAttackRatioEvent(presetRatio));
-          }
-        }
-
         // The emoji menu key works on keydown, unlike most keybinds, so a
         // favorite key typed right after it (before it is released) already
         // goes to the table instead of panning the map. Pressed again, it
