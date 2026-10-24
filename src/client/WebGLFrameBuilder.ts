@@ -9,6 +9,7 @@ import {
   type NukeExplosionType,
 } from "@openfront/shared/CosmeticSchemas";
 import { colord } from "colord";
+import { commanderStore } from "./CommanderStore";
 import { getCachedCosmetics } from "./Cosmetics";
 import { buildTerrainRowSpans } from "./render/frame/derive/TerrainRowSpans";
 import { uploadFrameData } from "./render/frame/Upload";
@@ -475,6 +476,10 @@ export class WebGLFrameBuilder {
         const url = p.equippedCosmetics.skin?.url;
         if (url) urls.add(assetUrl(url));
       }
+      const myCustomSkin = commanderStore.getCustomSkinUrl();
+      if (myCustomSkin) {
+        urls.add(assetUrl(myCustomSkin));
+      }
       this.view.initSkinAtlas([...urls]);
     }
     const newPlayers: PlayerStatic[] = [];
@@ -530,19 +535,22 @@ export class WebGLFrameBuilder {
       p.borderColor(),
     );
 
+    const isSelf = p.isSelf();
+    const myCustomSkin = isSelf ? commanderStore.getCustomSkinUrl() : null;
+
     // p.cosmetics.flag has already been server-resolved to either a full URL
     // or a relative asset path (e.g. "/flags/US.svg" or a CDN URL for a
     // custom flag). assetUrl() passes URLs through and rewrites paths.
-    const flagRef = p.cosmetics.flag;
+    const flagRef = (isSelf && myCustomSkin) ? myCustomSkin : p.cosmetics.flag;
     const flagUrl = flagRef ? assetUrl(flagRef) : undefined;
 
     // Crown cosmetic: already server-resolved to the catalog image URL.
     const crownRef = p.cosmetics.crown?.url;
     const crownUrl = crownRef ? assetUrl(crownRef) : undefined;
 
-    if (p.equippedCosmetics.skin?.url) {
-      const skinUrl = p.cosmetics.skin?.url;
-      this.view.setPlayerSkin(smallID, skinUrl ? assetUrl(skinUrl) : null);
+    const skinUrl = (isSelf && myCustomSkin) ? myCustomSkin : p.cosmetics.skin?.url;
+    if (skinUrl) {
+      this.view.setPlayerSkin(smallID, assetUrl(skinUrl));
     }
 
     writePatternEntry(

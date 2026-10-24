@@ -56,7 +56,9 @@ export class SoundEffectController implements Controller {
   constructor(
     private readonly game: GameView,
     private readonly eventBus: EventBus,
-  ) {}
+  ) {
+    tacticalInteractions.startServerSync(this.game);
+  }
 
   init(): void {
     // On the intent, not the sim confirmation: the cue answers the player's

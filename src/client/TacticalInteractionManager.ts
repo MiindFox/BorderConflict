@@ -1,6 +1,7 @@
 import { EventBus } from "@openfront/shared/EventBus";
 import { commanderStore } from "./CommanderStore";
 import { PlaySoundEffectEvent } from "./sound/Sounds";
+import { SendTargetPlayerIntentEvent } from "./Transport";
 import { showToast } from "./Utils";
 import { GameView, PlayerView } from "./view";
 
@@ -29,12 +30,74 @@ export class TacticalInteractionManager {
 
   private countdownInterval: number | null = null;
   private tradeIncomeInterval: number | null = null;
+  private serverSyncInterval: number | null = null;
+  private currentGame: GameView | null = null;
 
   public static getInstance(): TacticalInteractionManager {
     if (!TacticalInteractionManager.instance) {
       TacticalInteractionManager.instance = new TacticalInteractionManager();
     }
     return TacticalInteractionManager.instance;
+  }
+
+  // --- MULTIPLAYER SERVER SYNC ---
+
+  public startServerSync(game: GameView): void {
+    this.currentGame = game;
+    if (this.serverSyncInterval !== null) {
+      clearInterval(this.serverSyncInterval);
+      this.serverSyncInterval = null;
+    }
+
+    const gameId = game.gameID();
+    const sync = async () => {
+      try {
+        const [bountyRes, pnaRes] = await Promise.all([
+          fetch(`/api/tactical/bounties/${gameId}`),
+          fetch(`/api/tactical/pna/${gameId}`),
+        ]);
+        if (bountyRes.ok) {
+          const data = await bountyRes.json();
+          if (data.ok && Array.isArray(data.bounties)) {
+            for (const b of data.bounties) {
+              const prev = this.bounties.get(b.targetId);
+              if (!prev || prev.amount < b.amount) {
+                this.bounties.set(b.targetId, b);
+                if (!prev) {
+                  showToast(
+                    `🎯 NOUVEAU CONTRAT : Prime de ${b.amount} 🪙 sur ${b.targetName} !`,
+                    "green",
+                    4000,
+                  );
+                }
+              }
+            }
+          }
+        }
+        if (pnaRes.ok) {
+          const data = await pnaRes.json();
+          if (data.ok && Array.isArray(data.pnas)) {
+            for (const p of data.pnas) {
+              this.pacts.set(p.p1Id, {
+                targetId: p.p1Id,
+                targetName: p.p1Name,
+                expiresAt: p.expiresAt,
+              });
+              this.pacts.set(p.p2Id, {
+                targetId: p.p2Id,
+                targetName: p.p2Name,
+                expiresAt: p.expiresAt,
+              });
+            }
+          }
+        }
+      } catch {
+        // Tolerated transient network failure
+      }
+    };
+
+    void sync();
+    this.serverSyncInterval = window.setInterval(sync, 3500);
   }
 
   // --- BOUNTY SYSTEM ---
@@ -47,7 +110,10 @@ export class TacticalInteractionManager {
   ): boolean {
     const profile = commanderStore.getProfile();
     if (profile.caps < amount) {
-      showToast(`Capsules insuffisantes : ${amount} 🪙 requises (vous avez ${profile.caps} 🪙).`, "red");
+      showToast(
+        `Capsules insuffisantes : ${amount} 🪙 requises (vous avez ${profile.caps} 🪙).`,
+        "red",
+      );
       return false;
     }
 
@@ -56,14 +122,31 @@ export class TacticalInteractionManager {
     const existing = this.bounties.get(targetId);
     const newTotal = (existing?.amount || 0) + amount;
 
-    this.bounties.set(targetId, {
+    const record: ActiveBounty = {
       targetId,
       targetName: target.displayName(),
       amount: newTotal,
       sponsorName: myPlayer.displayName(),
       sponsorId: myPlayer.id(),
       placedAt: Date.now(),
-    });
+    };
+    this.bounties.set(targetId, record);
+
+    if (this.currentGame) {
+      const gameId = this.currentGame.gameID();
+      void fetch("/api/tactical/bounty", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gameId,
+          targetId,
+          targetName: target.displayName(),
+          amount,
+          sponsorName: myPlayer.displayName(),
+          sponsorId: myPlayer.id(),
+        }),
+      }).catch(() => {});
+    }
 
     if (eventBus) {
       eventBus.emit(new PlaySoundEffectEvent("ka-ching"));
@@ -96,6 +179,17 @@ export class TacticalInteractionManager {
     if (!bounty) return;
 
     this.bounties.delete(conqueredId);
+    if (this.currentGame) {
+      void fetch("/api/tactical/bounty/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gameId: this.currentGame.gameID(),
+          conqueredId,
+        }),
+      }).catch(() => {});
+    }
+
     const myPlayer = game.myPlayer();
 
     if (myPlayer && myPlayer.id() === conquerorId) {
@@ -127,7 +221,13 @@ export class TacticalInteractionManager {
     targetName: string,
     initiatorName: string,
     eventBus: EventBus,
+    targetId?: string,
   ): void {
+    if (targetId) {
+      // Broadcast target intent across lockstep multiplayer turns to all friendly players
+      eventBus.emit(new SendTargetPlayerIntentEvent(targetId));
+    }
+
     if (this.countdownInterval !== null) {
       clearInterval(this.countdownInterval);
       this.countdownInterval = null;
@@ -221,6 +321,21 @@ export class TacticalInteractionManager {
       expiresAt: Date.now() + durationSec * 1000,
     });
 
+    if (this.currentGame) {
+      void fetch("/api/tactical/pna", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gameId: this.currentGame.gameID(),
+          p1Id: myPlayer.id(),
+          p2Id: targetId,
+          p1Name: myPlayer.displayName(),
+          p2Name: target.displayName(),
+          durationSec,
+        }),
+      }).catch(() => {});
+    }
+
     if (eventBus) {
       eventBus.emit(new PlaySoundEffectEvent("alliance-accepted"));
     }
@@ -253,6 +368,18 @@ export class TacticalInteractionManager {
   public breakPna(targetId: string, eventBus?: EventBus): void {
     const pact = this.pacts.get(targetId);
     this.pacts.delete(targetId);
+
+    if (this.currentGame) {
+      void fetch("/api/tactical/pna/break", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gameId: this.currentGame.gameID(),
+          p1Id: targetId,
+        }),
+      }).catch(() => {});
+    }
+
     if (eventBus) {
       eventBus.emit(new PlaySoundEffectEvent("alliance-broken"));
     }

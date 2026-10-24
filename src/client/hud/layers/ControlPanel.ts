@@ -10,7 +10,7 @@ import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { keyed } from "lit/directives/keyed.js";
 import { Controller } from "../../Controller";
-import { AttackRatioEvent } from "../../InputHandler";
+import { AttackRatioEvent, SetAttackRatioEvent } from "../../InputHandler";
 import { UIState } from "../../UIState";
 import { USER_SETTINGS_CHANGED_EVENT, UserSettings } from "../../UserSettings";
 import { getGamesPlayed, translateText } from "../../Utils";
@@ -110,6 +110,9 @@ export class ControlPanel extends LitElement implements Controller {
 
       this.attackRatio = newAttackRatio;
       this.onAttackRatioChange(this.attackRatio);
+    });
+    this.eventBus.on(SetAttackRatioEvent, (event) => {
+      this.setRatioPreset(event.ratio);
     });
   }
 
@@ -697,9 +700,9 @@ export class ControlPanel extends LitElement implements Controller {
             >
           </div>
         </div>
-        <!-- Attack ratio slider -->
+        <!-- Attack ratio slider & mobile presets -->
         <div
-          class="flex-1 min-w-0 ${this.tutorialHighlightClass("attack_ratio")}"
+          class="flex-1 min-w-0 flex flex-col gap-1 ${this.tutorialHighlightClass("attack_ratio")}"
           translate="no"
         >
           <input
@@ -709,8 +712,30 @@ export class ControlPanel extends LitElement implements Controller {
             .value=${String(Math.round(this.attackRatio * 100))}
             @input=${(e: Event) => this.handleRatioSliderInput(e)}
             @pointerup=${(e: Event) => this.handleRatioSliderPointerUp(e)}
-            class="w-full h-1.5 accent-aquarius cursor-pointer"
+            class="w-full h-1.5 accent-cyan-400 cursor-pointer"
           />
+          <div class="flex items-center justify-between gap-1">
+            ${[
+              { label: "20%", val: 0.2 },
+              { label: "50%", val: 0.5 },
+              { label: "75%", val: 0.75 },
+              { label: "MAX", val: 1.0 },
+            ].map(
+              (p) => html`
+                <button
+                  type="button"
+                  @click=${() => this.setRatioPreset(p.val)}
+                  class="flex-1 py-0.5 rounded text-[10px] font-black transition-all ${Math.abs(
+                    this.attackRatio - p.val,
+                  ) < 0.03
+                    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black shadow-xs border border-cyan-300"
+                    : "bg-slate-900/90 text-slate-300 border border-slate-700/60"}"
+                >
+                  ${p.label}
+                </button>
+              `,
+            )}
+          </div>
         </div>
       </div>
     `;

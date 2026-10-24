@@ -1201,6 +1201,7 @@ export class PlayerPanel extends LitElement implements Controller {
                       other.displayName(),
                       my.displayName(),
                       this.eventBus,
+                      other.id(),
                     );
                     this.hide();
                   }}

@@ -354,6 +354,104 @@ app.post("/api/custom-skin/upload", (req, res) => {
   return res.json({ ok: true, skinUrl: result.skinUrl });
 });
 
+// Tactical Multiplayer Store (Bounties, Pacts)
+interface ActiveBountyRecord {
+  targetId: string;
+  targetName: string;
+  amount: number;
+  sponsorName: string;
+  sponsorId: string;
+  placedAt: number;
+}
+
+interface ActivePnaRecord {
+  p1Id: string;
+  p2Id: string;
+  p1Name: string;
+  p2Name: string;
+  expiresAt: number;
+}
+
+const gameBounties = new Map<string, Map<string, ActiveBountyRecord>>();
+const gamePnas = new Map<string, ActivePnaRecord[]>();
+
+app.post("/api/tactical/bounty", (req, res) => {
+  const { gameId, targetId, targetName, amount, sponsorName, sponsorId } = req.body || {};
+  if (!gameId || !targetId || !amount) {
+    return res.status(400).json({ ok: false, error: "Missing parameters" });
+  }
+  if (!gameBounties.has(gameId)) {
+    gameBounties.set(gameId, new Map());
+  }
+  const map = gameBounties.get(gameId)!;
+  const existing = map.get(String(targetId));
+  const newAmount = (existing?.amount || 0) + Number(amount);
+  map.set(String(targetId), {
+    targetId: String(targetId),
+    targetName: String(targetName || "Commandant"),
+    amount: newAmount,
+    sponsorName: String(sponsorName || "Anonyme"),
+    sponsorId: String(sponsorId || ""),
+    placedAt: Date.now(),
+  });
+  return res.json({ ok: true, bounty: map.get(String(targetId)) });
+});
+
+app.get("/api/tactical/bounties/:gameId", (req, res) => {
+  const gameId = req.params.gameId;
+  const map = gameBounties.get(gameId);
+  const list = map ? Array.from(map.values()) : [];
+  return res.json({ ok: true, bounties: list });
+});
+
+app.post("/api/tactical/bounty/claim", (req, res) => {
+  const { gameId, conqueredId } = req.body || {};
+  if (!gameId || !conqueredId) return res.status(400).json({ ok: false });
+  const map = gameBounties.get(gameId);
+  if (!map) return res.json({ ok: true, claimed: null });
+  const bounty = map.get(String(conqueredId));
+  if (bounty) {
+    map.delete(String(conqueredId));
+    return res.json({ ok: true, claimed: bounty });
+  }
+  return res.json({ ok: true, claimed: null });
+});
+
+app.post("/api/tactical/pna", (req, res) => {
+  const { gameId, p1Id, p2Id, p1Name, p2Name, durationSec } = req.body || {};
+  if (!gameId || !p1Id || !p2Id) return res.status(400).json({ ok: false });
+  if (!gamePnas.has(gameId)) gamePnas.set(gameId, []);
+  const list = gamePnas.get(gameId)!;
+  const sec = Number(durationSec) || 180;
+  const filtered = list.filter(p => !((p.p1Id === p1Id && p.p2Id === p2Id) || (p.p1Id === p2Id && p.p2Id === p1Id)));
+  filtered.push({
+    p1Id: String(p1Id),
+    p2Id: String(p2Id),
+    p1Name: String(p1Name || "Joueur"),
+    p2Name: String(p2Name || "Joueur"),
+    expiresAt: Date.now() + sec * 1000,
+  });
+  gamePnas.set(gameId, filtered);
+  return res.json({ ok: true });
+});
+
+app.get("/api/tactical/pna/:gameId", (req, res) => {
+  const list = gamePnas.get(req.params.gameId) || [];
+  const now = Date.now();
+  const active = list.filter(p => p.expiresAt > now);
+  gamePnas.set(req.params.gameId, active);
+  return res.json({ ok: true, pnas: active });
+});
+
+app.post("/api/tactical/pna/break", (req, res) => {
+  const { gameId, p1Id, p2Id } = req.body || {};
+  if (!gameId) return res.status(400).json({ ok: false });
+  const list = gamePnas.get(gameId) || [];
+  const filtered = list.filter(p => !((p.p1Id === p1Id && p.p2Id === p2Id) || (p.p1Id === p2Id && p.p2Id === p1Id)));
+  gamePnas.set(gameId, filtered);
+  return res.json({ ok: true });
+});
+
 app.get("/api/public/player/:publicId", (req, res) => {
   const profile = accountDb.getPublicProfile(req.params.publicId);
   if (!profile) {

@@ -26,6 +26,7 @@ import { onlyImages } from "./OnlyImages";
 
 import { renderNumber, renderTroops } from "@openfront/engine-lib/Format";
 import { PlaySoundEffectEvent } from "../../sound/Sounds";
+import { tacticalInteractions } from "../../TacticalInteractionManager";
 import { UIState } from "../../UIState";
 import { getMessageTypeClasses, translateText } from "../../Utils";
 
@@ -514,11 +515,19 @@ export class EventsDisplay extends LitElement implements Controller {
     if (!myPlayer || !myPlayer.isFriendly(other)) return;
 
     const target = this.game.playerBySmallID(event.targetID) as PlayerView;
+    const targetName = target ? target.displayName() : "Ennemi";
+
+    // Synchronize 5s assault countdown overlay on all allies
+    tacticalInteractions.startAssaultCountdown(
+      targetName,
+      other.displayName(),
+      this.eventBus,
+    );
 
     this.addEvent({
       description: translateText("events_display.attack_request", {
         name: other.displayName(),
-        target: target.displayName(),
+        target: targetName,
       }),
       type: MessageType.ATTACK_REQUEST,
       highlight: true,
