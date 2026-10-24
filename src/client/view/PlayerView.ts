@@ -25,9 +25,8 @@ import { ClientID } from "@openfront/engine-api/Schemas";
 import { PatternDecoder } from "@openfront/shared/PatternDecoder";
 import { createRandomName } from "@openfront/shared/SharedUtil";
 import { PlayerCosmetics } from "@openfront/shared/WireSchemas";
-import { colord, Colord } from "colord";
+import { Colord, colord } from "colord";
 import { base64url } from "jose";
-import { commanderStore } from "../CommanderStore";
 import { PlayerState, PlayerStatic, PlayerTypeEnum } from "../render/types";
 import { themeProvider } from "../theme/ThemeProvider";
 import { UserSettings } from "../UserSettings";
@@ -107,17 +106,6 @@ export class PlayerView implements PlayerLike {
       this.game.cosmeticVisibility(),
       this.cosmeticOwner(),
     );
-
-    if (this.cosmeticOwner() === "self") {
-      const customSkin = commanderStore.getCustomSkinUrl();
-      if (customSkin) {
-        this.cosmetics.flag = customSkin;
-        this.cosmetics.skin = { url: customSkin, name: "Custom Territory Skin" };
-        this.equippedCosmetics.skin = { url: customSkin, name: "Custom Territory Skin" };
-        this.equippedCosmetics.flag = customSkin;
-      }
-    }
-
     this.computeColors();
 
     const pattern = this.cosmetics.pattern;
@@ -132,15 +120,11 @@ export class PlayerView implements PlayerLike {
     this.refreshCosmetics();
   }
 
-  public isSelf(): boolean {
-    return (
+  private cosmeticOwner(): CosmeticOwner {
+    if (
       this.static.clientID !== null &&
       this.static.clientID === this.game.myClientID()
-    );
-  }
-
-  private cosmeticOwner(): CosmeticOwner {
-    if (this.isSelf()) {
+    ) {
       return "self";
     }
     const myTeam = this.game.myPlayer()?.team() ?? null;
