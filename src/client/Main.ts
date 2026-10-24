@@ -47,7 +47,7 @@ import {
   steamGrantStringsReady,
 } from "./BootInterrupts";
 import type { JoinLobbyResult } from "./ClientGameRunner";
-import { commanderStore } from "./CommanderStore";
+import { commanderStore, COMMANDER_UPDATED_EVENT } from "./CommanderStore";
 import {
   broadcastFreshUserMe,
   getPlayerCosmeticsRefs,
@@ -993,6 +993,11 @@ class Client {
       authGeneration++;
       snapshotLapseMarker();
       void onUserMe(false);
+    });
+
+    window.addEventListener(COMMANDER_UPDATED_EVENT, () => {
+      const email = commanderStore.getEmail();
+      void onUserMe(email ? commanderStore.getLocalUserMeResponse() : false);
     });
 
     // Register before initial auth settles: the status bar may already offer

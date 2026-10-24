@@ -7,6 +7,7 @@ import {
   getCommanderRankTitle,
   xpRequiredForLevel,
 } from "../CommanderStore";
+import "./CapIcon";
 import "./CosmeticBackground";
 import "./NavAccountMenu";
 import "./NavUtilityIcons";
@@ -89,6 +90,55 @@ export class PlayPage extends LitElement {
               `
             : html``}
         </div>
+
+        <!-- Commander Cloud Currencies Badge & Status -->
+        <div
+          class="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/90 border border-cyan-500/25 text-xs font-mono shadow-inner"
+        >
+          <div
+            class="flex items-center gap-1.5 text-green-400 font-extrabold"
+            title="Plutonium Cloud Autoritaire"
+          >
+            <plutonium-icon .size=${16}></plutonium-icon>
+            <span>${profile.plutonium.toLocaleString("fr-FR")} 💎</span>
+          </div>
+          <div class="h-3.5 w-px bg-white/10"></div>
+          <div
+            class="flex items-center gap-1.5 text-amber-400 font-extrabold"
+            title="Capsules Cloud Autoritaires"
+          >
+            <cap-icon .size=${18}></cap-icon>
+            <span>${profile.caps.toLocaleString("fr-FR")} 🪙</span>
+          </div>
+        </div>
+
+        ${!profile.email
+          ? html`
+              <button
+                @click=${() =>
+                  window.dispatchEvent(
+                    new CustomEvent("showPage", { detail: "page-account" }),
+                  )}
+                class="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 hover:from-cyan-500/30 hover:to-indigo-500/30 border border-cyan-400/40 text-cyan-300 hover:text-white text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+              >
+                <span>☁️ Se Connecter & Synchroniser mes Devises</span>
+              </button>
+            `
+          : html`
+              <div
+                class="flex items-center justify-between text-[10px] font-mono text-cyan-300/80 px-1"
+              >
+                <span class="flex items-center gap-1">
+                  <span
+                    class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"
+                  ></span>
+                  <span>Cloud Synchronisé</span>
+                </span>
+                <span class="text-slate-400 truncate max-w-[150px]"
+                  >${profile.email}</span
+                >
+              </div>
+            `}
 
         <!-- Identity: Territory Pattern / Skin Frame with Username Input -->
         <div class="flex flex-col gap-1">

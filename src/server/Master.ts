@@ -323,6 +323,42 @@ app.post("/api/account/login", (req, res) => {
   return res.json({ ok: true, profile: result.account?.profile });
 });
 
+app.all("/api/account/me", (req, res) => {
+  const email = (req.body?.email || req.query?.email || req.headers["x-account-email"]) as string;
+  const password = (req.body?.password || req.query?.password || req.headers["x-account-pass"]) as string;
+  if (!email || !password) {
+    return res.status(401).json({ ok: false, error: "Identifiants requis." });
+  }
+  const result = accountDb.getProfile(email, password);
+  if (!result.ok) {
+    return res.status(401).json({ ok: false, error: result.error });
+  }
+  return res.json({ ok: true, profile: result.profile });
+});
+
+app.post("/api/account/currency", (req, res) => {
+  const { email, password, deltaPlutonium, deltaCaps, reason } = req.body || {};
+  if (!email || !password) {
+    return res.status(401).json({ ok: false, error: "Identifiants requis." });
+  }
+  const result = accountDb.adjustCurrency(
+    email,
+    password,
+    Number(deltaPlutonium) || 0,
+    Number(deltaCaps) || 0,
+    reason
+  );
+  if (!result.ok) {
+    return res.status(400).json({ ok: false, error: result.error });
+  }
+  return res.json({
+    ok: true,
+    profile: result.profile,
+    plutonium: result.profile?.plutonium,
+    caps: result.profile?.caps,
+  });
+});
+
 app.post("/api/account/sync", (req, res) => {
   const { email, password, profile } = req.body || {};
   const result = accountDb.syncProfile(email, password, profile);

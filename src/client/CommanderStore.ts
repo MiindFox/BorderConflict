@@ -124,7 +124,9 @@ class CommanderStore {
   constructor() {
     this.profile = this.load();
     if (typeof window !== "undefined") {
-      setTimeout(() => this.syncWithServerInBackground(), 50);
+      setTimeout(() => this.syncWithServerInBackground(), 10);
+      window.addEventListener("focus", () => this.syncWithServerInBackground());
+      window.addEventListener("online", () => this.syncWithServerInBackground());
     }
   }
 
@@ -206,15 +208,54 @@ class CommanderStore {
     this.syncWithServerInBackground();
   }
 
+  private sendCurrencyDelta(
+    deltaPlutonium: number,
+    deltaCaps: number,
+    reason: string = "mutation",
+  ): void {
+    if (typeof window === "undefined" || !this.profile.email) return;
+    const email = this.profile.email;
+    const password = localStorage.getItem(ACCOUNT_PASS_KEY);
+    if (!password) return;
+
+    fetch("/api/account/currency", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        password,
+        deltaPlutonium,
+        deltaCaps,
+        reason,
+      }),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.ok && data?.profile) {
+          this.applyServerProfile(data.profile);
+        }
+      })
+      .catch(() => {
+        // Fallback silently if offline
+      });
+  }
+
   private applyServerProfile(serverProfile: any): void {
     if (!serverProfile) return;
     let changed = false;
 
-    if (typeof serverProfile.plutonium === "number" && serverProfile.plutonium > this.profile.plutonium) {
+    // Cloud Authoritative Currencies: Always synchronize directly with the central database!
+    if (
+      typeof serverProfile.plutonium === "number" &&
+      this.profile.plutonium !== serverProfile.plutonium
+    ) {
       this.profile.plutonium = serverProfile.plutonium;
       changed = true;
     }
-    if (typeof serverProfile.caps === "number" && serverProfile.caps > this.profile.caps) {
+    if (
+      typeof serverProfile.caps === "number" &&
+      this.profile.caps !== serverProfile.caps
+    ) {
       this.profile.caps = serverProfile.caps;
       changed = true;
     }
@@ -222,7 +263,10 @@ class CommanderStore {
       this.profile.isVip = true;
       changed = true;
     }
-    if (typeof serverProfile.vipUntil === "number" && (!this.profile.vipUntil || serverProfile.vipUntil > this.profile.vipUntil)) {
+    if (
+      typeof serverProfile.vipUntil === "number" &&
+      (!this.profile.vipUntil || serverProfile.vipUntil > this.profile.vipUntil)
+    ) {
       this.profile.vipUntil = serverProfile.vipUntil;
       changed = true;
     }
@@ -230,24 +274,78 @@ class CommanderStore {
       this.profile.hasBattlePass = true;
       changed = true;
     }
-    if (typeof serverProfile.battlePassSeason === "number" && (!this.profile.battlePassSeason || serverProfile.battlePassSeason > (this.profile.battlePassSeason || 0))) {
+    if (
+      typeof serverProfile.battlePassSeason === "number" &&
+      (!this.profile.battlePassSeason ||
+        serverProfile.battlePassSeason > (this.profile.battlePassSeason || 0))
+    ) {
       this.profile.battlePassSeason = serverProfile.battlePassSeason;
       changed = true;
     }
-    if (serverProfile.hasCustomSkinUnlocked && !this.profile.hasCustomSkinUnlocked) {
+    if (
+      serverProfile.hasCustomSkinUnlocked &&
+      !this.profile.hasCustomSkinUnlocked
+    ) {
       this.profile.hasCustomSkinUnlocked = true;
       changed = true;
     }
-    if (serverProfile.customSkinUrl && !this.profile.customSkinUrl) {
+    if (
+      serverProfile.customSkinUrl &&
+      this.profile.customSkinUrl !== serverProfile.customSkinUrl
+    ) {
       this.profile.customSkinUrl = serverProfile.customSkinUrl;
       changed = true;
     }
-    if (serverProfile.customSkinName && !this.profile.customSkinName) {
+    if (
+      serverProfile.customSkinName &&
+      this.profile.customSkinName !== serverProfile.customSkinName
+    ) {
       this.profile.customSkinName = serverProfile.customSkinName;
       changed = true;
     }
+    if (
+      typeof serverProfile.level === "number" &&
+      serverProfile.level > this.profile.level
+    ) {
+      this.profile.level = serverProfile.level;
+      changed = true;
+    }
+    if (
+      typeof serverProfile.xp === "number" &&
+      (serverProfile.level > this.profile.level ||
+        serverProfile.xp > this.profile.xp)
+    ) {
+      this.profile.xp = serverProfile.xp;
+      changed = true;
+    }
+    if (
+      typeof serverProfile.doctrineMask === "number" &&
+      this.profile.doctrineMask === 0 &&
+      serverProfile.doctrineMask > 0
+    ) {
+      this.profile.doctrineMask = serverProfile.doctrineMask;
+      changed = true;
+    }
+    if (serverProfile.equippedMedal && !this.profile.equippedMedal) {
+      this.profile.equippedMedal = serverProfile.equippedMedal;
+      changed = true;
+    }
+    if (Array.isArray(serverProfile.unlockedMedals)) {
+      const mergedMedals = Array.from(
+        new Set([
+          ...this.profile.unlockedMedals,
+          ...serverProfile.unlockedMedals,
+        ]),
+      );
+      if (mergedMedals.length !== this.profile.unlockedMedals.length) {
+        this.profile.unlockedMedals = mergedMedals;
+        changed = true;
+      }
+    }
     if (Array.isArray(serverProfile.ownedFlares)) {
-      const mergedFlares = Array.from(new Set([...this.profile.ownedFlares, ...serverProfile.ownedFlares]));
+      const mergedFlares = Array.from(
+        new Set([...this.profile.ownedFlares, ...serverProfile.ownedFlares]),
+      );
       if (mergedFlares.length !== this.profile.ownedFlares.length) {
         this.profile.ownedFlares = mergedFlares;
         changed = true;
@@ -259,7 +357,7 @@ class CommanderStore {
     }
   }
 
-  private syncWithServerInBackground(): void {
+  public syncWithServerInBackground(): void {
     if (typeof window === "undefined" || !this.profile.email) return;
     const email = this.profile.email;
     const password = localStorage.getItem(ACCOUNT_PASS_KEY);
@@ -271,7 +369,26 @@ class CommanderStore {
       body: JSON.stringify({
         email,
         password,
-        profile: this.profile,
+        profile: {
+          level: this.profile.level,
+          xp: this.profile.xp,
+          gamesPlayed: this.profile.gamesPlayed,
+          victories: this.profile.victories,
+          worldEventsSurvived: this.profile.worldEventsSurvived,
+          directivesCompleted: this.profile.directivesCompleted,
+          unlockedMedals: this.profile.unlockedMedals,
+          equippedMedal: this.profile.equippedMedal,
+          ownedFlares: this.profile.ownedFlares,
+          doctrineMask: this.profile.doctrineMask,
+          username: this.profile.username,
+          isVip: this.profile.isVip,
+          vipUntil: this.profile.vipUntil,
+          hasBattlePass: this.profile.hasBattlePass,
+          battlePassSeason: this.profile.battlePassSeason,
+          hasCustomSkinUnlocked: this.profile.hasCustomSkinUnlocked,
+          customSkinUrl: this.profile.customSkinUrl,
+          customSkinName: this.profile.customSkinName,
+        },
       }),
     })
       .then((res) => (res.ok ? res.json() : null))
@@ -390,9 +507,16 @@ class CommanderStore {
       const data = await res.json();
       if (res.ok && data.ok && data.profile) {
         this.profile = {
+          ...DEFAULT_PROFILE,
           ...data.profile,
           email,
           username: data.profile.username || email.split("@")[0],
+          plutonium:
+            typeof data.profile.plutonium === "number"
+              ? data.profile.plutonium
+              : 0,
+          caps:
+            typeof data.profile.caps === "number" ? data.profile.caps : 0,
           ownedFlares: Array.from(
             new Set([...STARTER_FLARES, ...(data.profile.ownedFlares ?? [])]),
           ),
@@ -407,7 +531,7 @@ class CommanderStore {
         };
         this.saveAccountsDb(db);
         localStorage.setItem(ACCOUNT_PASS_KEY, passwordRaw);
-        this.save();
+        this.saveLocalAndBroadcast();
         return { ok: true };
       } else if (res.status === 401) {
         return { ok: false, error: data.error || "Mot de passe incorrect." };
@@ -526,6 +650,7 @@ class CommanderStore {
       // Level-up reward: 1 plutonium, 12 caps
       this.profile.plutonium += 1;
       this.profile.caps += 12;
+      this.sendCurrencyDelta(1, 12, "level_up_reward");
       leveledUp = true;
     }
     this.save();
@@ -580,8 +705,14 @@ class CommanderStore {
     const isVip = this.isVipActive();
     // Hard grind rewards: 0 plutonium on loss, 1 on victory. Very scarce caps. VIP gets +25% caps & +2 bonus XP
     const capsGained = won ? (isVip ? 7 : 5) : (isVip ? 2 : 1);
-    this.profile.plutonium += won ? 1 : 0;
+    const puGained = won ? 1 : 0;
+    this.profile.plutonium += puGained;
     this.profile.caps += capsGained;
+    this.sendCurrencyDelta(
+      puGained,
+      capsGained,
+      won ? "match_victory" : "match_played",
+    );
     const baseXp = won ? 18 : 6;
     const timeBonus = Math.min(6, Math.floor(durationSeconds * 0.015));
     const xpGained = baseXp + timeBonus + (isVip ? 2 : 0);
@@ -591,24 +722,25 @@ class CommanderStore {
 
   recordWorldEventSurvived(): void {
     this.profile.worldEventsSurvived++;
-    this.profile.plutonium += 0;
     this.profile.caps += 2;
+    this.sendCurrencyDelta(0, 2, "world_event_survived");
     this.addXp(4);
     this.checkCareerMedals();
   }
 
   recordDirectiveCompleted(xpReward: number = 25): void {
     this.profile.directivesCompleted++;
-    this.profile.plutonium += 0;
     this.profile.caps += 3;
+    this.sendCurrencyDelta(0, 3, "directive_completed");
     this.addXp(Math.min(xpReward, 6));
     this.checkCareerMedals();
   }
 
-  addCurrency(plutonium: number, caps: number): void {
+  addCurrency(plutonium: number, caps: number, reason: string = "gameplay"): void {
     this.profile.plutonium = Math.max(0, this.profile.plutonium + plutonium);
     this.profile.caps = Math.max(0, this.profile.caps + caps);
-    this.save();
+    this.saveLocalAndBroadcast();
+    this.sendCurrencyDelta(plutonium, caps, reason);
   }
 
   purchaseLocalCosmetic(
@@ -619,9 +751,11 @@ class CommanderStore {
     if (method === "hard") {
       if (this.profile.plutonium < price) return false;
       this.profile.plutonium -= price;
+      this.sendCurrencyDelta(-price, 0, "shop_cosmetic_hard");
     } else {
       if (this.profile.caps < price) return false;
       this.profile.caps -= price;
+      this.sendCurrencyDelta(0, -price, "shop_cosmetic_soft");
     }
     const merged = new Set([...this.profile.ownedFlares, ...flaresToGrant]);
     this.profile.ownedFlares = Array.from(merged);
@@ -730,8 +864,10 @@ class CommanderStore {
 
     if (cost.method === "hard") {
       this.profile.plutonium -= cost.amount;
+      this.sendCurrencyDelta(-cost.amount, 0, `supply_crate_${tier}`);
     } else {
       this.profile.caps -= cost.amount;
+      this.sendCurrencyDelta(0, -cost.amount, `supply_crate_${tier}`);
     }
 
     // Filter/bias pool for supreme or elite crates

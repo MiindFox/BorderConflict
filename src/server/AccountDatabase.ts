@@ -204,6 +204,55 @@ class AccountDatabase {
     return { ok: true, account };
   }
 
+  public getProfile(emailRaw: string, passwordRaw: string): { ok: boolean; error?: string; profile?: any } {
+    const email = emailRaw.trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) {
+      return { ok: false, error: "Compte introuvable." };
+    }
+    const hash = hashPassword(passwordRaw, account.salt);
+    if (hash !== account.passwordHash) {
+      return { ok: false, error: "Mot de passe incorrect." };
+    }
+    return { ok: true, profile: account.profile };
+  }
+
+  public adjustCurrency(
+    emailRaw: string,
+    passwordRaw: string,
+    deltaPlutonium: number,
+    deltaCaps: number,
+    reason?: string
+  ): { ok: boolean; error?: string; profile?: any } {
+    const email = emailRaw.trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) {
+      return { ok: false, error: "Compte introuvable." };
+    }
+    const hash = hashPassword(passwordRaw, account.salt);
+    if (hash !== account.passwordHash) {
+      return { ok: false, error: "Non autorisé." };
+    }
+
+    account.profile = account.profile || {};
+    const curPu = typeof account.profile.plutonium === "number" ? account.profile.plutonium : 0;
+    const curCaps = typeof account.profile.caps === "number" ? account.profile.caps : 0;
+
+    const newPu = Math.max(0, curPu + (Number(deltaPlutonium) || 0));
+    const newCaps = Math.max(0, curCaps + (Number(deltaCaps) || 0));
+
+    account.profile.plutonium = newPu;
+    account.profile.caps = newCaps;
+    account.updatedAt = Date.now();
+    this.save();
+
+    console.log(
+      `[AccountDatabase] Currency mutation for ${email}: Pu ${curPu}->${newPu} (${deltaPlutonium}), Caps ${curCaps}->${newCaps} (${deltaCaps}) [${reason || "mutation"}]`
+    );
+
+    return { ok: true, profile: account.profile };
+  }
+
   public syncProfile(emailRaw: string, passwordRaw: string, profile: any): { ok: boolean; error?: string; profile?: any } {
     const email = emailRaw.trim().toLowerCase();
     const account = this.db[email];
@@ -216,6 +265,20 @@ class AccountDatabase {
     }
 
     const current = account.profile || {};
+
+    // Cloud Authoritative Balance Protection:
+    // The server is the sole source of truth for plutonium and caps.
+    // We only mutate currencies if explicit deltas are passed in the sync payload.
+    let updatedPlutonium = typeof current.plutonium === "number" ? current.plutonium : 0;
+    let updatedCaps = typeof current.caps === "number" ? current.caps : 0;
+
+    if (typeof profile?.deltaPlutonium === "number" && profile.deltaPlutonium !== 0) {
+      updatedPlutonium = Math.max(0, updatedPlutonium + profile.deltaPlutonium);
+    }
+    if (typeof profile?.deltaCaps === "number" && profile.deltaCaps !== 0) {
+      updatedCaps = Math.max(0, updatedCaps + profile.deltaCaps);
+    }
+
     const merged = {
       ...current,
       ...profile,
@@ -225,8 +288,8 @@ class AccountDatabase {
       victories: Math.max(current.victories || 0, profile.victories || 0),
       worldEventsSurvived: Math.max(current.worldEventsSurvived || 0, profile.worldEventsSurvived || 0),
       directivesCompleted: Math.max(current.directivesCompleted || 0, profile.directivesCompleted || 0),
-      plutonium: typeof profile.plutonium === "number" ? profile.plutonium : (current.plutonium || 0),
-      caps: typeof profile.caps === "number" ? profile.caps : (current.caps || 0),
+      plutonium: updatedPlutonium,
+      caps: updatedCaps,
       unlockedMedals: Array.from(new Set([...(current.unlockedMedals || []), ...(profile.unlockedMedals || [])])),
       ownedFlares: Array.from(new Set([...(current.ownedFlares || []), ...(profile.ownedFlares || [])])),
       doctrineMask: profile.doctrineMask !== undefined ? profile.doctrineMask : current.doctrineMask,
@@ -240,6 +303,10 @@ class AccountDatabase {
       customSkinUrl: profile.customSkinUrl || current.customSkinUrl || undefined,
       customSkinName: profile.customSkinName || current.customSkinName || undefined,
     };
+
+    // Remove temporary deltas from persisted profile object
+    delete (merged as any).deltaPlutonium;
+    delete (merged as any).deltaCaps;
 
     account.profile = merged;
     if (profile.username) {
