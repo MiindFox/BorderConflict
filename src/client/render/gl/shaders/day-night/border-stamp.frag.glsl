@@ -82,21 +82,20 @@ void main() {
       }
 
       // =========================================================================
-      // VFX OPTION 1 : LIGNE DE FRONT DE COMBAT & ÉTINCELLES (Active Combat Frontline)
+      // VFX OPTION 1 : LIGNE DE FRONT DE COMBAT
       // =========================================================================
       if (combatFrontline > 0.5) {
-        // Horloge quantifiée à haute fréquence (18 fps) pour crépitements électriques rétro CRT
-        float sparkTick = floor(uTime * 18.0);
         vec2 p = vec2(tc);
-        float sparkHash = fract(sin(dot(p, vec2(127.1, 311.7)) + sparkTick * 43.17) * 43758.5453);
-
-        // Onde de tension électrique parcourant la zone de friction frontalière
-        float tensionHum = sin((p.x * 2.3 - p.y * 1.9) * 0.45 + uTime * 6.5) * 0.5 + 0.5;
 
         if (combatFrontline > 0.85) {
-          // --- FRONT EN GUERRE OUVERT / EMBARGO (Alerte rouge & étincelles violentes) ---
+          // --- FRONT EN GUERRE OUVERT / EMBARGO (Alerte rouge & étincelles vives) ---
           float alertStrobe = sin(uTime * 8.0) * 0.5 + 0.5;
           bc = mix(bc, vec3(1.0, 0.15, 0.08), 0.22 + 0.28 * alertStrobe);
+
+          // Horloge quantifiée à haute fréquence (18 fps) pour crépitements électriques
+          float sparkTick = floor(uTime * 18.0);
+          float sparkHash = fract(sin(dot(p, vec2(127.1, 311.7)) + sparkTick * 43.17) * 43758.5453);
+          float tensionHum = sin((p.x * 2.3 - p.y * 1.9) * 0.45 + uTime * 6.5) * 0.5 + 0.5;
 
           if (sparkHash > 0.80) {
             float sparkStrength = (sparkHash - 0.80) / 0.20;
@@ -106,14 +105,9 @@ void main() {
             bc += vec3(0.25, 0.08, 0.0) * tensionHum;
           }
         } else {
-          // --- LIGNE DE FRONT RIVALE / FFA (Arcs électriques cyan/or & crépitement) ---
-          if (sparkHash > 0.84) {
-            float sparkStrength = (sparkHash - 0.84) / 0.16;
-            vec3 sparkColor = mix(vec3(0.35, 0.85, 1.0), vec3(1.0, 1.0, 1.0), sparkStrength);
-            bc = mix(bc, sparkColor, 0.60 + 0.40 * sparkStrength);
-          } else {
-            bc += vec3(0.12, 0.22, 0.32) * (tensionHum * 0.45);
-          }
+          // --- SITUATION DE RIVALITÉ STANDARD (Pulsation lente et fluide, sans aucun scintillement) ---
+          float slowPulse = 0.5 + 0.5 * sin(uTime * 2.0 + (p.x + p.y) * 0.12);
+          bc = mix(bc, bc * 1.35 + vec3(0.08, 0.14, 0.20), slowPulse * 0.60);
         }
       }
     }
