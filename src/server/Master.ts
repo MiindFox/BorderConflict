@@ -1032,9 +1032,9 @@ function buildProgressionConfig() {
   };
 }
 
-app.get(["/cluster.json", "/api/cluster.json"], (_req, res) => {
+app.get(["/cluster.json", "/api/cluster.json"], (req, res) => {
   const commit = ServerEnv.gitCommit();
-  const host = process.env.DOMAIN || "borderconflict.cloud";
+  const host = (req.headers.host as string) || process.env.DOMAIN || "borderconflict.cloud";
   return res.json({
     latest: commit,
     servers: {
