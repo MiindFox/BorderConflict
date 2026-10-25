@@ -309,6 +309,7 @@ export class GameModeSelector extends LitElement {
   // multiplayerAllowedForBackend for why one missed heartbeat must not dim
   // these buttons.
   @state() private backendOutage = false;
+  @state() private isCreatingDuel = false;
   private serverTimeOffset: number = 0;
   private defaultLobbyTime: number = 0;
 
@@ -845,16 +846,16 @@ export class GameModeSelector extends LitElement {
           <div
             class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-lg bg-[#182119] border border-[#2d3d2f]"
           >
-            <!-- CREER SALON -->
+            <!-- DEFIER AMI (SALON AUTO) -->
             <button
               type="button"
-              @click=${this.openHostLobby}
-              ?disabled=${!this.inputValid}
-              class="retro-metal-btn flex items-center justify-center gap-1 py-2 px-1 sm:px-1.5 rounded font-retro text-[9px] sm:text-[10px] font-bold text-amber-300 hover:text-amber-100 transition-all uppercase tracking-tight cursor-pointer whitespace-nowrap"
-              title="Créer un salon personnalisé"
+              @click=${this.handleChallengeFriend}
+              ?disabled=${!this.inputValid || this.isCreatingDuel}
+              class="retro-metal-btn flex items-center justify-center gap-1 py-2 px-1 sm:px-1.5 rounded font-retro text-[9px] sm:text-[10px] font-bold text-amber-300 hover:text-amber-100 transition-all uppercase tracking-tight cursor-pointer whitespace-nowrap border-amber-500/50 bg-amber-950/40 shadow-[0_0_8px_rgba(245,158,11,0.3)]"
+              title="Créer un salon et copier automatiquement le lien pour défier un ami"
             >
-              <span class="text-xs shrink-0">➕</span>
-              <span class="whitespace-nowrap">CREER SALON</span>
+              <span class="text-xs shrink-0 animate-bounce">⚔️</span>
+              <span class="whitespace-nowrap font-black">DÉFIER AMI</span>
             </button>
 
             <!-- CODE PRIVE -->
@@ -963,6 +964,21 @@ export class GameModeSelector extends LitElement {
                   : `${ffa.numClients}👥`}
               </span>
             </button>
+
+            <!-- Bouton Défier un ami en 1 clic -->
+            <button
+              type="button"
+              @click=${this.handleChallengeFriend}
+              ?disabled=${!this.inputValid || this.isCreatingDuel}
+              class="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl font-retro text-[10px] sm:text-[11px] font-black text-amber-200 bg-gradient-to-r from-amber-950/90 via-yellow-950 to-amber-950/90 hover:from-amber-900 hover:to-yellow-900 border border-amber-500/60 shadow-[0_0_12px_rgba(245,158,11,0.25)] hover:shadow-[0_0_18px_rgba(245,158,11,0.4)] active:translate-y-0.5 transition-all cursor-pointer uppercase tracking-wider"
+              title="Créer un salon privé avec IA et copier automatiquement le lien pour votre ami"
+            >
+              <span class="text-xs sm:text-sm animate-bounce">⚔️</span>
+              <span>${this.isCreatingDuel ? "CRÉATION EN COURS..." : "DÉFIER UN AMI (DUEL EN 1 CLIC)"}</span>
+              <span class="px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-300 border border-amber-400/40 text-[8.5px] font-pixel tracking-normal">
+                LIEN AUTO 🔗
+              </span>
+            </button>
           </div>
         `;
       }
@@ -1009,6 +1025,21 @@ export class GameModeSelector extends LitElement {
                 ${teams.gameConfig?.maxPlayers
                   ? `${teams.numClients}/${teams.gameConfig.maxPlayers}`
                   : `${teams.numClients}👥`}
+              </span>
+            </button>
+
+            <!-- Bouton Défier un ami en 1 clic -->
+            <button
+              type="button"
+              @click=${this.handleChallengeFriend}
+              ?disabled=${!this.inputValid || this.isCreatingDuel}
+              class="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl font-retro text-[10px] sm:text-[11px] font-black text-amber-200 bg-gradient-to-r from-amber-950/90 via-yellow-950 to-amber-950/90 hover:from-amber-900 hover:to-yellow-900 border border-amber-500/60 shadow-[0_0_12px_rgba(245,158,11,0.25)] hover:shadow-[0_0_18px_rgba(245,158,11,0.4)] active:translate-y-0.5 transition-all cursor-pointer uppercase tracking-wider"
+              title="Créer un salon privé avec IA et copier automatiquement le lien pour votre ami"
+            >
+              <span class="text-xs sm:text-sm animate-bounce">⚔️</span>
+              <span>${this.isCreatingDuel ? "CRÉATION EN COURS..." : "DÉFIER UN AMI (DUEL EN 1 CLIC)"}</span>
+              <span class="px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-300 border border-amber-400/40 text-[8.5px] font-pixel tracking-normal">
+                LIEN AUTO 🔗
               </span>
             </button>
           </div>
@@ -1226,6 +1257,27 @@ export class GameModeSelector extends LitElement {
     whenModalLoaded("host-lobby-modal", () =>
       (document.querySelector("host-lobby-modal") as HostLobbyModal)?.open(),
     );
+  };
+
+  private handleChallengeFriend = () => {
+    if (this.blockedFromApiAction()) return;
+    if (!this.validateUsername()) return;
+    if (this.isCreatingDuel) return;
+    this.isCreatingDuel = true;
+    showToast("⚔️ Création du salon de duel...", "green", 1500);
+
+    whenModalLoaded("host-lobby-modal", () => {
+      const modal = document.querySelector(
+        "host-lobby-modal",
+      ) as HostLobbyModal | null;
+      if (modal) {
+        modal.open({ duelMode: true });
+        this.isCreatingDuel = false;
+      } else {
+        this.isCreatingDuel = false;
+        showToast("Erreur d'ouverture du salon", "red");
+      }
+    });
   };
 
   private openJoinLobby = () => {

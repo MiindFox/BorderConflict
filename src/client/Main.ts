@@ -1144,6 +1144,18 @@ class Client {
         void this.openReplayViewer(replayViewerID);
         return;
       }
+      if (window.location.hash.includes("duel")) {
+        history.replaceState(
+          null,
+          "",
+          window.location.pathname + window.location.search,
+        );
+        whenModalLoaded("host-lobby-modal", () => {
+          const modal = document.querySelector("host-lobby-modal") as any;
+          modal?.open({ duelMode: true });
+        });
+        return;
+      }
       // Router-managed hash changes (#modal=...) are handled by the router
       // syncing in/out; we don't need to tear down the lobby state for them.
       if (modalRouter.isHashRouted()) {
@@ -1223,6 +1235,20 @@ class Client {
     window.addEventListener("popstate", onPopState);
     window.addEventListener("hashchange", onHashUpdate);
     window.addEventListener("join-changed", onJoinChanged);
+
+    if (window.location.hash.includes("duel")) {
+      history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search,
+      );
+      setTimeout(() => {
+        whenModalLoaded("host-lobby-modal", () => {
+          const modal = document.querySelector("host-lobby-modal") as any;
+          modal?.open({ duelMode: true });
+        });
+      }, 500);
+    }
 
     if (
       steamSDK.isOnSteam() &&

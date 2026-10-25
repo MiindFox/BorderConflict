@@ -424,6 +424,18 @@ export class WinModal extends LitElement implements Controller {
             () => this._handleExit(),
             "exit",
           )}
+          <button
+            type="button"
+            @click=${() => {
+              this.hide();
+              window.location.href = homeHref() + "#duel";
+            }}
+            class="win-action flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-gradient-to-r from-amber-700 via-yellow-600 to-amber-700 hover:from-amber-600 hover:to-yellow-500 text-amber-100 font-retro font-black text-xs uppercase cursor-pointer shadow-[0_0_15px_rgba(245,158,11,0.4)] active:scale-95 transition-all"
+            title="Créer un salon et copier le lien automatique pour défier un ami"
+          >
+            <span class="animate-bounce">⚔️</span>
+            <span>DÉFIER UN AMI</span>
+          </button>
           ${this.renderShare()}
           ${this.isRankedGame
             ? this.actionButton(

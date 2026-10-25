@@ -132,6 +132,8 @@ export class HostLobbyModal extends BaseModal {
   // The host paid to put the listed lobby in the public Special queue.
   @state() private queued: boolean = false;
   // Queue price from cosmetics.json; the Queue button hides without it.
+  @state() private isDuelMode: boolean = false;
+  @state() private duelShareUrl: string = "";
   @state() private queuePriceHard: number | null = null;
   @state() private queueRequestInFlight: boolean = false;
   @state() private showQueueConfirm: boolean = false;
@@ -679,6 +681,33 @@ export class HostLobbyModal extends BaseModal {
               </div>
             </div>
 
+            ${this.isDuelMode
+              ? html`
+                  <div
+                    class="mb-3 p-3 rounded-xl border-2 border-amber-500/50 bg-gradient-to-r from-amber-950/70 via-slate-900 to-amber-950/70 shadow-[0_0_15px_rgba(245,158,11,0.25)] flex flex-wrap items-center justify-between gap-3"
+                  >
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-xl animate-bounce">⚔️</span>
+                      <div>
+                        <span
+                          class="text-xs font-black font-mono text-amber-300 uppercase tracking-wider block"
+                        >
+                          MODE DÉFI ACTIF · 1v1 + IA
+                        </span>
+                        <span class="text-[10px] text-slate-300 font-mono">
+                          Le lien a été copié automatiquement ! Partagez-le à votre ami pour qu'il rejoigne la partie.
+                        </span>
+                      </div>
+                    </div>
+                    <span
+                      class="px-2 py-0.5 rounded bg-amber-500/30 text-amber-300 border border-amber-400/50 text-[10px] font-black uppercase shrink-0"
+                    >
+                      PRÊT AU COMBAT
+                    </span>
+                  </div>
+                `
+              : nothing}
+
             <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
               <button
                 type="button"
@@ -688,7 +717,7 @@ export class HostLobbyModal extends BaseModal {
                 title="Copier le code clé pour vos amis"
               >
                 <span>📋</span>
-                <span>COPIER LA CLÉ</span>
+                <span>COPIER CLÉ</span>
               </button>
               <button
                 type="button"
@@ -698,8 +727,27 @@ export class HostLobbyModal extends BaseModal {
                 title="Copier le lien direct vers ce salon"
               >
                 <span>🔗</span>
-                <span>COPIER LE LIEN</span>
+                <span>COPIER LIEN</span>
               </button>
+              <a
+                href="https://api.whatsapp.com/send?text=${encodeURIComponent(
+                  `Rejoins mon salon sur BorderConflict pour un duel stratégique : ${
+                    this.duelShareUrl ||
+                    (this.lobbyId
+                      ? `${window.location.origin}${ClientEnv.gamePath(
+                          this.lobbyId,
+                        )}`
+                      : window.location.href)
+                  }`,
+                )}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-emerald-300 hover:text-white uppercase tracking-wider cursor-pointer border border-emerald-500/50 bg-emerald-950/40"
+                title="Inviter directement via WhatsApp"
+              >
+                <span>💬</span>
+                <span>WHATSAPP</span>
+              </a>
             </div>
           </div>
 
@@ -947,6 +995,12 @@ export class HostLobbyModal extends BaseModal {
       this.queuePriceHard = cosmetics?.lobbyQueue?.priceHard ?? null;
     });
 
+    this.isDuelMode = Boolean(args?.duelMode);
+    if (this.isDuelMode) {
+      this.bots = 400;
+      this.selectedMap = GameMapType.Europe;
+    }
+
     // Attach mode: the server already minted this successor lobby with us as
     // creator (win-screen "New lobby" flow), so bind to the existing id instead
     // of creating another game.
@@ -977,9 +1031,20 @@ export class HostLobbyModal extends BaseModal {
         // Now that we have the id, build and copy the share link. If lobby
         // creation fails, the catch below clears the clipboard.
         const url = await this.constructUrl();
+        this.duelShareUrl = url;
         this.updateLobbyHistory(url);
         await this.updateComplete;
         void (this.querySelector("copy-button") as CopyButton)?.handleCopy();
+        if (this.isDuelMode) {
+          try {
+            await navigator.clipboard.writeText(url);
+            showToast(
+              "⚔️ Salon de Duel créé ! Lien d'invitation copié !",
+              "green",
+              4000,
+            );
+          } catch {}
+        }
         return creatorToken;
       })
       .then((creatorToken) => {
