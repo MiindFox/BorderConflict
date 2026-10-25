@@ -19,10 +19,29 @@ map $worker $worker_port {
     1 3002;
 }
 
+# Redirect HTTP to HTTPS
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name _;
+    server_name borderconflict.cloud www.borderconflict.cloud _;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# HTTPS Server
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    server_name borderconflict.cloud www.borderconflict.cloud _;
+
+    ssl_certificate /etc/letsencrypt/live/borderconflict.cloud/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/borderconflict.cloud/privkey.pem;
 
     client_max_body_size 50M;
 
@@ -37,6 +56,8 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
     }
 
     # Game creation route distributed across workers
@@ -68,6 +89,8 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
     }
 }
 `;
