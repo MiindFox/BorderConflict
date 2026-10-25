@@ -138,6 +138,22 @@ export class MobileNavBar extends LitElement {
           data-page="page-clan"
           data-i18n="main.clans"
         ></button>
+        <button
+          class="${MOBILE_ITEM} ${currentPage === "page-settings"
+            ? "active"
+            : ""}"
+          data-page="page-settings"
+        >
+          ⚙️ Paramètres
+        </button>
+        <button
+          class="${MOBILE_ITEM} ${currentPage === "page-account"
+            ? "active"
+            : ""}"
+          data-page="page-account"
+        >
+          👤 Compte & Profil
+        </button>
         <div
           class="flex flex-col w-full mt-auto [.in-game_&]:hidden items-end justify-end pt-4 border-t border-white/10"
         ></div>

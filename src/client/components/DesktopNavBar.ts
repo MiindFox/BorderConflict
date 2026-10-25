@@ -226,22 +226,18 @@ export class DesktopNavBar extends LitElement {
           <div class="flex items-center gap-1.5">
             <button
               type="button"
-              @click=${() =>
-                window.dispatchEvent(
-                  new CustomEvent("showPage", { detail: "page-settings" }),
-                )}
-              class="retro-metal-btn size-7 rounded flex items-center justify-center text-xs font-bold text-amber-200 hover:text-white"
+              @click=${() => window.showPage?.("page-settings")}
+              class="nav-menu-item retro-metal-btn size-7 rounded flex items-center justify-center text-xs font-bold text-amber-200 hover:text-white"
+              data-page="page-settings"
               title="Paramètres / Configuration"
             >
               ⚙️
             </button>
             <button
               type="button"
-              @click=${() =>
-                window.dispatchEvent(
-                  new CustomEvent("showPage", { detail: "page-account" }),
-                )}
-              class="retro-metal-btn size-7 rounded flex items-center justify-center text-xs font-bold text-amber-200 hover:text-white"
+              @click=${() => window.showPage?.("page-account")}
+              class="nav-menu-item retro-metal-btn size-7 rounded flex items-center justify-center text-xs font-bold text-amber-200 hover:text-white"
+              data-page="page-account"
               title="Compte & Identité"
             >
               👤
@@ -327,12 +323,28 @@ export class DesktopNavBar extends LitElement {
           </span>
         </div>
 
-        <!-- Right Quick Action / Currency -->
+        <!-- Right Quick Actions: Settings, Account & Combat -->
         <div class="flex items-center gap-1.5">
           <button
             type="button"
+            @click=${() => window.showPage?.("page-settings")}
+            class="retro-metal-btn size-7 rounded flex items-center justify-center text-xs font-bold text-amber-200 hover:text-white"
+            title="Paramètres"
+          >
+            ⚙️
+          </button>
+          <button
+            type="button"
+            @click=${() => window.showPage?.("page-account")}
+            class="retro-metal-btn size-7 rounded flex items-center justify-center text-xs font-bold text-amber-200 hover:text-white"
+            title="Compte & Profil"
+          >
+            👤
+          </button>
+          <button
+            type="button"
             @click=${this._handleDeployCombat}
-            class="retro-red-btn px-2.5 py-1 rounded font-pixel text-[10px] text-white font-black tracking-wide"
+            class="retro-red-btn px-2 sm:px-2.5 py-1 rounded font-pixel text-[9px] sm:text-[10px] text-white font-black tracking-wide"
             title="Engager le combat"
           >
             COMBAT

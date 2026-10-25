@@ -99,6 +99,21 @@ export function initNavigation() {
 
   window.showPage = showPage;
 
+  // Listen for showPage requests from any component dispatching "showPage"
+  let isHandlingShowPage = false;
+  window.addEventListener("showPage", (e: Event) => {
+    if (isHandlingShowPage) return;
+    const pageId = (e as CustomEvent).detail;
+    if (typeof pageId === "string" && pageId !== window.currentPageId) {
+      isHandlingShowPage = true;
+      try {
+        showPage(pageId);
+      } finally {
+        isHandlingShowPage = false;
+      }
+    }
+  });
+
   // Use event delegation for navigation items (they may be inside Lit components)
   document.addEventListener("click", async (e) => {
     const target = (e.target as HTMLElement).closest(

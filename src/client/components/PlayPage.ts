@@ -15,6 +15,7 @@ import "./NewsBox";
 import "./PlutoniumIcon";
 import "./SteamWishlist";
 import "./StreamingNow";
+import "../UsernameInput";
 
 @customElement("play-page")
 export class PlayPage extends LitElement {
@@ -74,7 +75,7 @@ export class PlayPage extends LitElement {
             </div>
             <div class="flex flex-col min-w-0">
               <span
-                class="font-pixel text-[10px] sm:text-[11px] font-black text-amber-200 uppercase tracking-wider truncate glow-amber"
+                class="font-pixel text-[9px] sm:text-[10.5px] font-black text-amber-200 uppercase tracking-wide leading-tight glow-amber"
               >
                 ${rank.title}
               </span>
@@ -127,40 +128,30 @@ export class PlayPage extends LitElement {
           </div>
         </div>
 
-        <!-- Satellite Cloud Status & Callsign -->
-        <div class="flex flex-col gap-1 px-0.5">
+        <!-- Satellite Cloud Status & Tactical Identification -->
+        <div class="flex flex-col gap-1.5 px-0.5">
           <div
             class="flex items-center justify-between text-[10px] font-terminal text-[#7e9482]"
           >
             <span class="flex items-center gap-1.5">
               <span class="size-2 rounded-full led-green-on"></span>
-              <span class="uppercase">LIAISON QG SATELLITE</span>
+              <span class="uppercase">INDICATIF & FACTION MILITAIRE</span>
             </span>
-            <span class="text-zinc-400 truncate max-w-[170px]"
-              >${profile.email || "darkgdooo@gmail.com"}</span
+            <button
+              type="button"
+              @click=${() => window.showPage?.("page-account")}
+              class="text-amber-300 hover:text-white font-pixel text-[8.5px] cursor-pointer flex items-center gap-1 transition-colors bg-[#182119] border border-[#2d3d2f] px-1.5 py-0.5 rounded shadow-sm"
+              title="Gérer le compte et modifier l'identité"
             >
+              <span>👤 COMPTE</span>
+            </button>
           </div>
 
-          <!-- Stamped Aluminum Callsign Plate -->
+          <!-- Stamped Aluminum Callsign Slot with Interactive Username & Clan Tag Input -->
           <div
-            class="flex items-center justify-between px-3 py-1.5 rounded bg-[#182119] border border-[#2d3d2f] cursor-pointer hover:border-amber-400/60 transition-colors shadow-inner"
-            @click=${() =>
-              window.dispatchEvent(
-                new CustomEvent("showPage", { detail: "page-account" }),
-              )}
-            title="Modifier l'identifiant militaire"
+            class="relative rounded-lg bg-[#0c120d] border border-[#2b3a2d] p-1.5 shadow-[inset_0_2px_6px_rgba(0,0,0,0.9)] focus-within:border-amber-400/80 transition-colors"
           >
-            <div class="flex items-center gap-2 min-w-0">
-              <span
-                class="text-[9px] font-pixel text-zinc-400 bg-black/40 px-1.5 py-0.5 rounded border border-white/10"
-                >TAG</span
-              >
-              <span
-                class="font-pixel text-xs text-white font-black tracking-wider uppercase truncate"
-                >${username}</span
-              >
-            </div>
-            <span class="text-[9px] text-amber-300 font-pixel">✏️ MODIF</span>
+            <username-input class="w-full block"></username-input>
           </div>
         </div>
 
