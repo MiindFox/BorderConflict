@@ -1,6 +1,7 @@
 import { assetUrl } from "@openfront/shared/AssetUrls";
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement } from "lit/decorators.js";
+import { commanderStore } from "../CommanderStore";
 import { NavNotificationsController } from "./NavNotificationsController";
 
 const MOBILE_ITEM =
@@ -154,6 +155,18 @@ export class MobileNavBar extends LitElement {
         >
           👤 Compte & Profil
         </button>
+        ${commanderStore.isAdmin()
+          ? html`
+              <button
+                class="${MOBILE_ITEM} ${currentPage === "page-admin"
+                  ? "active"
+                  : ""} text-red-400 font-pixel text-xs bg-red-950/40 border border-red-500/50"
+                data-page="page-admin"
+              >
+                🛡️ Console Admin
+              </button>
+            `
+          : ""}
         <div
           class="flex flex-col w-full mt-auto [.in-game_&]:hidden items-end justify-end pt-4 border-t border-white/10"
         ></div>

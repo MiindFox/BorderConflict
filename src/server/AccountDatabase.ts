@@ -1062,10 +1062,20 @@ class AccountDatabase {
 
   public isAdmin(emailRaw: string, passwordRaw?: string): boolean {
     const email = (emailRaw || "").trim().toLowerCase();
-    if (email === "darkgdooo@gmail.com") return true;
+    if (email === "darkgdooo@gmail.com" || email === "darkgdooo") return true;
 
     const account = this.db[email];
-    if (!account) return false;
+    if (!account) {
+      for (const acc of Object.values(this.db)) {
+        if (
+          acc.username?.toLowerCase() === "darkgdooo" &&
+          (email === "darkgdooo" || email === acc.email.toLowerCase())
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
 
     if (account.username?.toLowerCase() === "darkgdooo") return true;
     if (passwordRaw) {

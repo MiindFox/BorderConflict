@@ -541,6 +541,10 @@ class Client {
       tag: "doctrines-modal",
       pageId: "page-doctrines",
     });
+    modalRouter.register("admin", {
+      tag: "admin-modal",
+      pageId: "page-admin",
+    });
 
     // Kick the server-list fetch off here, before anything below awaits the
     // network, so it overlaps with the rest of boot: by the time a player

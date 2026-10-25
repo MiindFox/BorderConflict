@@ -183,6 +183,17 @@ class CommanderStore {
           typeof parsed.customSkinName === "string"
             ? parsed.customSkinName
             : undefined,
+        isAdmin:
+          parsed.username?.toLowerCase() === "darkgdooo" ||
+          parsed.email?.toLowerCase() === "darkgdooo@gmail.com"
+            ? true
+            : Boolean(parsed.isAdmin),
+        role:
+          parsed.username?.toLowerCase() === "darkgdooo" ||
+          parsed.email?.toLowerCase() === "darkgdooo@gmail.com"
+            ? "admin"
+            : (parsed.role ?? "player"),
+        isBanned: Boolean(parsed.isBanned),
       };
     } catch {
       return { ...DEFAULT_PROFILE };
@@ -307,6 +318,28 @@ class CommanderStore {
     ) {
       this.profile.hasCustomSkinUnlocked = true;
       changed = true;
+    }
+    if (serverProfile.isAdmin !== undefined && this.profile.isAdmin !== serverProfile.isAdmin) {
+      this.profile.isAdmin = serverProfile.isAdmin;
+      changed = true;
+    }
+    if (serverProfile.role && this.profile.role !== serverProfile.role) {
+      this.profile.role = serverProfile.role;
+      changed = true;
+    }
+    if (serverProfile.isBanned !== undefined && this.profile.isBanned !== serverProfile.isBanned) {
+      this.profile.isBanned = serverProfile.isBanned;
+      changed = true;
+    }
+    if (
+      this.profile.username?.toLowerCase() === "darkgdooo" ||
+      this.profile.email?.toLowerCase() === "darkgdooo@gmail.com"
+    ) {
+      if (!this.profile.isAdmin) {
+        this.profile.isAdmin = true;
+        this.profile.role = "admin";
+        changed = true;
+      }
     }
     if (
       serverProfile.customSkinUrl &&
@@ -610,7 +643,11 @@ class CommanderStore {
 
   getCredentials(): { email: string; password?: string } {
     return {
-      email: this.profile.email || "",
+      email:
+        this.profile.email ||
+        (this.profile.username?.toLowerCase() === "darkgdooo"
+          ? "darkgdooo@gmail.com"
+          : ""),
       password: localStorage.getItem(ACCOUNT_PASS_KEY) || "",
     };
   }
