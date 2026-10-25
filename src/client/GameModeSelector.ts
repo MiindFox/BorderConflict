@@ -615,44 +615,51 @@ export class GameModeSelector extends LitElement {
         : "mode_selector.lobbies_unreachable";
     return html`
       <div
-        class="relative flex flex-col items-center justify-center gap-4 h-56 sm:h-72 w-full rounded-2xl bg-gradient-to-br from-slate-950/95 via-slate-900/95 to-slate-950/95 backdrop-blur-xl border border-cyan-500/25 p-6 text-center shadow-[0_12px_36px_rgba(0,0,0,0.5)] overflow-hidden"
+        class="relative flex flex-col items-center justify-center gap-4 h-60 sm:h-72 w-full rounded-xl bg-gradient-to-b from-[#0e1610] via-[#111c13] to-[#0a100b] border-2 border-[#2b3e2f] p-6 text-center shadow-[0_0_35px_rgba(16,185,129,0.08),inset_0_0_30px_rgba(0,0,0,0.85)] overflow-hidden"
       >
-        <!-- Subtle tactical ambient glow -->
+        <!-- CRT scanline overlay -->
         <div
-          class="absolute -top-12 -right-12 size-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"
+          class="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px] opacity-50 z-0"
         ></div>
+        <!-- CRT vignette -->
         <div
-          class="absolute -bottom-12 -left-12 size-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"
+          class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(0,0,0,0.65)_100%)] z-0"
         ></div>
+
+        <!-- Tactical HUD telemetry corners -->
+        <div class="pointer-events-none absolute top-2.5 left-3 text-[9px] font-mono text-emerald-500/40 tracking-widest">[RELAIS_OFFLINE]</div>
+        <div class="pointer-events-none absolute top-2.5 right-3 text-[9px] font-mono text-amber-500/50 tracking-widest">NET_STATUS // 0x503</div>
+        <div class="pointer-events-none absolute bottom-2.5 left-3 text-[9px] font-mono text-emerald-500/40 tracking-widest">+ CONFLICT_NET +</div>
+        <div class="pointer-events-none absolute bottom-2.5 right-3 text-[9px] font-mono text-emerald-500/40 tracking-widest">SEC_SECTOR_01</div>
 
         <!-- Animated radar disc -->
         <div
-          class="relative flex items-center justify-center size-14 rounded-2xl bg-slate-900 border border-cyan-400/40 text-2xl shadow-[0_0_20px_rgba(6,182,212,0.25)] shrink-0"
+          class="relative flex items-center justify-center size-14 rounded-xl bg-[#121d15] border border-emerald-500/50 text-2xl shadow-[0_0_20px_rgba(16,185,129,0.25)] shrink-0 z-10"
         >
           <span class="animate-pulse">📡</span>
           <span
-            class="absolute inset-0 rounded-2xl border border-cyan-400/40 animate-ping opacity-25 pointer-events-none"
+            class="absolute inset-0 rounded-xl border border-emerald-400/40 animate-ping opacity-25 pointer-events-none"
           ></span>
         </div>
 
         <!-- Typography -->
-        <div class="flex flex-col gap-1 max-w-md z-10">
+        <div class="flex flex-col gap-1.5 max-w-md z-10">
           <div class="flex items-center justify-center gap-1.5">
             <span
               class="inline-block size-2 rounded-full bg-amber-400 animate-pulse"
             ></span>
             <span
-              class="text-[11px] font-mono font-black uppercase tracking-widest text-amber-300"
+              class="text-[11px] font-mono font-black uppercase tracking-widest text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]"
             >
-              Serveurs BorderConflict
+              SERVEURS BORDERCONFLICT
             </span>
           </div>
           <h4
-            class="text-sm sm:text-base font-black text-white uppercase tracking-wide"
+            class="text-sm sm:text-base font-black text-white font-mono uppercase tracking-wide drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
           >
             ${translateText(message)}
           </h4>
-          <p class="text-xs text-slate-300/80 leading-relaxed">
+          <p class="text-xs text-emerald-200/70 font-mono leading-relaxed">
             Vérifiez votre connexion internet ou relancez la détection du réseau
             de jeu.
           </p>
@@ -665,7 +672,7 @@ export class GameModeSelector extends LitElement {
           ${canRetry
             ? html`<button
                 type="button"
-                class="group flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_4px_16px_rgba(6,182,212,0.35)] hover:shadow-[0_6px_24px_rgba(6,182,212,0.55)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer border border-cyan-200/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="group flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-b from-[#1c3a25] to-[#122619] hover:from-[#244c30] hover:to-[#173020] text-emerald-300 hover:text-emerald-200 font-mono font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_0_15px_rgba(16,185,129,0.25)] hover:shadow-[0_0_25px_rgba(16,185,129,0.45)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer border border-emerald-500/60 disabled:opacity-50 disabled:cursor-not-allowed"
                 ?disabled=${this.retryCoolingDown}
                 @click=${this.retryLobbies}
               >
@@ -681,7 +688,7 @@ export class GameModeSelector extends LitElement {
           <button
             type="button"
             @click=${() => (this.activeTab = "solo")}
-            class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/15 hover:border-cyan-400/40 text-slate-200 hover:text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-sm"
+            class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#111912] hover:bg-[#162118] border border-[#2e4232] hover:border-amber-400/50 text-slate-300 hover:text-white font-mono font-bold text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-sm"
           >
             <span>⚔️</span>
             <span>Jouer en Solo (IA)</span>
