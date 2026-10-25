@@ -399,7 +399,7 @@ export class MasterLobbyService {
     return delist;
   }
 
-  private broadcastLobbies() {
+  public broadcastLobbies() {
     let games: Record<PublicGameType, InternalGameInfo[]>;
     let delist: string[];
     if (this.isCoordinated() && this.roster !== null) {
@@ -497,6 +497,21 @@ export class MasterLobbyService {
       publicGameType: type,
     } satisfies MasterCreateGame);
     return gameID;
+  }
+
+  public updateLobbyConfig(
+    gameID: string,
+    patch: Partial<GameConfig>,
+  ): boolean {
+    const lobby = this.ownLobbies().find((l) => l.gameID === gameID);
+    if (!lobby) return false;
+    this.sendMessageToWorker({
+      type: "updateLobby",
+      gameID,
+      startsAt: lobby.startsAt ?? Date.now() + ServerEnv.gameCreationRate(),
+      gameConfigPatch: patch,
+    } as any);
+    return true;
   }
 
   private sendMessageToWorker(msg: MasterCreateGame | MasterUpdateGame): void {

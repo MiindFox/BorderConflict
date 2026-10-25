@@ -680,9 +680,15 @@ app.all("/api/admin/purchases", requireAdmin, (_req, res) => {
 });
 
 app.all("/api/admin/rotation", requireAdmin, (_req, res) => {
+  const allLobbies = lobbyService ? (lobbyService as any).getAllLobbies().games : {};
   return res.json({
     ok: true,
     rotation: playlist.getPlaylistSnapshot(),
+    currentLobbies: {
+      ffa: allLobbies.ffa?.[0]?.gameConfig?.gameMap || null,
+      team: allLobbies.team?.[0]?.gameConfig?.gameMap || null,
+      special: allLobbies.special?.[0]?.gameConfig?.gameMap || null,
+    },
     allMaps: allMaps.map((m) => ({
       type: m.type,
       category: m.categories ? m.categories.join(", ") : "Standard",
@@ -703,11 +709,39 @@ app.post("/api/admin/rotation/set-next", requireAdmin, (req, res) => {
   const typedSlot =
     slot === "ffa" ? "ffa" : slot === "team" ? "team" : "special";
   const typedMode = mode === "Team" ? GameMode.Team : GameMode.FFA;
+  
+  // 1. Force dans la playlist pour les futures générations
   playlist.forceNextMap(typedSlot, mapType, typedMode);
+
+  // 2. Mettre à jour immédiatement le salon en direct actuellement ouvert aux joueurs !
+  let updatedLiveLobby = false;
+  if (lobbyService) {
+    const allLobbies = (lobbyService as any).getAllLobbies().games;
+    const activeLobbies = allLobbies[typedSlot] || [];
+    if (activeLobbies.length > 0) {
+      const liveLobby = activeLobbies[0];
+      lobbyService.updateLobbyConfig(liveLobby.gameID, {
+        gameMap: mapType,
+        gameMode: typedMode,
+      });
+      updatedLiveLobby = true;
+    }
+    lobbyService.broadcastLobbies();
+  }
+
+  const allLobbies = lobbyService ? (lobbyService as any).getAllLobbies().games : {};
   return res.json({
     ok: true,
-    message: `Prochaine carte pour ${slot} définie sur "${mapType}".`,
+    message: updatedLiveLobby
+      ? `🗺️ Carte "${mapType}" appliquée IMMÉDIATEMENT au salon ouvert (${typedSlot.toUpperCase()}) !`
+      : `🗺️ Prochaine carte pour ${slot} définie sur "${mapType}".`,
     rotation: playlist.getPlaylistSnapshot(),
+    currentLobbies: {
+      ffa: allLobbies.ffa?.[0]?.gameConfig?.gameMap || null,
+      team: allLobbies.team?.[0]?.gameConfig?.gameMap || null,
+      special: allLobbies.special?.[0]?.gameConfig?.gameMap || null,
+    },
+    updatedLiveLobby,
   });
 });
 

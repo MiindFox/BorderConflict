@@ -74,6 +74,11 @@ export class AdminModal extends BaseModal {
 
   // Rotation
   @state() private rotation: RotationSnapshot | null = null;
+  @state() private currentLobbies: {
+    ffa: string | null;
+    team: string | null;
+    special: string | null;
+  } | null = null;
   @state() private allMaps: { type: string; category: string }[] = [];
   @state() private selectedNextMap: string = "Europe";
   @state() private selectedSlot: "ffa" | "team" | "special" = "ffa";
@@ -142,6 +147,7 @@ export class AdminModal extends BaseModal {
       if (resPlayers?.ok) this.players = resPlayers.players;
       if (resRotation?.ok) {
         this.rotation = resRotation.rotation;
+        this.currentLobbies = resRotation.currentLobbies || null;
         this.allMaps = resRotation.allMaps || [];
         if (this.allMaps.length > 0 && !this.selectedNextMap) {
           this.selectedNextMap = this.allMaps[0].type;
@@ -203,11 +209,44 @@ export class AdminModal extends BaseModal {
       const data = await res.json();
       if (data.ok) {
         showToast(
-          `🗺️ Prochaine map forcée : ${this.selectedNextMap} (${this.selectedSlot.toUpperCase()}) !`,
+          data.message ||
+            `🗺️ Map ${this.selectedNextMap} appliquée (${this.selectedSlot.toUpperCase()}) !`,
           "green",
-          3000,
+          4000,
         );
         this.rotation = data.rotation;
+        if (data.currentLobbies) this.currentLobbies = data.currentLobbies;
+      } else {
+        showToast(`❌ ${data.error || "Erreur"}`, "red", 3000);
+      }
+    } catch (e: any) {
+      showToast("❌ Erreur réseau", "red", 3000);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private async handleSpawnLobby() {
+    this.isLoading = true;
+    try {
+      const res = await fetch("/api/admin/rotation/spawn-lobby", {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({
+          type: this.selectedSlot,
+          map: this.selectedNextMap,
+          mode: this.selectedGameMode,
+          maxPlayers: 50,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast(
+          `🚀 Salon lancé avec succès sur ${this.selectedNextMap} !`,
+          "green",
+          4000,
+        );
+        this.refreshAllData();
       } else {
         showToast(`❌ ${data.error || "Erreur"}`, "red", 3000);
       }
@@ -593,16 +632,79 @@ export class AdminModal extends BaseModal {
         ${this.currentTab === "rotation"
           ? html`
               <div class="space-y-6">
+                <!-- LIVE LOBBIES STATUS (ACCUEIL) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div
+                    class="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 shadow flex items-center justify-between"
+                  >
+                    <div>
+                      <span
+                        class="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider block"
+                      >
+                        Salon Ouvert Actuel (Accueil FFA)
+                      </span>
+                      <span
+                        class="text-sm font-black font-mono text-white flex items-center gap-1.5 mt-0.5"
+                      >
+                        <span
+                          class="size-2 rounded-full bg-cyan-400 animate-pulse"
+                        ></span>
+                        <span
+                          >${this.currentLobbies?.ffa || "Chargement..."}</span
+                        >
+                      </span>
+                    </div>
+                    <span
+                      class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-[10px] font-mono font-bold uppercase"
+                    >
+                      En Ligne
+                    </span>
+                  </div>
+
+                  <div
+                    class="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/40 shadow flex items-center justify-between"
+                  >
+                    <div>
+                      <span
+                        class="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-wider block"
+                      >
+                        Salon Ouvert Actuel (Accueil Équipes)
+                      </span>
+                      <span
+                        class="text-sm font-black font-mono text-white flex items-center gap-1.5 mt-0.5"
+                      >
+                        <span
+                          class="size-2 rounded-full bg-purple-400 animate-pulse"
+                        ></span>
+                        <span
+                          >${this.currentLobbies?.team || "Chargement..."}</span
+                        >
+                      </span>
+                    </div>
+                    <span
+                      class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/40 text-[10px] font-mono font-bold uppercase"
+                    >
+                      En Ligne
+                    </span>
+                  </div>
+                </div>
+
                 <!-- CONTROLLER BOX -->
-                <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-700 shadow-xl space-y-4">
+                <div
+                  class="p-5 rounded-2xl bg-slate-900/90 border border-slate-700 shadow-xl space-y-4"
+                >
                   <div class="flex items-center gap-2">
                     <span class="text-2xl">🗺️</span>
                     <div>
-                      <h3 class="text-base font-black font-mono text-white uppercase">
+                      <h3
+                        class="text-base font-black font-mono text-white uppercase"
+                      >
                         Contrôle de la Rotation en Temps Réel
                       </h3>
                       <p class="text-xs text-slate-400">
-                        Choisissez la carte et le mode de jeu exacts pour le prochain salon public généré par le serveur.
+                        Choisissez la carte et le mode de jeu exacts pour changer
+                        immédiatement le salon en direct sur la page d'accueil ou
+                        générer un nouveau salon public.
                       </p>
                     </div>
                   </div>
@@ -610,63 +712,91 @@ export class AdminModal extends BaseModal {
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                     <!-- SLOT SELECTION -->
                     <div>
-                      <label class="block text-xs font-mono text-slate-400 uppercase mb-1">
+                      <label
+                        class="block text-xs font-mono text-slate-400 uppercase mb-1"
+                      >
                         File de Rotation
                       </label>
                       <select
                         .value=${this.selectedSlot}
-                        @change=${(e: any) => (this.selectedSlot = e.target.value)}
+                        @change=${(e: any) =>
+                          (this.selectedSlot = e.target.value)}
                         class="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-mono text-white focus:outline-none"
                       >
                         <option value="ffa">Solo FFA (Chacun pour soi)</option>
                         <option value="team">Matchs en Équipe</option>
-                        <option value="special">Événement Spécial / Modifié</option>
+                        <option value="special">
+                          Événement Spécial / Modifié
+                        </option>
                       </select>
                     </div>
 
                     <!-- MAP SELECTION -->
                     <div>
-                      <label class="block text-xs font-mono text-slate-400 uppercase mb-1">
+                      <label
+                        class="block text-xs font-mono text-slate-400 uppercase mb-1"
+                      >
                         Carte Sélectionnée
                       </label>
                       <select
                         .value=${this.selectedNextMap}
-                        @change=${(e: any) => (this.selectedNextMap = e.target.value)}
+                        @change=${(e: any) =>
+                          (this.selectedNextMap = e.target.value)}
                         class="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-mono text-white focus:outline-none"
                       >
                         ${this.allMaps.map(
                           (m) =>
-                            html`<option value=${m.type}>${m.type} (${m.category})</option>`,
+                            html`<option value=${m.type}>
+                              ${m.type} (${m.category})
+                            </option>`,
                         )}
                       </select>
                     </div>
 
                     <!-- MODE SELECTION -->
                     <div>
-                      <label class="block text-xs font-mono text-slate-400 uppercase mb-1">
+                      <label
+                        class="block text-xs font-mono text-slate-400 uppercase mb-1"
+                      >
                         Mode de Jeu
                       </label>
                       <select
                         .value=${this.selectedGameMode}
-                        @change=${(e: any) => (this.selectedGameMode = e.target.value)}
+                        @change=${(e: any) =>
+                          (this.selectedGameMode = e.target.value)}
                         class="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-mono text-white focus:outline-none"
                       >
                         <option value="FFA">Chacun pour soi (FFA)</option>
                         <option value="Team">2 Équipes</option>
                         <option value="Duos">Duos (2 par équipe)</option>
                         <option value="Trios">Trios (3 par équipe)</option>
-                        <option value="HumansVsNations">Humains vs IA Fédérées</option>
+                        <option value="HumansVsNations">
+                          Humains vs IA Fédérées
+                        </option>
                       </select>
                     </div>
                   </div>
 
-                  <div class="pt-2 flex justify-end">
+                  <div
+                    class="pt-2 flex flex-wrap items-center justify-end gap-3"
+                  >
+                    <button
+                      type="button"
+                      @click=${() => this.handleSpawnLobby()}
+                      class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-mono font-black text-xs uppercase tracking-wider cursor-pointer shadow-lg active:scale-95 flex items-center gap-1.5"
+                      title="Génère un nouveau salon public immédiat avec cette carte"
+                    >
+                      <span>🚀</span>
+                      <span>Spawner un Salon Public</span>
+                    </button>
                     <button
                       type="button"
                       @click=${() => this.handleSetNextMap()}
-                      class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-mono font-black text-xs uppercase tracking-wider cursor-pointer shadow-lg active:scale-95"
+                      class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-mono font-black text-xs uppercase tracking-wider cursor-pointer shadow-lg active:scale-95 flex items-center gap-1.5"
+                      title="Met à jour immédiatement le salon en direct actuellement ouvert aux joueurs"
                     >
-                      ⚡ Forcer cette Map au Prochain Salon
+                      <span>⚡</span>
+                      <span>Changer le Salon Actuel (En Direct)</span>
                     </button>
                   </div>
                 </div>

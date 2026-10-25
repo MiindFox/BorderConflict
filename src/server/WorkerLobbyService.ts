@@ -163,7 +163,17 @@ export class WorkerLobbyService {
           });
           return;
         }
-        game.setStartsAt(msg.startsAt);
+        if (msg.startsAt !== undefined) {
+          game.setStartsAt(msg.startsAt);
+        }
+        if (msg.gameConfigPatch) {
+          game.updateGameConfig(msg.gameConfigPatch);
+          this.log.info(
+            `Updated gameConfig for lobby ${msg.gameID}:`,
+            msg.gameConfigPatch,
+          );
+        }
+        this.sendMyLobbiesToMaster();
         break;
       }
     }
