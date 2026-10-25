@@ -1032,6 +1032,22 @@ function buildProgressionConfig() {
   };
 }
 
+app.get(["/cluster.json", "/api/cluster.json"], (_req, res) => {
+  const commit = ServerEnv.gitCommit();
+  const host = process.env.DOMAIN || "borderconflict.cloud";
+  return res.json({
+    latest: commit,
+    servers: {
+      a: {
+        host: host,
+        numWorkers: 2,
+        version: commit,
+        state: "open",
+      },
+    },
+  });
+});
+
 app.get(["/api/public/progression/config", "/public/progression/config"], (_req, res) => {
   return res.json(buildProgressionConfig());
 });
@@ -1040,6 +1056,13 @@ app.get(["/api/public/player/:publicId/progress", "/public/player/:publicId/prog
   const profile = accountDb.getPublicProfile(String(req.params.publicId));
   const lvl = profile?.stats?.level || 1;
   const xp = profile?.stats?.xp || 0;
+  const milestones = [];
+  if (lvl >= 10) milestones.push({ level: 10, prestige: 0, at: new Date().toISOString() });
+  if (lvl >= 25) milestones.push({ level: 25, prestige: 0, at: new Date().toISOString() });
+  if (lvl >= 50) milestones.push({ level: 50, prestige: 0, at: new Date().toISOString() });
+  if (lvl >= 75) milestones.push({ level: 75, prestige: 0, at: new Date().toISOString() });
+  if (lvl >= 100) milestones.push({ level: 100, prestige: 0, at: new Date().toISOString() });
+
   return res.json({
     prestige: 0,
     level: lvl,
@@ -1048,13 +1071,7 @@ app.get(["/api/public/player/:publicId/progress", "/public/player/:publicId/prog
     lifetimeXp: (lvl - 1) * 450 + xp,
     legend: lvl >= 36,
     prestigeHistory: [],
-    milestones: [
-      { level: 10, prestige: 0, at: null },
-      { level: 25, prestige: 0, at: null },
-      { level: 50, prestige: 0, at: null },
-      { level: 75, prestige: 0, at: null },
-      { level: 100, prestige: 0, at: null },
-    ],
+    milestones,
   });
 });
 
