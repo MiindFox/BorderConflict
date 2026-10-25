@@ -108,6 +108,12 @@ app.get("/desktop/release.json", async (_req, res) => {
 });
 
 app.use("/static", express.static(path.join(__dirname, "../../static")));
+app.use("/icons", express.static(path.join(__dirname, "../../resources/icons")));
+
+app.get("/manifest.json", (_req, res) => {
+  res.type("application/manifest+json");
+  res.sendFile(path.join(__dirname, "../../resources/manifest.json"));
+});
 
 app.use(
   express.static(path.join(__dirname, "../../static"), {

@@ -53,9 +53,9 @@ async function main() {
   }
 
   try {
-    // On compresse tout le contenu de static (assets, _assets, manifestes, etc.)
+    // On compresse static/assets et les manifestes/fichiers d'entrée (ultra-rapide)
     execSync(
-      "tar -czf build-assets.tar.gz -C static .",
+      "tar -czf build-assets.tar.gz -C static assets index.html asset-hashes.json asset-manifest.json core-version.txt root-files.json sw.js",
       { stdio: "inherit" }
     );
     const archiveSize = (fs.statSync(archivePath).size / (1024 * 1024)).toFixed(2);
