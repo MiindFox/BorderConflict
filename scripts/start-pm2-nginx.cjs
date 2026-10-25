@@ -2,12 +2,61 @@ const { Client } = require("ssh2");
 const conn = new Client();
 
 const nginxConfig = `
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+upstream openfront_workers {
+    random;
+    server 127.0.0.1:3001;
+    server 127.0.0.1:3002;
+}
+
+map $worker $worker_port {
+    default 3001;
+    0 3001;
+    1 3002;
+}
+
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
     server_name _;
 
     client_max_body_size 50M;
+
+    # Worker specific routes: /w0/..., /w1/... (both HTTP and WebSockets)
+    location ~* ^/w(\\d+)(/.*)?$ {
+        set $worker $1;
+        proxy_pass http://127.0.0.1:$worker_port$2$is_args$args;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Game creation route distributed across workers
+    location = /api/create_game {
+        proxy_pass http://openfront_workers;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location = /api/adminbot/create_game {
+        proxy_pass http://openfront_workers;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 
     location / {
         proxy_pass http://127.0.0.1:3000;

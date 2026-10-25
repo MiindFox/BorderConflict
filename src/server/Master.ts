@@ -313,6 +313,32 @@ app.use("/api", (_req, res, next) => {
   next();
 });
 
+// Proxy new game creation to a random game worker if the request reached Master directly
+app.post(["/api/create_game", "/api/adminbot/create_game"], async (req, res) => {
+  const workerIndex = Math.floor(Math.random() * ServerEnv.numWorkers());
+  const workerPort = ServerEnv.workerPortByIndex(workerIndex);
+  try {
+    const query = req.url.includes("?") ? req.url.substring(req.url.indexOf("?")) : "";
+    const targetUrl = `http://127.0.0.1:${workerPort}${req.path}${query}`;
+    const forwardHeaders: Record<string, string> = {
+      "content-type": "application/json",
+    };
+    if (req.headers.authorization) {
+      forwardHeaders.authorization = req.headers.authorization as string;
+    }
+    const response = await fetch(targetUrl, {
+      method: "POST",
+      headers: forwardHeaders,
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    return res.status(response.status).json(data);
+  } catch (err) {
+    log.error(`Failed to proxy ${req.path} to worker:`, err);
+    return res.status(502).json({ error: "Failed to connect to game worker" });
+  }
+});
+
 // Centralized Account & Progression Endpoints
 app.post("/api/account/register", (req, res) => {
   const { email, password, username } = req.body || {};

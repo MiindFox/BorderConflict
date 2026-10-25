@@ -221,6 +221,27 @@ export class HostLobbyModal extends BaseModal {
     return await this.buildLobbyUrl();
   }
 
+  private async copyLobbyCodeOnly() {
+    if (!this.lobbyId) return;
+    try {
+      await navigator.clipboard.writeText(this.lobbyId);
+      showToast(`Clé du salon copiée : ${this.lobbyId}`, "green");
+    } catch {
+      showToast("Impossible de copier la clé", "red");
+    }
+  }
+
+  private async copyLobbyFullLink() {
+    if (!this.lobbyId) return;
+    try {
+      const url = await this.buildLobbyUrl();
+      await navigator.clipboard.writeText(url);
+      showToast("Lien d'invitation copié dans le presse-papier !", "green");
+    } catch {
+      showToast("Impossible de copier le lien", "red");
+    }
+  }
+
   private updateHistory(url: string): void {
     if (gamePortal.isOnGamePortal()) {
       return;
@@ -435,8 +456,8 @@ export class HostLobbyModal extends BaseModal {
         ? this.queued
           ? translateText("host_modal.queued_waiting")
           : this.clients.length === 1
-            ? translateText("host_modal.waiting")
-            : translateText("game_settings.start")
+            ? "Lancer la partie (Solo / Bots)"
+            : `Lancer la partie (${this.clients.length} joueurs)`
         : // A queued lobby's countdown belongs to the public queue; the host
           // can't cancel it.
           translateText(
@@ -629,6 +650,59 @@ export class HostLobbyModal extends BaseModal {
         <div
           class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-3 pb-6 mx-auto w-full max-w-4xl"
         >
+          <!-- Bannière Clé du Salon Privé & Partage Rapide -->
+          <div
+            class="mb-6 p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-[#182119] via-[#223023] to-[#182119] border-2 border-amber-500/50 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4"
+          >
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <div
+                class="size-10 sm:size-11 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shrink-0 text-amber-300 shadow-inner"
+              >
+                🔑
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span
+                  class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-400 font-pixel flex items-center gap-1.5"
+                >
+                  CLE DU SALON PRIVE (CODE INVITATION)
+                </span>
+                <div class="flex items-center gap-2 mt-1">
+                  <span
+                    class="font-mono text-sm sm:text-base font-black tracking-widest text-amber-100 select-all bg-black/60 px-3 py-1 rounded border border-amber-500/30 shadow-inner"
+                  >
+                    ${this.lobbyId || "GÉNÉRATION..."}
+                  </span>
+                  <span class="text-[10px] sm:text-[11px] text-[#8fa382] font-terminal hidden sm:inline">
+                    (À coller dans "CODE PRIVÉ" sur l'accueil)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+              <button
+                type="button"
+                @click=${this.copyLobbyCodeOnly}
+                ?disabled=${!this.lobbyId}
+                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-amber-200 hover:text-white uppercase tracking-wider cursor-pointer"
+                title="Copier le code clé pour vos amis"
+              >
+                <span>📋</span>
+                <span>COPIER LA CLÉ</span>
+              </button>
+              <button
+                type="button"
+                @click=${this.copyLobbyFullLink}
+                ?disabled=${!this.lobbyId}
+                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-cyan-200 hover:text-white uppercase tracking-wider cursor-pointer"
+                title="Copier le lien direct vers ce salon"
+              >
+                <span>🔗</span>
+                <span>COPIER LE LIEN</span>
+              </button>
+            </div>
+          </div>
+
           ${this.publiclyListed
             ? html`<div
                 class="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm font-medium text-amber-300"
@@ -797,7 +871,7 @@ export class HostLobbyModal extends BaseModal {
               .title=${statusLabel}
               .uppercase=${secondsRemaining === null}
               ?disable=${this.queued ||
-              (this.lobbyStartAt === null && this.clients.length < 2)}
+              (this.lobbyStartAt === null && this.clients.length < 1)}
               @click=${this.toggleGameStartTimer}
             ></o-button>
           </div>
@@ -864,11 +938,8 @@ export class HostLobbyModal extends BaseModal {
     this.leaveLobbyOnClose = true;
     this.startLobbyUpdates();
     void getUserMe().then((userMe) => {
-      // Dev skips the entitlement gate (matching the server) so the
-      // listing flow is testable locally.
-      this.canListPublicly =
-        ClientEnv.env() === GameEnv.Dev ||
-        (userMe !== false && userMe.player.canCreatePublicLobbies);
+      // In self-hosted/custom build, all players can list lobbies publicly
+      this.canListPublicly = true;
       this.hardBalance =
         userMe === false ? 0 : (userMe.player.currency?.hard ?? 0);
     });
@@ -924,7 +995,9 @@ export class HostLobbyModal extends BaseModal {
           }),
         );
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Erreur création lobby:", err);
+        showToast("Impossible de créer le salon : vérifiez la connexion au serveur.", "red");
         // Clear clipboard so the host doesn't accidentally share a dead link
         void navigator.clipboard.writeText("").catch(() => {});
       });

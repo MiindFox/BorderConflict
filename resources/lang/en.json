@@ -1989,7 +1989,7 @@
   },
   "private_lobby": {
     "disabled_units": "Disabled Units",
-    "enter_id": "Enter Lobby ID",
+    "enter_id": "Enter Lobby Key or Link (e.g. a1b2c3d4)",
     "error": "An error occurred. Please try again or contact support.",
     "game_length": "Game length",
     "host_cheats": "Host Cheats",

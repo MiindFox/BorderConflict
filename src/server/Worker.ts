@@ -228,23 +228,8 @@ export function registerListingRoute(opts: {
           return res.status(409).json({ error: preError });
         }
 
-        // Dev has no subscription backend; skip the check so the feature is
-        // testable locally (same precedent as Turnstile).
-        if (ServerEnv.env() !== GameEnv.Dev) {
-          const userMe = await getUserMe(token);
-          if (userMe.type === "error") {
-            log.warn(
-              `listing rejected, user me fetch failed: ${userMe.message}`,
-              {
-                gameID: req.params.id,
-              },
-            );
-            return res.status(403).json({ error: "subscription_required" });
-          }
-          if (!userMe.response.player.canCreatePublicLobbies) {
-            return res.status(403).json({ error: "subscription_required" });
-          }
-        }
+        // Self-hosted and dev environments allow public lobby listing for all players.
+        // Subscription check is bypassed so custom lobbies can be listed freely.
 
         // Re-verify after the async entitlement check to close the race window
         // where the host could alter lobby settings (e.g. enable host cheats).

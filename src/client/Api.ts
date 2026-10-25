@@ -309,11 +309,7 @@ export async function getUserMe(): Promise<UserMeResponse | false> {
     if (profile !== false) {
       return profile;
     }
-    const local = commanderStore.getLocalUserMeResponse();
-    if (local.user.email) {
-      return local;
-    }
-    return false;
+    return commanderStore.getLocalUserMeResponse();
   })();
   __userMe = attempt.request;
   return attempt.request;
