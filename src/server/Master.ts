@@ -1,3 +1,4 @@
+import { UserMeResponse } from "@openfront/shared/ApiSchemas";
 import { GameEnv } from "@openfront/shared/configuration/Env";
 import cluster, { Worker } from "cluster";
 import crypto from "crypto";
@@ -6,6 +7,8 @@ import rateLimit from "express-rate-limit";
 import http from "http";
 import path from "path";
 import { fileURLToPath } from "url";
+import { getHexaFrontCosmeticsCatalog } from "../client/HexaFrontCosmeticsCatalog";
+import { verifyClientToken } from "./jwt";
 import {
   applyCheckinState,
   CHECKIN_INTERVAL_MS,
@@ -616,6 +619,103 @@ app.post("/api/clans/:tag/join", (req, res) => {
     return res.status(400).json({ ok: false, error: result.error });
   }
   return res.json({ ok: true, clan: result.clan });
+});
+
+// --- STANDALONE BACKEND ADAPTER ROUTES ---
+app.get("/cosmetics.json", (_req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.json(getHexaFrontCosmeticsCatalog());
+});
+
+app.get("/reserved_clan_tags", (_req, res) => {
+  res.json(accountDb.getAllClanTags());
+});
+
+app.post("/cluster/checkin", (_req, res) => {
+  res.json({ state: "open" });
+});
+
+app.post("/matchmaking/checkin", (_req, res) => {
+  res.json({ assignment: null });
+});
+
+app.get("/custom_tribes", (_req, res) => {
+  res.json([]);
+});
+
+app.get("/map_weights", (_req, res) => {
+  res.json({});
+});
+
+app.all("/game/:id", (_req, res) => {
+  res.status(200).json({ ok: true });
+});
+
+app.get("/.well-known/jwks.json", (_req, res) => {
+  res.json({
+    keys: [
+      {
+        kty: "OKP",
+        crv: "Ed25519",
+        alg: "EdDSA",
+        x: "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
+      },
+    ],
+  });
+});
+
+app.get("/users/@me", async (req, res) => {
+  let pid = "commander";
+  let username: string | null = null;
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.substring("Bearer ".length);
+    try {
+      const auth = await verifyClientToken(token);
+      if (auth.type === "success") {
+        pid = auth.persistentId;
+      }
+    } catch {}
+  }
+
+  const publicProfile = accountDb.getPublicProfile(pid);
+  if (publicProfile) {
+    username = publicProfile.username;
+  }
+
+  const userMeResponse: UserMeResponse = {
+    user: {},
+    steamLicence: false,
+    steamLicenceSince: null,
+    noticesSeen: [],
+    pendingMessages: [],
+    tierConversion: null,
+    player: {
+      publicId: pid,
+      adfree: true,
+      canCreatePublicLobbies: true,
+      trustTier: "trusted",
+      username,
+      usernameBase: username,
+      usernameDiscriminator: null,
+      usernameClaimExpiresAt: null,
+      nextUsernameChangeAt: null,
+      flares: publicProfile?.ownedFlares ?? [],
+      achievements: {
+        singleplayerMap: [],
+        player: [],
+      },
+      friends: [],
+      clans: accountDb.getPlayerClans(pid),
+      clanRequests: [],
+      subscription: null,
+      levelHidden: false,
+      searchHidden: false,
+    },
+  };
+
+  res.json(userMeResponse);
 });
 
 // Start the master process

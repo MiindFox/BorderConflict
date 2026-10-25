@@ -597,6 +597,10 @@ class AccountDatabase {
     return this.clans[tag.toUpperCase()] || null;
   }
 
+  public getAllClanTags(): string[] {
+    return Object.keys(this.clans);
+  }
+
   public getPlayerClans(publicId: string): any[] {
     const res: any[] = [];
     for (const clan of Object.values(this.clans)) {

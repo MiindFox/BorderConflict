@@ -109,14 +109,33 @@ export class ServerEnv {
   static cdnBase(): string {
     return process.env.CDN_BASE ?? "";
   }
+  static isStandalone(): boolean {
+    return process.env.STANDALONE !== "false";
+  }
+
+  static masterPort(): number {
+    return Number(process.env.PORT || 3000);
+  }
+
   static jwtIssuer(): string {
+    if (process.env.JWT_ISSUER) return process.env.JWT_ISSUER;
     const audience = ServerEnv.jwtAudience();
-    return audience === "localhost"
-      ? "http://localhost:8787"
-      : `https://api.${audience}`;
+    if (audience === "localhost" || ServerEnv.isStandalone()) {
+      return `http://127.0.0.1:${ServerEnv.masterPort()}`;
+    }
+    return `https://api.${audience}`;
   }
   static async jwkPublicKey(): Promise<JWK> {
     if (ServerEnv.publicKey) return ServerEnv.publicKey;
+    if (ServerEnv.isStandalone()) {
+      ServerEnv.publicKey = {
+        kty: "OKP",
+        crv: "Ed25519",
+        alg: "EdDSA",
+        x: "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
+      };
+      return ServerEnv.publicKey;
+    }
     const jwksUrl = ServerEnv.jwtIssuer() + "/.well-known/jwks.json";
     console.log(`Fetching JWKS from ${jwksUrl}`);
     const response = await fetch(jwksUrl);
