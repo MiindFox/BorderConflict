@@ -1,24 +1,65 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <defs>
-    <linearGradient id="favGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#22d3ee" />
-      <stop offset="50%" stop-color="#06b6d4" />
-      <stop offset="100%" stop-color="#4f46e5" />
+    <linearGradient id="bcHexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="45%" stop-color="#22c55e" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <radialGradient id="bcRadarGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.35" />
+      <stop offset="80%" stop-color="#0a120c" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#050a06" />
+    </radialGradient>
+    <linearGradient id="bcJetGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="40%" stop-color="#4ade80" />
+      <stop offset="100%" stop-color="#15803d" />
     </linearGradient>
   </defs>
+
+  <!-- Heavy Outer Armor Hexagon -->
   <polygon
-    points="32,3 58,18 58,46 32,61 6,46 6,18"
-    fill="#090d16"
-    stroke="url(#favGrad)"
-    stroke-width="4"
+    points="32,2 60,17 60,47 32,62 4,47 4,17"
+    fill="url(#bcRadarGlow)"
+    stroke="url(#bcHexGrad)"
+    stroke-width="3.5"
     stroke-linejoin="round"
   />
-  <polygon points="32,10 51,21 32,32" fill="#38bdf8" opacity="0.95" />
-  <polygon points="51,21 51,43 32,32" fill="#06b6d4" opacity="0.8" />
-  <polygon points="51,43 32,54 32,32" fill="#4f46e5" opacity="0.9" />
-  <polygon points="32,54 13,43 32,32" fill="#6366f1" opacity="0.65" />
-  <polygon points="13,43 13,21 32,32" fill="#0284c7" opacity="0.85" />
-  <polygon points="13,21 32,10 32,32" fill="#7dd3fc" opacity="0.95" />
-  <circle cx="32" cy="32" r="6" fill="#090d16" stroke="#22d3ee" stroke-width="2.5" />
-  <circle cx="32" cy="32" r="2.5" fill="#22d3ee" />
+
+  <!-- Subtle Inner Tactical Hexagon -->
+  <polygon
+    points="32,7 55,19 55,45 32,57 9,45 9,19"
+    fill="none"
+    stroke="#22c55e"
+    stroke-width="1"
+    stroke-opacity="0.35"
+    stroke-dasharray="2,3"
+  />
+
+  <!-- Radar Concentric Rings -->
+  <circle cx="32" cy="32" r="22" stroke="#22c55e" stroke-width="1" stroke-opacity="0.3" fill="none" />
+  <circle cx="32" cy="32" r="14" stroke="#22c55e" stroke-width="1" stroke-opacity="0.45" fill="none" />
+  <circle cx="32" cy="32" r="6" stroke="#4ade80" stroke-width="1.2" stroke-opacity="0.6" fill="none" />
+
+  <!-- Radar Crosshairs (4 axes) -->
+  <line x1="32" y1="8" x2="32" y2="56" stroke="#22c55e" stroke-width="1" stroke-opacity="0.4" />
+  <line x1="8" y1="32" x2="56" y2="32" stroke="#22c55e" stroke-width="1" stroke-opacity="0.4" />
+
+  <!-- Target Lock Brackets -->
+  <path d="M 20,23 L 20,20 L 23,20" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 44,23 L 44,20 L 41,20" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 20,41 L 20,44 L 23,44" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 44,41 L 44,44 L 41,44" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Center Stealth Fighter / Delta Wings War Emblem -->
+  <path
+    d="M 32,13 L 43,37 L 37,34 L 32,46 L 27,34 L 21,37 Z"
+    fill="url(#bcJetGrad)"
+    stroke="#0a120c"
+    stroke-width="1"
+    stroke-linejoin="round"
+  />
+
+  <!-- Glowing Radar Core Ping -->
+  <circle cx="32" cy="32" r="2.5" fill="#fef08a" />
 </svg>
