@@ -545,7 +545,7 @@ function requireAdmin(
 // ============================================================================
 // Presence heartbeat endpoint for all online commanders
 app.post("/api/presence/ping", (req, res) => {
-  const { sessionId, username, email, state, currentPage } = req.body || {};
+  const { sessionId, username, email, isGuest, state, currentPage } = req.body || {};
   const ip =
     (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
     req.socket.remoteAddress ||
@@ -553,9 +553,19 @@ app.post("/api/presence/ping", (req, res) => {
   const userAgent = req.headers["user-agent"] || "";
   const key = sessionId || `${ip}_${username || email || "anon"}`;
 
+  if (presenceTracker.isKicked(key) || (sessionId && presenceTracker.isKicked(sessionId))) {
+    return res.json({
+      ok: false,
+      kicked: true,
+      onlineCount: presenceTracker.getOnlineCount(),
+      serverTime: Date.now(),
+    });
+  }
+
   presenceTracker.recordHeartbeat(key, {
     username,
     email,
+    isGuest,
     ip,
     userAgent,
     state,
@@ -565,6 +575,8 @@ app.post("/api/presence/ping", (req, res) => {
   return res.json({
     ok: true,
     onlineCount: presenceTracker.getOnlineCount(),
+    guestCount: presenceTracker.getGuestCount(),
+    registeredCount: presenceTracker.getRegisteredCount(),
     serverTime: Date.now(),
   });
 });
@@ -576,6 +588,8 @@ app.all("/api/admin/overview", requireAdmin, (_req, res) => {
   const accounts = accountDb.getAllAccounts();
   const stats = purchaseTracker.getStats();
   const activeSessions = presenceTracker.getActiveSessions();
+  const guestSessions = presenceTracker.getGuestSessions();
+  const registeredSessions = presenceTracker.getRegisteredSessions();
   const onlineCount = activeSessions.length;
   const lobbyPlayers = lobbyService?.getLobbyPlayerCount() ?? 0;
   const liveGames = lobbyService?.liveGames() ?? 0;
@@ -588,13 +602,30 @@ app.all("/api/admin/overview", requireAdmin, (_req, res) => {
       vipCount: accounts.filter((a) => a.isVip).length,
       livePlayers: {
         totalOnline: Math.max(onlineCount, lobbyPlayers),
+        registeredCount: registeredSessions.length,
+        guestsCount: guestSessions.length,
         inMenus: Math.max(0, onlineCount - lobbyPlayers),
         inLobbies: lobbyPlayers,
         liveGames: liveGames,
-        sessions: activeSessions.slice(0, 50).map((s) => ({
+        sessions: activeSessions.slice(0, 100).map((s) => ({
+          sessionId: s.sessionId,
           username: s.username,
+          email: s.email,
+          ip: s.ip,
+          state: s.state,
+          isGuest: s.isGuest,
+          currentPage: s.currentPage,
+          connectedDurationSeconds: Math.floor((Date.now() - s.connectedAt) / 1000),
+          lastSeenAgoSeconds: Math.floor((Date.now() - s.lastSeen) / 1000),
+        })),
+        guestSessions: guestSessions.slice(0, 100).map((s) => ({
+          sessionId: s.sessionId,
+          username: s.username,
+          ip: s.ip,
+          userAgent: s.userAgent,
           state: s.state,
           currentPage: s.currentPage,
+          connectedDurationSeconds: Math.floor((Date.now() - s.connectedAt) / 1000),
           lastSeenAgoSeconds: Math.floor((Date.now() - s.lastSeen) / 1000),
         })),
       },
@@ -611,6 +642,37 @@ app.all("/api/admin/overview", requireAdmin, (_req, res) => {
           : null,
     },
   });
+});
+
+app.all("/api/admin/guests", requireAdmin, (_req, res) => {
+  const guestSessions = presenceTracker.getGuestSessions();
+  return res.json({
+    ok: true,
+    count: guestSessions.length,
+    guests: guestSessions.map((s) => ({
+      sessionId: s.sessionId,
+      username: s.username,
+      ip: s.ip,
+      userAgent: s.userAgent,
+      state: s.state,
+      currentPage: s.currentPage,
+      connectedAt: s.connectedAt,
+      connectedDurationSeconds: Math.floor((Date.now() - s.connectedAt) / 1000),
+      lastSeenAgoSeconds: Math.floor((Date.now() - s.lastSeen) / 1000),
+    })),
+  });
+});
+
+app.post("/api/admin/guests/action", requireAdmin, (req, res) => {
+  const { action, sessionId } = req.body || {};
+  if (!sessionId) {
+    return res.status(400).json({ ok: false, error: "SessionId requis." });
+  }
+  if (action === "kick") {
+    const kicked = presenceTracker.kickSession(sessionId);
+    return res.json({ ok: true, message: "Session invité éjectée.", kicked });
+  }
+  return res.status(400).json({ ok: false, error: "Action inconnue." });
 });
 
 app.all("/api/admin/players", requireAdmin, (_req, res) => {

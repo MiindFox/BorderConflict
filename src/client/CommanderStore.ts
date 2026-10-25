@@ -170,17 +170,41 @@ class CommanderStore {
         sessionStorage.setItem("bc_session_id", sessionId);
       }
       const inGame = document.body.classList.contains("in-game");
+      const inLobby =
+        Boolean(window.location.hash?.includes("lobby")) ||
+        Boolean(window.location.search?.includes("lobby"));
+      const state = inGame ? "in_game" : inLobby ? "lobby" : "menu";
+      const localUsername =
+        typeof localStorage !== "undefined"
+          ? localStorage.getItem("username")
+          : null;
+      const isGuest = !this.profile.email;
+      const effectiveUsername =
+        this.profile.username ||
+        localUsername ||
+        `Invité_${sessionId.slice(-4)}`;
+
       fetch("/api/presence/ping", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId,
-          username: this.profile.username || "Commandant",
+          username: effectiveUsername,
           email: this.profile.email || undefined,
-          state: inGame ? "in_game" : "menu",
-          currentPage: window.currentPageId || "play",
+          isGuest,
+          state,
+          currentPage: window.currentPageId || (inGame ? "combat" : "play"),
         }),
-      }).catch(() => {});
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data?.kicked) {
+            sessionStorage.removeItem("bc_session_id");
+            alert("Votre session a été réinitialisée par un administrateur.");
+            window.location.reload();
+          }
+        })
+        .catch(() => {});
     } catch {}
   }
 
