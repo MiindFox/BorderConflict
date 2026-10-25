@@ -1075,7 +1075,7 @@ class CommanderStore {
         newlyCompleted.push(d);
         if (typeof window !== "undefined") {
           showToast(
-            `🎯 DIRECTIVE DU JOUR VALIDÉE : ${d.title} (+${d.rewardCaps} 🍾 Capsules, +${d.rewardXp} XP) !`,
+            `🎯 DIRECTIVE DU JOUR VALIDÉE : ${d.title} (+${d.rewardCaps} Capsules, +${d.rewardXp} XP) !`,
             "green",
             3500,
           );
@@ -1097,7 +1097,7 @@ class CommanderStore {
       );
       if (typeof window !== "undefined") {
         showToast(
-          `🌟 GRAND CHELEM DU JOUR ! 3/3 Directives terminées (+${b.plutonium} ☢️ Plutonium, +${b.caps} 🍾 Capsules, +${b.xp} XP) !`,
+          `🌟 GRAND CHELEM DU JOUR ! 3/3 Directives terminées (+${b.plutonium} Plutonium, +${b.caps} Capsules, +${b.xp} XP) !`,
           "green",
           5000,
         );

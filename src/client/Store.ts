@@ -755,7 +755,7 @@ export class StoreModal extends BaseModal {
           >
             <div>
               <div class="flex items-center justify-between">
-                <span class="text-2xl">☢️</span>
+                <plutonium-icon .size=${28}></plutonium-icon>
                 <span
                   class="rounded bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300"
                 >
@@ -766,7 +766,7 @@ export class StoreModal extends BaseModal {
                 250 Plutonium
               </h4>
               <p class="text-[11px] text-slate-300 mt-1">
-                Débloque directement 1 cosmétique Rare (249 ☢️) ou personnalise votre profil.
+                Débloque directement 1 cosmétique Rare (249 Plutonium) ou personnalise votre profil.
               </p>
             </div>
             <button
@@ -789,7 +789,7 @@ export class StoreModal extends BaseModal {
             </div>
             <div>
               <div class="flex items-center justify-between">
-                <span class="text-2xl">☢️</span>
+                <plutonium-icon .size=${28}></plutonium-icon>
                 <span
                   class="rounded bg-indigo-500/20 px-2 py-0.5 text-xs font-bold text-indigo-300"
                 >
@@ -800,7 +800,7 @@ export class StoreModal extends BaseModal {
                 600 Plutonium
               </h4>
               <p class="text-[11px] text-slate-300 mt-1">
-                Débloque 1 skin Légendaire (599 ☢️), 1 Coffre Cyber-Élite ou 1 Pack Spécial.
+                Débloque 1 skin Légendaire (599 Plutonium), 1 Coffre Cyber-Élite ou 1 Pack Spécial.
               </p>
             </div>
             <button
@@ -823,7 +823,10 @@ export class StoreModal extends BaseModal {
             </div>
             <div>
               <div class="flex items-center justify-between">
-                <span class="text-2xl">☢️✨</span>
+                <div class="flex items-center gap-1.5">
+                  <plutonium-icon .size=${28}></plutonium-icon>
+                  <span class="text-sm">✨</span>
+                </div>
                 <span
                   class="rounded bg-cyan-500/20 px-2 py-0.5 text-xs font-bold text-cyan-300"
                 >
@@ -852,12 +855,30 @@ export class StoreModal extends BaseModal {
           >
             <div>
               <div class="flex items-center justify-between">
-                <span class="text-2xl">☢️🔥</span>
+                <div class="flex items-center gap-1.5">
+                  <plutonium-icon .size=${28}></plutonium-icon>
+                  <span class="text-sm">🔥</span>
+                </div>
                 <span
                   class="rounded bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-300"
                 >
                   9,99 €
                 </span>
+              </div>
+              <h4 class="mt-2 text-base font-black text-amber-300">
+                3 000 Plutonium
+              </h4>
+              <p class="text-[11px] text-slate-300 mt-1">
+                2 500 + 500 Plutonium OFFERTS. Permet d'acquérir le Pack Suprême Apothéose.
+              </p>
+            </div>
+            <button
+              type="button"
+              @click=${() => this.handleBuyStripeBundle("plutonium_3000")}
+              class="mt-4 w-full cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 py-2.5 text-xs font-black uppercase text-slate-950 shadow"
+            >
+              Acheter · 9,99 €
+            </button>
               </div>
               <h4 class="mt-2 text-base font-black text-amber-300">
                 3 000 Plutonium
@@ -1196,8 +1217,9 @@ export class StoreModal extends BaseModal {
                     <span class="rounded bg-purple-500/30 border border-purple-400/50 px-2 py-0.5 text-xs font-black uppercase text-purple-200">
                       3,99 €
                     </span>
-                    <span class="rounded bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 text-xs font-black uppercase text-amber-300">
-                      450 ☢️
+                    <span class="rounded bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 text-xs font-black uppercase text-amber-300 flex items-center gap-1">
+                      <span>450</span>
+                      <plutonium-icon .size=${14}></plutonium-icon>
                     </span>
                   </div>
                 </div>
@@ -1207,8 +1229,12 @@ export class StoreModal extends BaseModal {
                 <p class="text-xs text-slate-300 mt-1">
                   Cornes Démoniaques, Toile Nécromantique, Étendard Faucheuse d'Âmes, Sillage Ectoplasme & Déflagration Toxique Mort-Vivante.
                 </p>
-                <div class="mt-2 text-[11px] text-emerald-400 font-bold">
-                  🎁 Bonus Stripe : +500 Plutonium & +8 000 Caps offerts !
+                <div class="mt-2 text-[11px] text-emerald-400 font-bold flex items-center gap-1 flex-wrap">
+                  <span>🎁 Bonus Stripe : +500</span>
+                  <plutonium-icon .size=${12}></plutonium-icon>
+                  <span>& +8 000</span>
+                  <cap-icon .size=${14}></cap-icon>
+                  <span>offerts !</span>
                 </div>
               </div>
               <div class="mt-4 flex gap-2">
@@ -1222,9 +1248,10 @@ export class StoreModal extends BaseModal {
                 <button
                   type="button"
                   @click=${() => this.openPackByName("pack_halloween_necropolis")}
-                  class="cursor-pointer rounded-lg bg-slate-800 hover:bg-slate-700 border border-purple-400/40 px-3 py-2.5 text-xs font-black uppercase text-purple-300 shadow transition-all active:scale-95 text-center flex items-center gap-1"
+                  class="cursor-pointer rounded-lg bg-slate-800 hover:bg-slate-700 border border-purple-400/40 px-3 py-2.5 text-xs font-black uppercase text-purple-300 shadow transition-all active:scale-95 text-center flex items-center justify-center gap-1.5"
                 >
-                  <span>450 ☢️</span>
+                  <span>450</span>
+                  <plutonium-icon .size=${14}></plutonium-icon>
                 </button>
               </div>
             </div>
@@ -1238,8 +1265,9 @@ export class StoreModal extends BaseModal {
                     <span class="rounded bg-orange-500/30 border border-orange-400/50 px-2 py-0.5 text-xs font-black uppercase text-orange-200">
                       4,49 €
                     </span>
-                    <span class="rounded bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 text-xs font-black uppercase text-amber-300">
-                      490 ☢️
+                    <span class="rounded bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 text-xs font-black uppercase text-amber-300 flex items-center gap-1">
+                      <span>490</span>
+                      <plutonium-icon .size=${14}></plutonium-icon>
                     </span>
                   </div>
                 </div>
@@ -1249,8 +1277,12 @@ export class StoreModal extends BaseModal {
                 <p class="text-xs text-slate-300 mt-1">
                   Couronne Roi Citrouille, Lanterne d'Effroi, Blason Samhain, Coque Citrouille Infernale & Traînée d'Âmes Enflammées.
                 </p>
-                <div class="mt-2 text-[11px] text-emerald-400 font-bold">
-                  🎁 Bonus Stripe : +600 Plutonium & +10 000 Caps offerts !
+                <div class="mt-2 text-[11px] text-emerald-400 font-bold flex items-center gap-1 flex-wrap">
+                  <span>🎁 Bonus Stripe : +600</span>
+                  <plutonium-icon .size=${12}></plutonium-icon>
+                  <span>& +10 000</span>
+                  <cap-icon .size=${14}></cap-icon>
+                  <span>offerts !</span>
                 </div>
               </div>
               <div class="mt-4 flex gap-2">
@@ -1264,9 +1296,11 @@ export class StoreModal extends BaseModal {
                 <button
                   type="button"
                   @click=${() => this.openPackByName("pack_halloween_pumpkin_infernal")}
-                  class="cursor-pointer rounded-lg bg-slate-800 hover:bg-slate-700 border border-orange-400/40 px-3 py-2.5 text-xs font-black uppercase text-orange-300 shadow transition-all active:scale-95 text-center flex items-center gap-1"
+                  class="cursor-pointer rounded-lg bg-slate-800 hover:bg-slate-700 border border-orange-400/40 px-3 py-2.5 text-xs font-black uppercase text-orange-300 shadow transition-all active:scale-95 text-center flex items-center justify-center gap-1.5"
                 >
-                  <span>490 ☢️</span>
+                  <span>490</span>
+                  <plutonium-icon .size=${14}></plutonium-icon>
+                </button>
                 </button>
               </div>
             </div>

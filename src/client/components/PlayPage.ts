@@ -278,7 +278,7 @@ export class PlayPage extends LitElement {
                       title="Capsules de Territoire"
                     >
                       <span>+${d.rewardCaps}</span>
-                      <span>🍾</span>
+                      <cap-icon .size=${12}></cap-icon>
                     </span>
                     <span
                       class="px-1.5 py-0.2 rounded bg-[#1e2e1a] text-emerald-300 font-pixel text-[8px] font-black shadow-inner"
@@ -376,7 +376,7 @@ export class PlayPage extends LitElement {
               </span>
               <span class="text-amber-300 flex items-center gap-0.5">
                 <span>+25</span>
-                <span>🍾</span>
+                <cap-icon .size=${12}></cap-icon>
               </span>
               <span class="text-emerald-300">+45 XP</span>
             </div>
