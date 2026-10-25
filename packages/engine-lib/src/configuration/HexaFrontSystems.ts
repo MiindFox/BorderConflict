@@ -2153,50 +2153,50 @@ export const MEGASTRUCTURE_DEFINITIONS: MegastructureDefinition[] = [
     name: "Arcologie Cybernétique",
     icon: "🏙️",
     accentColor: "#38bdf8",
-    requirementDesc: "3+ niveaux de Villes cumulés",
-    effectDesc: "+8 000 Or & +6 000 Troupes toutes les 5s",
-    goldPerPulse: 8_000,
-    troopsPerPulse: 6_000,
+    requirementDesc: "8+ Villes contrôlées",
+    effectDesc: "+50 000 Or & +35 000 Troupes toutes les 5s",
+    goldPerPulse: 50_000,
+    troopsPerPulse: 35_000,
   },
   {
     id: "titan_foundry",
     name: "Complexe Industriel Titan",
     icon: "🏭",
     accentColor: "#f59e0b",
-    requirementDesc: "3+ niveaux d'Usines cumulés",
-    effectDesc: "+25 000 Or de dividende industriel toutes les 5s",
-    goldPerPulse: 25_000,
-    troopsPerPulse: 0,
+    requirementDesc: "8+ Usines contrôlées",
+    effectDesc: "+140 000 Or & +15 000 Troupes de production toutes les 5s",
+    goldPerPulse: 140_000,
+    troopsPerPulse: 15_000,
   },
   {
     id: "hegemon_shipyard",
     name: "Chantier Naval Hégémonique",
     icon: "⚓",
     accentColor: "#06b6d4",
-    requirementDesc: "3+ niveaux de Ports cumulés",
-    effectDesc: "+18 000 Or maritime & +5 000 Troupes toutes les 5s",
-    goldPerPulse: 18_000,
-    troopsPerPulse: 5_000,
+    requirementDesc: "7+ Ports contrôlés",
+    effectDesc: "+95 000 Or maritime & +30 000 Troupes toutes les 5s",
+    goldPerPulse: 95_000,
+    troopsPerPulse: 30_000,
   },
   {
     id: "orbital_command",
     name: "Centre de Commandement Orbital",
     icon: "🛰️",
     accentColor: "#f43f5e",
-    requirementDesc: "2+ niveaux de Silos de Missiles",
-    effectDesc: "+20 000 Or stratégique & +8 000 Troupes toutes les 5s",
-    goldPerPulse: 20_000,
-    troopsPerPulse: 8_000,
+    requirementDesc: "5+ Silos de Missiles nucléaires",
+    effectDesc: "+110 000 Or stratégique & +45 000 Troupes toutes les 5s",
+    goldPerPulse: 110_000,
+    troopsPerPulse: 45_000,
   },
   {
     id: "continental_dome",
     name: "Dôme Énergétique Continental",
     icon: "🛡️",
     accentColor: "#10b981",
-    requirementDesc: "4+ Postes de Défense / Batteries SAM cumulés",
-    effectDesc: "+5 000 Or & +10 000 Troupes de garnison toutes les 5s",
-    goldPerPulse: 5_000,
-    troopsPerPulse: 10_000,
+    requirementDesc: "14+ Postes de Défense et SAM",
+    effectDesc: "+40 000 Or & +70 000 Troupes de garnison toutes les 5s",
+    goldPerPulse: 40_000,
+    troopsPerPulse: 70_000,
   },
 ];
 
@@ -2204,19 +2204,19 @@ export function getActiveMegastructures(
   counts: PlayerStructureCounts,
 ): MegastructureDefinition[] {
   const active: MegastructureDefinition[] = [];
-  if (counts.cities >= 3) {
+  if (counts.cities >= 8) {
     active.push(MEGASTRUCTURE_DEFINITIONS[0]);
   }
-  if (counts.factories >= 3) {
+  if (counts.factories >= 8) {
     active.push(MEGASTRUCTURE_DEFINITIONS[1]);
   }
-  if (counts.ports >= 3) {
+  if (counts.ports >= 7) {
     active.push(MEGASTRUCTURE_DEFINITIONS[2]);
   }
-  if (counts.silos >= 2) {
+  if (counts.silos >= 5) {
     active.push(MEGASTRUCTURE_DEFINITIONS[3]);
   }
-  if (counts.defensesAndSam >= 4) {
+  if (counts.defensesAndSam >= 14) {
     active.push(MEGASTRUCTURE_DEFINITIONS[4]);
   }
   return active;
@@ -3042,7 +3042,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🏙️",
     rarity: "Rare",
     rarityColor: "#06b6d4",
-    description: "Ériger la Mégastructure Arcologie Cybernétique (3+ niveaux de Villes).",
+    description: "Ériger la Mégastructure Arcologie Cybernétique (8+ Villes contrôlées).",
     xpBonus: 30,
   },
   {
@@ -3051,7 +3051,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🌆",
     rarity: "Épique",
     rarityColor: "#a855f7",
-    description: "Détenir un réseau urbain de 8 Villes fortifiées de haute densité.",
+    description: "Détenir un réseau urbain titanesque de 14 Villes fortifiées.",
     xpBonus: 50,
   },
   {
@@ -3060,7 +3060,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🏭",
     rarity: "Rare",
     rarityColor: "#f59e0b",
-    description: "Activer le Complexe Industriel Titan ou accumuler 500k+ Or.",
+    description: "Activer le Complexe Industriel Titan (8+ Usines) ou accumuler 1 000 000 Or.",
     xpBonus: 30,
   },
   {
@@ -3078,7 +3078,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "⚓",
     rarity: "Rare",
     rarityColor: "#06b6d4",
-    description: "Activer le Chantier Naval Hégémonique (3+ niveaux de Ports).",
+    description: "Activer le Chantier Naval Hégémonique (7+ Ports contrôlés).",
     xpBonus: 30,
   },
   {
@@ -3087,7 +3087,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🚢",
     rarity: "Épique",
     rarityColor: "#06b6d4",
-    description: "Contrôler un chapelet maritime de 6 Ports opérationnels simultanément.",
+    description: "Contrôler un chapelet maritime de 10 Ports opérationnels simultanément.",
     xpBonus: 55,
   },
   {
@@ -3096,7 +3096,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "☢️",
     rarity: "Épique",
     rarityColor: "#f43f5e",
-    description: "Déployer le Centre de Commandement Orbital (2+ niveaux de Silos).",
+    description: "Déployer le Centre de Commandement Orbital (5+ Silos nucléaires).",
     xpBonus: 45,
   },
   {
@@ -3105,7 +3105,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🚀",
     rarity: "Épique",
     rarityColor: "#f43f5e",
-    description: "Posséder au moins 4 Silos atomiques parés au tir simultané.",
+    description: "Posséder au moins 7 Silos atomiques parés au tir simultané.",
     xpBonus: 60,
   },
   {
@@ -3114,7 +3114,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🛡️",
     rarity: "Rare",
     rarityColor: "#10b981",
-    description: "Activer le Dôme Énergétique Continental (4+ Défenses/SAM).",
+    description: "Activer le Dôme Énergétique Continental (14+ Défenses/SAM).",
     xpBonus: 25,
   },
   {
@@ -3123,7 +3123,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🧱",
     rarity: "Épique",
     rarityColor: "#10b981",
-    description: "Fortifier votre territoire avec 12 Postes de Défense et tourelles SAM.",
+    description: "Fortifier votre territoire avec 20 Postes de Défense et tourelles SAM.",
     xpBonus: 50,
   },
   {

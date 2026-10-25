@@ -1424,19 +1424,19 @@ class CommanderStore {
     tryUnlock("capital_annihilator", counts.tilesOwned >= 3500 && won);
 
     // Bâtiments, Mégastructures & Économie
-    tryUnlock("arcology_builder", counts.cities >= 3);
-    tryUnlock("megalopolis_ruler", counts.cities >= 8);
+    tryUnlock("arcology_builder", counts.cities >= 8);
+    tryUnlock("megalopolis_ruler", counts.cities >= 14);
     tryUnlock(
       "industrial_tycoon",
-      counts.factories >= 3 || counts.gold >= 500_000,
+      counts.factories >= 8 || counts.gold >= 1_000_000,
     );
     tryUnlock("gold_billionaire", counts.gold >= 1_500_000);
-    tryUnlock("grand_admiral", counts.ports >= 3);
-    tryUnlock("naval_armada", counts.ports >= 6);
-    tryUnlock("atomic_master", counts.silos >= 2);
-    tryUnlock("atomic_rain", counts.silos >= 4);
-    tryUnlock("iron_sentinel", counts.defensesAndSam >= 4);
-    tryUnlock("impenetrable_wall", counts.defensesAndSam >= 12);
+    tryUnlock("grand_admiral", counts.ports >= 7);
+    tryUnlock("naval_armada", counts.ports >= 10);
+    tryUnlock("atomic_master", counts.silos >= 5);
+    tryUnlock("atomic_rain", counts.silos >= 7);
+    tryUnlock("iron_sentinel", counts.defensesAndSam >= 14);
+    tryUnlock("impenetrable_wall", counts.defensesAndSam >= 20);
     tryUnlock("iron_curtain", counts.defensesAndSam >= 6);
     tryUnlock("supreme_architect", activeMegas.length >= 3);
     tryUnlock("wonder_monopolist", activeMegas.length >= 5);
