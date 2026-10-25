@@ -7,6 +7,7 @@ import {
   Flag,
   Pattern,
 } from "@openfront/shared/CosmeticSchemas";
+import { GameRegistry } from "@openfront/shared/GameRegistry";
 import { base64url } from "jose";
 
 type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
@@ -4709,6 +4710,8 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     effects,
     packs,
   };
+
+  GameRegistry.cosmetics.applyToCatalog(cachedCatalog);
 
   return cachedCatalog;
 }

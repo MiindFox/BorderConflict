@@ -1,9 +1,11 @@
 import { UserMeResponse } from "@openfront/shared/ApiSchemas";
 import { GameEnv } from "@openfront/shared/configuration/Env";
+import { GameRegistry } from "@openfront/shared/GameRegistry";
 import cluster, { Worker } from "cluster";
 import crypto from "crypto";
 import express from "express";
 import rateLimit from "express-rate-limit";
+import fs from "fs";
 import http from "http";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -644,6 +646,14 @@ app.get("/custom_tribes", (_req, res) => {
   res.json([]);
 });
 
+app.get("/api/game_presets", (_req, res) => {
+  res.json(GameRegistry.presets.getAll());
+});
+
+app.get("/api/game_units", (_req, res) => {
+  res.json(GameRegistry.units.getAll());
+});
+
 app.get("/map_weights", (_req, res) => {
   res.json({});
 });
@@ -728,6 +738,18 @@ export async function startMaster() {
 
   log.info(`Primary ${process.pid} is running`);
   log.info(`Setting up ${ServerEnv.numWorkers()} workers...`);
+
+  const customCosmeticsPath = path.resolve("data/custom_cosmetics.json");
+  if (fs.existsSync(customCosmeticsPath)) {
+    try {
+      const raw = fs.readFileSync(customCosmeticsPath, "utf-8");
+      const parsed = JSON.parse(raw);
+      GameRegistry.cosmetics.loadFromJson(parsed);
+      log.info("Loaded custom cosmetics from data/custom_cosmetics.json");
+    } catch (err) {
+      log.warn(`Failed to parse data/custom_cosmetics.json: ${err}`);
+    }
+  }
 
   // A server that registers schedules nothing until the API calls it open: a
   // mistyped letter must not mint lobbies under a letter routed elsewhere.
