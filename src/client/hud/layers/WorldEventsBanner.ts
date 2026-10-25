@@ -3,6 +3,7 @@ import {
   getActiveMegastructures,
   getDirectiveAtTick,
   getDirectiveCurrentValue,
+  getMegastructureProgress,
   MEGASTRUCTURE_DEFINITIONS,
   MegastructureDefinition,
   PlayerStructureCounts,
@@ -481,25 +482,43 @@ export class WorldEventsBanner extends LitElement implements Controller {
   private renderMegastructuresCard() {
     const activeCount = this.activeMegas.length;
     const c = this.playerCounts;
+    const totalGoldPerPulse = this.activeMegas.reduce(
+      (sum, m) => sum + m.goldPerPulse,
+      0,
+    );
+    const totalTroopsPerPulse = this.activeMegas.reduce(
+      (sum, m) => sum + m.troopsPerPulse,
+      0,
+    );
 
     if (this.megasMinimized) {
       return html`
         <div
-          class="select-none w-fit max-w-[280px] rounded-l-xl border-l-4 border-2 ${activeCount >
+          class="select-none w-fit max-w-[290px] rounded-l-xl border-l-4 border-2 ${activeCount >
           0
-            ? "border-l-amber-400 border-[#2b3a2d] bg-[#121813]/95"
+            ? "border-l-emerald-400 border-[#2b3a2d] bg-[#121813]/95 shadow-[0_0_12px_rgba(34,197,94,0.3)]"
             : "border-l-[#2b3a2d] border-[#2b3a2d] bg-[#121813]/90"} px-2.5 py-1 text-xs font-mono text-slate-200 shadow-lg flex items-center justify-between gap-2"
         >
           <span
-            class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase text-amber-300"
+            class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase ${activeCount >
+            0
+              ? "text-emerald-300"
+              : "text-amber-300"}"
           >
             <span>🏛️</span>
             <span>MÉGAS (${activeCount}/5)</span>
+            ${activeCount > 0
+              ? html`
+                  <span class="text-[9px] text-emerald-400 font-bold">
+                    +${renderNumber(totalGoldPerPulse)}/5s
+                  </span>
+                `
+              : nothing}
           </span>
           <button
             type="button"
             @click=${() => (this.megasMinimized = false)}
-            class="px-1.5 py-0.5 rounded bg-[#18231a] hover:bg-[#223024] border border-[#2b3a2d] text-[9px] text-amber-200 font-mono transition-colors"
+            class="retro-metal-btn px-1.5 py-0.5 rounded bg-[#18231a] hover:bg-[#223024] border border-[#2b3a2d] text-[9px] text-amber-200 font-mono transition-colors"
             title="Agrandir les mégastructures"
           >
             ➕
@@ -510,101 +529,283 @@ export class WorldEventsBanner extends LitElement implements Controller {
 
     return html`
       <div
-        class="cursor-pointer select-none w-fit max-w-[310px] rounded-l-xl border-l-4 border-2 ${activeCount >
+        class="select-none w-[285px] sm:w-[335px] rounded-l-xl border-l-4 border-y-2 border-r-2 ${activeCount >
         0
-          ? "border-l-amber-400 border-[#2b3a2d] bg-[#121813]/95 shadow-[0_4px_18px_rgba(245,158,11,0.2)]"
-          : "border-l-[#2b3a2d] border-[#2b3a2d] bg-[#121813]/90"} px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-mono text-slate-200 transition-all hover:bg-[#1a251c]"
+          ? "border-l-emerald-400 border-[#2b3a2d] bg-[#101712]/98 shadow-[0_0_20px_rgba(34,197,94,0.25)]"
+          : "border-l-amber-400/80 border-[#2b3a2d] bg-[#101712]/95 shadow-[0_12px_32px_rgba(0,0,0,0.9)]"} px-3 py-2 text-xs font-mono text-slate-200 transition-all"
       >
-        <div class="flex items-center justify-between gap-3">
-          <span
+        <!-- Header -->
+        <div class="flex items-center justify-between gap-2">
+          <div
             @click=${() => (this.megasExpanded = !this.megasExpanded)}
-            class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider ${activeCount >
-            0
-              ? "text-amber-300"
-              : "text-slate-400"}"
+            class="cursor-pointer flex items-center gap-1.5 flex-1 min-w-0"
           >
-            <span>🏛️</span>
-            <span>MÉGASTRUCTURES (${activeCount}/5)</span>
+            <span class="text-sm">🏛️</span>
+            <span
+              class="text-[11px] font-mono font-black uppercase tracking-wider ${activeCount >
+              0
+                ? "text-emerald-300"
+                : "text-amber-300"} truncate"
+            >
+              MÉGASTRUCTURES (${activeCount}/5)
+            </span>
             <span class="text-[10px] text-slate-400">
               ${this.megasExpanded ? "▲" : "▼"}
             </span>
-          </span>
+          </div>
           <button
             type="button"
             @click=${(e: Event) => {
               e.stopPropagation();
               this.megasMinimized = true;
             }}
-            class="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] text-slate-300 font-mono transition-colors"
+            class="retro-metal-btn px-1.5 py-0.5 rounded bg-[#18231a] hover:bg-[#223024] border border-[#2b3a2d] text-[10px] text-slate-300 hover:text-white font-mono transition-colors"
             title="Réduire les mégastructures"
           >
             ➖
           </button>
         </div>
 
-        ${activeCount > 0 && !this.megasExpanded
+        <!-- Collapsed Summary -->
+        ${!this.megasExpanded
           ? html`
-              <div class="mt-1 flex flex-wrap gap-1">
-                ${this.activeMegas.map(
-                  (m) => html`
-                    <span
-                      class="rounded bg-amber-500/15 border border-amber-400/40 px-1.5 py-0.5 text-[10px] font-extrabold text-amber-200"
-                    >
-                      ${m.icon} ${m.name}
-                    </span>
-                  `,
-                )}
+              <div
+                @click=${() => (this.megasExpanded = true)}
+                class="mt-1.5 cursor-pointer space-y-1.5"
+              >
+                ${activeCount > 0
+                  ? html`
+                      <!-- Active Yield Banner -->
+                      <div
+                        class="rounded-lg bg-emerald-950/60 border border-emerald-500/40 px-2 py-1 flex items-center justify-between text-[10px] font-mono shadow-[0_0_8px_rgba(34,197,94,0.15)]"
+                      >
+                        <span
+                          class="text-emerald-300 font-bold flex items-center gap-1"
+                        >
+                          <span class="animate-pulse">⚡</span> BONUS ACTIFS :
+                        </span>
+                        <span class="text-white font-black">
+                          +${renderNumber(totalGoldPerPulse)} Or ·
+                          +${renderNumber(totalTroopsPerPulse)} Tr / 5s
+                        </span>
+                      </div>
+
+                      <div class="flex flex-wrap gap-1">
+                        ${this.activeMegas.map(
+                          (m) => html`
+                            <span
+                              class="rounded bg-emerald-900/30 border border-emerald-400/50 px-1.5 py-0.5 text-[9.5px] font-bold text-emerald-200 flex items-center gap-1"
+                            >
+                              <span>${m.icon}</span>
+                              <span>${m.name}</span>
+                              <span class="text-emerald-400 font-black">✓</span>
+                            </span>
+                          `,
+                        )}
+                      </div>
+                      <div class="text-[9.5px] text-slate-400 text-right italic">
+                        Cliquez pour voir tous les objectifs et bonus ▼
+                      </div>
+                    `
+                  : html`
+                      <div
+                        class="text-[10px] text-slate-300 flex items-center justify-between"
+                      >
+                        <span class="text-amber-400 font-bold"
+                          >🔒 Objectifs de suprématie</span
+                        >
+                        <span class="text-slate-400 underline text-[9.5px]"
+                          >Détails (0/5) ▼</span
+                        >
+                      </div>
+                      <div class="text-[9.5px] text-slate-400 mt-0.5">
+                        8 Villes · 8 Usines · 7 Ports · 5 Silos · 14 SAM
+                      </div>
+                    `}
               </div>
             `
           : nothing}
+
+        <!-- Expanded Detailed Drawer -->
         ${this.megasExpanded
           ? html`
-              <div
-                class="mt-2 pt-2 border-t border-white/10 space-y-1.5 w-[275px]"
-              >
-                ${MEGASTRUCTURE_DEFINITIONS.map((m) => {
-                  const isActive = this.activeMegas.some((a) => a.id === m.id);
-                  const progressLabel =
-                    m.id === "cyber_arcology"
-                      ? `${c.cities}/3`
-                      : m.id === "titan_foundry"
-                        ? `${c.factories}/3`
-                        : m.id === "hegemon_shipyard"
-                          ? `${c.ports}/3`
-                          : m.id === "orbital_command"
-                            ? `${c.silos}/2`
-                            : `${c.defensesAndSam}/4`;
-                  return html`
-                    <div
-                      class="rounded-lg border px-2 py-1 ${isActive
-                        ? "border-amber-400/50 bg-amber-500/10"
-                        : "border-white/10 bg-slate-900/70 opacity-75"}"
-                    >
+              <div class="mt-2 pt-2 border-t border-white/10 space-y-2">
+                <!-- Status Banner -->
+                ${activeCount > 0
+                  ? html`
                       <div
-                        class="flex items-center justify-between text-[11px] font-bold"
+                        class="rounded-lg bg-gradient-to-r from-emerald-950/70 to-emerald-900/40 border border-emerald-400/50 p-2 shadow-[0_0_12px_rgba(34,197,94,0.2)] font-mono"
                       >
-                        <span
-                          class="${isActive
-                            ? "text-amber-300"
-                            : "text-slate-200"}"
+                        <div
+                          class="flex items-center justify-between text-[10px] font-bold text-emerald-300 uppercase"
                         >
-                          ${m.icon} ${m.name}
-                        </span>
-                        <span
-                          class="font-mono text-[10px] ${isActive
-                            ? "text-emerald-400"
-                            : "text-slate-400"}"
+                          <span class="flex items-center gap-1">
+                            <span class="animate-pulse text-xs">⚡</span>
+                            PRODUCTION TOTALE ACTIVE
+                          </span>
+                          <span
+                            class="text-white bg-emerald-700/50 px-1.5 py-0.2 rounded border border-emerald-400/40 text-[9px]"
+                          >
+                            ${activeCount}/5 ACTIVES
+                          </span>
+                        </div>
+                        <div
+                          class="mt-1 flex items-center justify-between text-[11px] font-black text-white"
                         >
-                          ${isActive ? "ACTIF" : progressLabel}
-                        </span>
+                          <span class="text-amber-300">
+                            💰 +${renderNumber(totalGoldPerPulse)} Or / 5s
+                          </span>
+                          <span class="text-emerald-300">
+                            🎖️ +${renderNumber(totalTroopsPerPulse)} Troupes / 5s
+                          </span>
+                        </div>
+                        <div class="text-[9px] text-emerald-400/80 mt-0.5">
+                          Versé automatiquement en direct toutes les 5 secondes
+                        </div>
                       </div>
-                      <div class="text-[10px] text-slate-400">
-                        ${m.requirementDesc} →
-                        <span class="text-cyan-300">${m.effectDesc}</span>
+                    `
+                  : html`
+                      <div
+                        class="rounded-lg bg-[#0c120d] border border-[#2b3a2d] p-2 text-[10px] font-mono text-slate-300"
+                      >
+                        <div
+                          class="font-bold text-amber-300 uppercase flex items-center gap-1"
+                        >
+                          <span>🏛️</span> OBJECTIFS MID / LATE-GAME
+                        </div>
+                        <div
+                          class="text-[9.5px] text-slate-400 mt-0.5 leading-snug"
+                        >
+                          Atteignez les quotas d'infrastructures pour débloquer
+                          ces puissantes mégastructures et recevoir leurs bonus
+                          toutes les 5 secondes.
+                        </div>
                       </div>
-                    </div>
-                  `;
-                })}
+                    `}
+
+                <!-- 5 Megastructures List -->
+                <div class="space-y-1.5 max-h-[380px] overflow-y-auto pr-0.5">
+                  ${MEGASTRUCTURE_DEFINITIONS.map((m) => {
+                    const prog = getMegastructureProgress(m, c);
+                    return html`
+                      <div
+                        class="rounded-lg border p-2 transition-all font-mono ${prog.isUnlocked
+                          ? "border-emerald-500/70 bg-[#0e1f14]/95 shadow-[0_0_10px_rgba(34,197,94,0.2)]"
+                          : "border-[#2b3a2d] bg-[#0c120d]/85"}"
+                      >
+                        <!-- Card Header -->
+                        <div class="flex items-center justify-between gap-2">
+                          <span
+                            class="font-bold text-[11px] flex items-center gap-1.5 ${prog.isUnlocked
+                              ? "text-white"
+                              : "text-slate-200"}"
+                          >
+                            <span class="text-sm">${m.icon}</span>
+                            <span class="truncate">${m.name}</span>
+                          </span>
+                          <span
+                            class="text-[9.5px] font-extrabold px-1.5 py-0.5 rounded border uppercase shrink-0 ${prog.isUnlocked
+                              ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/60 animate-pulse"
+                              : "bg-black/40 text-amber-300 border-[#2b3a2d]"}"
+                          >
+                            ${prog.isUnlocked
+                              ? "⚡ ACTIVE"
+                              : `🔒 ${prog.current} / ${prog.target}`}
+                          </span>
+                        </div>
+
+                        <!-- Objective & Progress Bar -->
+                        <div class="mt-1.5">
+                          <div
+                            class="flex items-center justify-between text-[10px]"
+                          >
+                            <span
+                              class="${prog.isUnlocked
+                                ? "text-emerald-400 font-bold"
+                                : "text-amber-200/90 font-medium"}"
+                            >
+                              ${prog.isUnlocked
+                                ? `✓ Objectif atteint (${prog.current}/${prog.target} ${m.unitLabel})`
+                                : `Objectif : ${prog.target} ${m.unitLabel} (Actuel : ${prog.current}/${prog.target})`}
+                            </span>
+                            <span
+                              class="font-bold ${prog.isUnlocked
+                                ? "text-emerald-400"
+                                : "text-slate-400"}"
+                            >
+                              ${prog.percent}%
+                            </span>
+                          </div>
+
+                          <!-- Progress Bar -->
+                          <div
+                            class="mt-1 h-1.5 w-full rounded-full bg-[#070b08] border border-[#232f25] overflow-hidden"
+                          >
+                            <div
+                              class="h-full transition-all duration-300 ${prog.isUnlocked
+                                ? "bg-gradient-to-r from-emerald-500 to-green-300 shadow-[0_0_6px_rgba(34,197,94,0.8)]"
+                                : "bg-gradient-to-r from-[#183520] via-amber-600 to-amber-400"}"
+                              style="width: ${prog.percent}%"
+                            ></div>
+                          </div>
+                        </div>
+
+                        <!-- Bonus Yield Display -->
+                        <div
+                          class="mt-1.5 pt-1.5 border-t ${prog.isUnlocked
+                            ? "border-emerald-500/30"
+                            : "border-white/5"} text-[10px]"
+                        >
+                          ${prog.isUnlocked
+                            ? html`
+                                <div>
+                                  <div
+                                    class="text-[9.5px] uppercase font-bold text-emerald-300 flex items-center gap-1"
+                                  >
+                                    <span>⚡</span> BONUS ACTIF EN COURS :
+                                  </div>
+                                  <div
+                                    class="flex items-center justify-between font-black text-white mt-0.5"
+                                  >
+                                    <span class="text-amber-300">
+                                      +${renderNumber(m.goldPerPulse)} Or
+                                    </span>
+                                    <span class="text-emerald-300">
+                                      +${renderNumber(m.troopsPerPulse)} Troupes
+                                      / 5s
+                                    </span>
+                                  </div>
+                                </div>
+                              `
+                            : html`
+                                <div>
+                                  <div
+                                    class="text-[9.5px] text-cyan-300 font-bold"
+                                  >
+                                    🎁 Bonus au déblocage :
+                                  </div>
+                                  <div class="text-[9.5px] text-slate-200 mt-0.5">
+                                    +${renderNumber(m.goldPerPulse)} Or &
+                                    +${renderNumber(m.troopsPerPulse)} Troupes
+                                    toutes les 5s
+                                  </div>
+                                  ${prog.missing > 0
+                                    ? html`
+                                        <div
+                                          class="text-[9px] text-amber-400/80 mt-0.5 font-mono"
+                                        >
+                                          Reste ${prog.missing} ${m.unitLabel} à
+                                          construire ou capturer
+                                        </div>
+                                      `
+                                    : nothing}
+                                </div>
+                              `}
+                        </div>
+                      </div>
+                    `;
+                  })}
+                </div>
               </div>
             `
           : nothing}

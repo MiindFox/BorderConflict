@@ -2133,6 +2133,8 @@ export interface MegastructureDefinition {
   effectDesc: string;
   goldPerPulse: number;
   troopsPerPulse: number;
+  targetCount: number;
+  unitLabel: string;
 }
 
 export interface PlayerStructureCounts {
@@ -2157,6 +2159,8 @@ export const MEGASTRUCTURE_DEFINITIONS: MegastructureDefinition[] = [
     effectDesc: "+50 000 Or & +35 000 Troupes toutes les 5s",
     goldPerPulse: 50_000,
     troopsPerPulse: 35_000,
+    targetCount: 8,
+    unitLabel: "Villes",
   },
   {
     id: "titan_foundry",
@@ -2164,9 +2168,11 @@ export const MEGASTRUCTURE_DEFINITIONS: MegastructureDefinition[] = [
     icon: "🏭",
     accentColor: "#f59e0b",
     requirementDesc: "8+ Usines contrôlées",
-    effectDesc: "+140 000 Or & +15 000 Troupes de production toutes les 5s",
+    effectDesc: "+140 000 Or & +15 000 Troupes toutes les 5s",
     goldPerPulse: 140_000,
     troopsPerPulse: 15_000,
+    targetCount: 8,
+    unitLabel: "Usines",
   },
   {
     id: "hegemon_shipyard",
@@ -2174,9 +2180,11 @@ export const MEGASTRUCTURE_DEFINITIONS: MegastructureDefinition[] = [
     icon: "⚓",
     accentColor: "#06b6d4",
     requirementDesc: "7+ Ports contrôlés",
-    effectDesc: "+95 000 Or maritime & +30 000 Troupes toutes les 5s",
+    effectDesc: "+95 000 Or & +30 000 Troupes toutes les 5s",
     goldPerPulse: 95_000,
     troopsPerPulse: 30_000,
+    targetCount: 7,
+    unitLabel: "Ports",
   },
   {
     id: "orbital_command",
@@ -2184,9 +2192,11 @@ export const MEGASTRUCTURE_DEFINITIONS: MegastructureDefinition[] = [
     icon: "🛰️",
     accentColor: "#f43f5e",
     requirementDesc: "5+ Silos de Missiles nucléaires",
-    effectDesc: "+110 000 Or stratégique & +45 000 Troupes toutes les 5s",
+    effectDesc: "+110 000 Or & +45 000 Troupes toutes les 5s",
     goldPerPulse: 110_000,
     troopsPerPulse: 45_000,
+    targetCount: 5,
+    unitLabel: "Silos Atomiques",
   },
   {
     id: "continental_dome",
@@ -2194,9 +2204,11 @@ export const MEGASTRUCTURE_DEFINITIONS: MegastructureDefinition[] = [
     icon: "🛡️",
     accentColor: "#10b981",
     requirementDesc: "14+ Postes de Défense et SAM",
-    effectDesc: "+40 000 Or & +70 000 Troupes de garnison toutes les 5s",
+    effectDesc: "+40 000 Or & +70 000 Troupes toutes les 5s",
     goldPerPulse: 40_000,
     troopsPerPulse: 70_000,
+    targetCount: 14,
+    unitLabel: "Défenses & SAM",
   },
 ];
 
@@ -2204,22 +2216,62 @@ export function getActiveMegastructures(
   counts: PlayerStructureCounts,
 ): MegastructureDefinition[] {
   const active: MegastructureDefinition[] = [];
-  if (counts.cities >= 8) {
+  if (counts.cities >= MEGASTRUCTURE_DEFINITIONS[0].targetCount) {
     active.push(MEGASTRUCTURE_DEFINITIONS[0]);
   }
-  if (counts.factories >= 8) {
+  if (counts.factories >= MEGASTRUCTURE_DEFINITIONS[1].targetCount) {
     active.push(MEGASTRUCTURE_DEFINITIONS[1]);
   }
-  if (counts.ports >= 7) {
+  if (counts.ports >= MEGASTRUCTURE_DEFINITIONS[2].targetCount) {
     active.push(MEGASTRUCTURE_DEFINITIONS[2]);
   }
-  if (counts.silos >= 5) {
+  if (counts.silos >= MEGASTRUCTURE_DEFINITIONS[3].targetCount) {
     active.push(MEGASTRUCTURE_DEFINITIONS[3]);
   }
-  if (counts.defensesAndSam >= 14) {
+  if (counts.defensesAndSam >= MEGASTRUCTURE_DEFINITIONS[4].targetCount) {
     active.push(MEGASTRUCTURE_DEFINITIONS[4]);
   }
   return active;
+}
+
+export interface MegastructureProgress {
+  current: number;
+  target: number;
+  percent: number;
+  isUnlocked: boolean;
+  missing: number;
+}
+
+export function getMegastructureProgress(
+  mega: MegastructureDefinition,
+  counts: PlayerStructureCounts,
+): MegastructureProgress {
+  let current = 0;
+  switch (mega.id) {
+    case "cyber_arcology":
+      current = counts.cities;
+      break;
+    case "titan_foundry":
+      current = counts.factories;
+      break;
+    case "hegemon_shipyard":
+      current = counts.ports;
+      break;
+    case "orbital_command":
+      current = counts.silos;
+      break;
+    case "continental_dome":
+      current = counts.defensesAndSam;
+      break;
+  }
+  const target = mega.targetCount;
+  const percent = Math.min(
+    100,
+    Math.round((current / Math.max(1, target)) * 100),
+  );
+  const isUnlocked = current >= target;
+  const missing = Math.max(0, target - current);
+  return { current, target, percent, isUnlocked, missing };
 }
 
 // ============================================================================
