@@ -2,6 +2,7 @@ import { assetUrl } from "@openfront/shared/AssetUrls";
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement } from "lit/decorators.js";
 import { commanderStore } from "../CommanderStore";
+import { showToast } from "../Utils";
 import { NavNotificationsController } from "./NavNotificationsController";
 
 const MOBILE_ITEM =
@@ -129,16 +130,38 @@ export class MobileNavBar extends LitElement {
           data-page="page-inventory"
           data-i18n="main.inventory"
         ></button>
-        <button
-          class="${MOBILE_ITEM}"
-          data-page="page-leaderboard"
-          data-i18n="main.leaderboard"
-        ></button>
-        <button
-          class="no-game-portal ${MOBILE_ITEM}"
-          data-page="page-clan"
-          data-i18n="main.clans"
-        ></button>
+        <div
+          class="w-full flex items-center justify-between py-2 px-3 opacity-40 cursor-not-allowed border border-[#2d3a2c]/40 rounded-xs select-none bg-[#131b14]/50"
+          @click=${() =>
+            showToast(
+              "🚧 Le Classement mondial est en cours de développement !",
+              "red",
+              3000,
+            )}
+        >
+          <span class="font-retro uppercase tracking-wider text-slate-400 text-[13px] sm:text-[14px]">
+            CLASSEMENT
+          </span>
+          <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            WIP
+          </span>
+        </div>
+        <div
+          class="no-game-portal w-full flex items-center justify-between py-2 px-3 opacity-40 cursor-not-allowed border border-[#2d3a2c]/40 rounded-xs select-none bg-[#131b14]/50"
+          @click=${() =>
+            showToast(
+              "🚧 Le Système de Clans est en cours de développement !",
+              "red",
+              3000,
+            )}
+        >
+          <span class="font-retro uppercase tracking-wider text-slate-400 text-[13px] sm:text-[14px]">
+            CLANS
+          </span>
+          <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            WIP
+          </span>
+        </div>
         <button
           class="${MOBILE_ITEM} ${currentPage === "page-settings"
             ? "active"

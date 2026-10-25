@@ -2,6 +2,7 @@ import { assetUrl } from "@openfront/shared/AssetUrls";
 import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { COMMANDER_UPDATED_EVENT, commanderStore } from "../CommanderStore";
+import { showToast } from "../Utils";
 import "./CapIcon";
 import "./NavAccountMenu";
 import { NavNotificationsController } from "./NavNotificationsController";
@@ -178,46 +179,72 @@ export class DesktopNavBar extends LitElement {
             INVENTAIRE
           </button>
 
-          <!-- CLASSEMENT + TOGGLE SWITCH LEVER -->
-          <div class="flex items-center gap-1">
+          <!-- CLASSEMENT + TOGGLE SWITCH LEVER (WORK IN PROGRESS) -->
+          <div
+            class="flex items-center gap-1 opacity-50 cursor-not-allowed select-none"
+            title="Classement mondial - En cours de développement"
+          >
             <button
-              class="nav-menu-item retro-metal-btn ${currentPage ===
-              "page-leaderboard"
-                ? "ring-2 ring-amber-400 brightness-110"
-                : ""} px-3.5 py-1.5 rounded cursor-pointer transition-all text-[11px] font-retro font-black tracking-wider text-amber-100 uppercase"
-              data-page="page-leaderboard"
-            >
-              CLASSEMENT
-            </button>
-            <!-- Mechanical Toggle Switch Graphic -->
-            <div
-              class="flex flex-col items-center justify-center p-1 bg-[#151c16] border border-[#334235] rounded shadow-inner cursor-pointer"
-              title="Commutateur Tactique"
+              type="button"
               @click=${() =>
-                window.dispatchEvent(
-                  new CustomEvent("showPage", { detail: "page-leaderboard" }),
+                showToast(
+                  "🚧 Le Classement mondial est en cours de développement !",
+                  "red",
+                  3000,
+                )}
+              class="retro-metal-btn px-3 py-1.5 rounded cursor-not-allowed transition-all text-[11px] font-retro font-bold tracking-wider text-slate-400 uppercase flex items-center gap-1.5 border border-[#2d3a2d] bg-[#141b15]"
+            >
+              <span>CLASSEMENT</span>
+              <span
+                class="text-[8px] font-mono font-bold px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30"
+              >
+                WIP
+              </span>
+            </button>
+            <!-- Mechanical Toggle Switch Graphic (Disabled) -->
+            <div
+              class="flex flex-col items-center justify-center p-1 bg-[#121713] border border-[#232d24] rounded shadow-inner cursor-not-allowed opacity-60"
+              title="En maintenance"
+              @click=${() =>
+                showToast(
+                  "🚧 Le Classement mondial est en cours de développement !",
+                  "red",
+                  3000,
                 )}
             >
               <div
-                class="w-2.5 h-5 bg-gradient-to-b from-[#94a3b8] to-[#475569] rounded-xs border border-[#1e293b] shadow relative"
+                class="w-2.5 h-5 bg-gradient-to-b from-[#64748b] to-[#334155] rounded-xs border border-[#1e293b] shadow relative"
               >
                 <div
-                  class="w-3.5 h-2 bg-[#dc2626] rounded-xs -left-0.5 top-0.5 absolute shadow-[0_0_4px_rgba(220,38,38,0.8)]"
+                  class="w-3.5 h-2 bg-slate-500 rounded-xs -left-0.5 top-0.5 absolute shadow-none"
                 ></div>
               </div>
             </div>
           </div>
 
-          <!-- CLANS -->
-          <button
-            class="no-game-portal nav-menu-item retro-metal-btn ${currentPage ===
-            "page-clan"
-              ? "ring-2 ring-amber-400 brightness-110"
-              : ""} px-3.5 py-1.5 rounded cursor-pointer transition-all text-[11px] font-retro font-black tracking-wider text-amber-100 uppercase"
-            data-page="page-clan"
+          <!-- CLANS (WORK IN PROGRESS) -->
+          <div
+            class="opacity-50 cursor-not-allowed select-none"
+            title="Système de Clans - En cours de développement"
           >
-            CLANS
-          </button>
+            <button
+              type="button"
+              @click=${() =>
+                showToast(
+                  "🚧 Le Système de Clans est en cours de développement !",
+                  "red",
+                  3000,
+                )}
+              class="retro-metal-btn px-3 py-1.5 rounded cursor-not-allowed transition-all text-[11px] font-retro font-bold tracking-wider text-slate-400 uppercase flex items-center gap-1.5 border border-[#2d3a2d] bg-[#141b15]"
+            >
+              <span>CLANS</span>
+              <span
+                class="text-[8px] font-mono font-bold px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30"
+              >
+                WIP
+              </span>
+            </button>
+          </div>
 
           <!-- CONSOLE ADMIN (Visible uniquement pour les administrateurs) -->
           ${commanderStore.isAdmin()
