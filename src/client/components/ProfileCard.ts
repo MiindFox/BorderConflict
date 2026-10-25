@@ -268,7 +268,7 @@ export class ProfileCard extends LitElement {
         (_, i) =>
           html`<span
             aria-hidden="true"
-            class="absolute top-0 h-full w-[2px] -translate-x-1/2 bg-[#0b1424]"
+            class="absolute top-0 h-full w-[2px] -translate-x-1/2 bg-[#0a110c]"
             style="left: ${((i + 1) * 100) / BAR_SEGMENTS}%"
           ></span>`,
       )}
@@ -287,7 +287,7 @@ export class ProfileCard extends LitElement {
       ? nothing
       : html`<div data-profile-lifetime class="truncate">
           <span
-            class="text-[10px] font-bold uppercase tracking-wider text-blue-200/55"
+            class="text-[10px] font-bold uppercase tracking-wider text-emerald-400/80"
             >${translateText("profile_card.lifetime_xp")}</span
           >
           <span class="ml-1 font-black tabular-nums text-yellow-300"
@@ -401,8 +401,8 @@ export class ProfileCard extends LitElement {
     return this.renderPattern(
       this.patternId,
       gold
-        ? this.hexPath("#facc15", 0.075, 1.5)
-        : this.hexPath("#2dd4bf", 0.07, 1.5),
+        ? this.hexPath("#facc15", 0.08, 1.5)
+        : this.hexPath("#10b981", 0.08, 1.5),
       { className: "" },
     );
   }
@@ -420,7 +420,7 @@ export class ProfileCard extends LitElement {
             0.8,
             1.8,
           )}`
-        : this.hexPath("#7dd3fc", 0.75, 2);
+        : this.hexPath("#34d399", 0.75, 2);
     const svgTemplate = this.renderPattern(`${this.patternId}-pulse`, paths, {
       className: `profile-card-pulse profile-card-pulse-${pulse.kind}`,
       style: `--cx: ${pulse.cx}px; --cy: ${pulse.cy}px; --reach: ${pulse.reach}px`,
@@ -463,7 +463,7 @@ export class ProfileCard extends LitElement {
         ? nothing
         : html`<span
             data-profile-clan
-            class="font-black tracking-wider text-aquarius ${this.compact
+            class="font-black tracking-wider text-emerald-400 ${this.compact
               ? "shrink-0 text-sm"
               : "block text-sm"}"
             >[${this.clanTag}]</span
@@ -485,8 +485,9 @@ export class ProfileCard extends LitElement {
       // in a block of its own on the right (under them on a phone).
       return html`<section
         data-profile-card="compact"
-        class="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#0b1424] to-[#132644] px-5 py-4 text-white"
+        class="relative overflow-hidden rounded-xl border border-[#2a3c2e] bg-gradient-to-br from-[#0e1610] via-[#121c13] to-[#0a100b] px-5 py-4 text-white shadow-[0_0_20px_rgba(16,185,129,0.06),inset_0_1px_0_rgba(255,255,255,0.05)]"
       >
+        <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.22)_50%)] bg-[length:100%_4px] opacity-40"></div>
         ${this.renderBackground(false)}
         <div
           class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6"
@@ -514,10 +515,11 @@ export class ProfileCard extends LitElement {
     return html`<section
       data-profile-card="full"
       ?data-profile-legend=${legend}
-      class="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#0b1424] to-[#132644] p-5 text-white sm:p-6 ${legend
+      class="relative overflow-hidden rounded-xl border border-[#2a3c2e] bg-gradient-to-br from-[#0e1610] via-[#121c13] to-[#0a100b] p-5 text-white shadow-[0_0_25px_rgba(16,185,129,0.08),inset_0_1px_0_rgba(255,255,255,0.05)] sm:p-6 ${legend
         ? "profile-card-legend"
         : ""} ${this.intro ? "profile-card-intro" : ""}"
     >
+      <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.22)_50%)] bg-[length:100%_4px] opacity-40"></div>
       ${this.renderBackground(legend)}
       ${this.pulse === null ? nothing : this.renderPulse(this.pulse)}
       <div
@@ -607,7 +609,7 @@ const PROFILE_CARD_CSS = /* css */ `
 /* The pulse layers. */
 .profile-card-pulse-blue {
   --band: ${BLUE_BAND}px;
-  filter: drop-shadow(0 0 4px #38bdf8);
+  filter: drop-shadow(0 0 6px #10b981);
   -webkit-mask-image: ${blueMask};
   mask-image: ${blueMask};
   animation:
@@ -646,7 +648,7 @@ const PROFILE_CARD_CSS = /* css */ `
   box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.12), 0 0 28px rgba(250, 204, 21, 0.1),
     inset 0 0 40px rgba(250, 204, 21, 0.05);
   background-image: linear-gradient(135deg, rgba(250, 204, 21, 0.06), transparent 45%),
-    linear-gradient(to bottom right, #0b1424, #132644);
+    linear-gradient(to bottom right, #141c13, #1f1a09);
 }
 /* Its Legend line shimmers once as the card opens. */
 .profile-card-legend.profile-card-intro [data-profile-level-line] {

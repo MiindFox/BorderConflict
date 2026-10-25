@@ -218,6 +218,59 @@ let progressionConfig: {
 
 // GET /public/progression/config — the level curve, and whether progression is
 // on at all (404 when it is off). Memoised for as long as the server says it
+export function getDefaultProgressionConfig(): ProgressionConfig {
+  const levels = [];
+  let cumXp = 0;
+  for (let lvl = 1; lvl <= 100; lvl++) {
+    const xpToNext = Math.floor(400 + Math.pow(lvl, 1.5) * 80);
+    cumXp += xpToNext;
+    const caps = lvl <= 10 ? 50 : lvl <= 25 ? 100 : lvl <= 50 ? 200 : lvl <= 75 ? 350 : 500;
+    const plutonium = lvl % 25 === 0 ? 25 : lvl % 5 === 0 ? 5 : 0;
+    levels.push({
+      level: lvl,
+      xpToNext,
+      cumulativeXp: cumXp,
+      caps,
+      plutonium,
+    });
+  }
+
+  return {
+    version: 1,
+    maxLevel: 100,
+    maxPrestige: 10,
+    scoresSingleplayer: true,
+    requireStatsAgreed: false,
+    levels,
+    levelRewards: {
+      capsBands: [
+        { fromLevel: 1, toLevel: 25, caps: 50 },
+        { fromLevel: 26, toLevel: 50, caps: 100 },
+        { fromLevel: 51, toLevel: 75, caps: 200 },
+        { fromLevel: 76, toLevel: 100, caps: 350 },
+      ],
+      plutonium: {
+        fromLevel: 5,
+        everyLevels: 5,
+        amount: 5,
+      },
+    },
+    prestige: { caps: 1000 },
+    flares: [
+      { kind: "level", level: 5, prestige: null, flareName: "flag:hexafront_command", cosmetic: { type: "flag", name: "hexafront_command", url: null } },
+      { kind: "level", level: 10, prestige: null, flareName: "pattern:cyber_circuit:emerald_matrix", cosmetic: { type: "pattern", name: "cyber_circuit:emerald_matrix", url: null } },
+      { kind: "level", level: 15, prestige: null, flareName: "effect:plasma_wake_cyan", cosmetic: { type: "effect", name: "plasma_wake_cyan", url: null } },
+      { kind: "level", level: 20, prestige: null, flareName: "crown:iron_circlet", cosmetic: { type: "crown", name: "iron_circlet", url: null } },
+      { kind: "level", level: 25, prestige: null, flareName: "pattern:tactical_checker:titanium_ghost", cosmetic: { type: "pattern", name: "tactical_checker:titanium_ghost", url: null } },
+      { kind: "level", level: 30, prestige: null, flareName: "pattern:hazard_stripes:solar_flare", cosmetic: { type: "pattern", name: "hazard_stripes:solar_flare", url: null } },
+      { kind: "level", level: 35, prestige: null, flareName: "crown:cyber_emperor", cosmetic: { type: "crown", name: "cyber_emperor", url: null } },
+      { kind: "level", level: 50, prestige: null, flareName: "effect:neon_hologram_structures", cosmetic: { type: "effect", name: "neon_hologram_structures", url: null } },
+      { kind: "level", level: 75, prestige: null, flareName: "pattern:nova_star:golden_sovereign", cosmetic: { type: "pattern", name: "nova_star:golden_sovereign", url: null } },
+      { kind: "legend", level: null, prestige: null, flareName: "effect:supreme_sovereign_aura", cosmetic: { type: "effect", name: "supreme_sovereign_aura", url: null } },
+    ],
+  };
+}
+
 // stays fresh; a failure is not, so a later caller can try again.
 export function fetchProgressionConfig(): Promise<ProgressionConfig | false> {
   if (
@@ -232,19 +285,19 @@ export function fetchProgressionConfig(): Promise<ProgressionConfig | false> {
         headers: { Accept: "application/json" },
         signal: AbortSignal.timeout(10_000),
       });
-      if (!res.ok) return false;
+      if (!res.ok) return getDefaultProgressionConfig();
       const parsed = ProgressionConfigSchema.safeParse(await res.json());
       if (!parsed.success) {
         console.warn(
           "fetchProgressionConfig: Zod validation failed",
           parsed.error,
         );
-        return false;
+        return getDefaultProgressionConfig();
       }
       return parsed.data;
     } catch (err) {
-      console.warn("fetchProgressionConfig: request failed", err);
-      return false;
+      console.warn("fetchProgressionConfig: request failed, using default", err);
+      return getDefaultProgressionConfig();
     }
   })();
   const entry = { request, at: Date.now() };

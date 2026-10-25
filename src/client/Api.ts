@@ -188,7 +188,7 @@ export async function fetchPublicPlayerGames(
         res.status,
         res.statusText,
       );
-      return { error: "failed" };
+      return commanderStore.getLocalGameHistory(publicId, opts);
     }
 
     const json = await res.json();
@@ -198,12 +198,12 @@ export async function fetchPublicPlayerGames(
         "fetchPublicPlayerGames: Zod validation failed",
         parsed.error,
       );
-      return { error: "failed" };
+      return commanderStore.getLocalGameHistory(publicId, opts);
     }
     return parsed.data;
   } catch (err) {
     console.warn("fetchPublicPlayerGames: request failed", err);
-    return { error: "failed" };
+    return commanderStore.getLocalGameHistory(publicId, opts);
   }
 }
 

@@ -956,12 +956,106 @@ app.post("/api/tactical/pna/break", (req, res) => {
   return res.json({ ok: true });
 });
 
-app.get("/api/public/player/:publicId", (req, res) => {
-  const profile = accountDb.getPublicProfile(req.params.publicId);
+app.get(["/api/public/player/:publicId", "/public/player/:publicId"], (req, res) => {
+  const profile = accountDb.getPublicProfile(String(req.params.publicId));
   if (!profile) {
     return res.status(404).json({ error: "Player not found" });
   }
   return res.json(profile);
+});
+
+app.get(["/api/public/player/:publicId/games", "/public/player/:publicId/games"], (req, res) => {
+  const filter = typeof req.query.filter === "string" ? req.query.filter : undefined;
+  const type = typeof req.query.type === "string" ? req.query.type : undefined;
+  const cursor = typeof req.query.cursor === "string" ? req.query.cursor : undefined;
+  const result = accountDb.getPublicPlayerGames(String(req.params.publicId), filter, type, cursor);
+  return res.json(result);
+});
+
+app.post(["/api/player/games/record", "/player/games/record"], (req, res) => {
+  const { publicId, game } = req.body || {};
+  if (!publicId || !game) return res.status(400).json({ error: "Missing publicId or game payload" });
+  const result = accountDb.recordPlayerGame(publicId, game);
+  return res.json(result);
+});
+
+function buildProgressionConfig() {
+  const levels = [];
+  let cumXp = 0;
+  for (let lvl = 1; lvl <= 100; lvl++) {
+    const xpToNext = Math.floor(400 + Math.pow(lvl, 1.5) * 80);
+    cumXp += xpToNext;
+    const caps = lvl <= 10 ? 50 : lvl <= 25 ? 100 : lvl <= 50 ? 200 : lvl <= 75 ? 350 : 500;
+    const plutonium = lvl % 25 === 0 ? 25 : lvl % 5 === 0 ? 5 : 0;
+    levels.push({
+      level: lvl,
+      xpToNext,
+      cumulativeXp: cumXp,
+      caps,
+      plutonium,
+    });
+  }
+
+  return {
+    version: 1,
+    maxLevel: 100,
+    maxPrestige: 10,
+    scoresSingleplayer: true,
+    requireStatsAgreed: false,
+    levels,
+    levelRewards: {
+      capsBands: [
+        { fromLevel: 1, toLevel: 25, caps: 50 },
+        { fromLevel: 26, toLevel: 50, caps: 100 },
+        { fromLevel: 51, toLevel: 75, caps: 200 },
+        { fromLevel: 76, toLevel: 100, caps: 350 },
+      ],
+      plutonium: {
+        fromLevel: 5,
+        everyLevels: 5,
+        amount: 5,
+      },
+    },
+    prestige: { caps: 1000 },
+    flares: [
+      { kind: "level", level: 5, prestige: null, flareName: "flag:hexafront_command", cosmetic: { type: "flag", name: "hexafront_command", url: null } },
+      { kind: "level", level: 10, prestige: null, flareName: "pattern:cyber_circuit:emerald_matrix", cosmetic: { type: "pattern", name: "cyber_circuit:emerald_matrix", url: null } },
+      { kind: "level", level: 15, prestige: null, flareName: "effect:plasma_wake_cyan", cosmetic: { type: "effect", name: "plasma_wake_cyan", url: null } },
+      { kind: "level", level: 20, prestige: null, flareName: "crown:iron_circlet", cosmetic: { type: "crown", name: "iron_circlet", url: null } },
+      { kind: "level", level: 25, prestige: null, flareName: "pattern:tactical_checker:titanium_ghost", cosmetic: { type: "pattern", name: "tactical_checker:titanium_ghost", url: null } },
+      { kind: "level", level: 30, prestige: null, flareName: "pattern:hazard_stripes:solar_flare", cosmetic: { type: "pattern", name: "hazard_stripes:solar_flare", url: null } },
+      { kind: "level", level: 35, prestige: null, flareName: "crown:cyber_emperor", cosmetic: { type: "crown", name: "cyber_emperor", url: null } },
+      { kind: "level", level: 50, prestige: null, flareName: "effect:neon_hologram_structures", cosmetic: { type: "effect", name: "neon_hologram_structures", url: null } },
+      { kind: "level", level: 75, prestige: null, flareName: "pattern:nova_star:golden_sovereign", cosmetic: { type: "pattern", name: "nova_star:golden_sovereign", url: null } },
+      { kind: "legend", level: null, prestige: null, flareName: "effect:supreme_sovereign_aura", cosmetic: { type: "effect", name: "supreme_sovereign_aura", url: null } },
+    ],
+  };
+}
+
+app.get(["/api/public/progression/config", "/public/progression/config"], (_req, res) => {
+  return res.json(buildProgressionConfig());
+});
+
+app.get(["/api/public/player/:publicId/progress", "/public/player/:publicId/progress"], (req, res) => {
+  const profile = accountDb.getPublicProfile(String(req.params.publicId));
+  const lvl = profile?.stats?.level || 1;
+  const xp = profile?.stats?.xp || 0;
+  return res.json({
+    prestige: 0,
+    level: lvl,
+    xpInLevel: xp,
+    xpForNext: Math.floor(400 + Math.pow(lvl, 1.5) * 80),
+    lifetimeXp: (lvl - 1) * 450 + xp,
+    legend: lvl >= 36,
+    prestigeHistory: [],
+    milestones: [
+      { level: 10, prestige: 0, at: null },
+      { level: 25, prestige: 0, at: null },
+      { level: 50, prestige: 0, at: null },
+      { level: 75, prestige: 0, at: null },
+      { level: 100, prestige: 0, at: null },
+    ],
+  });
 });
 
 // Centralized Leaderboards

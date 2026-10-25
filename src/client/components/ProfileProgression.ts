@@ -478,6 +478,7 @@ export class ProfileProgression extends LitElement {
     if (progress === null || !this.ready) return nothing;
     const track = this.track;
     return html`
+      ${this.renderMilitaryCareer(progress)}
       ${track === null
         ? nothing
         : html`<reward-track
@@ -490,12 +491,192 @@ export class ProfileProgression extends LitElement {
             .describeCosmetic=${this.describeCosmetic}
             @claim-all=${() => void this.claimAll()}
           ></reward-track>`}
+      ${this.renderPrestigePerks()}
       ${this.renderHistory(progress)}
       ${this.renderMilestones(
         this.confirmedLevel === null
           ? progress
           : { ...progress, level: this.confirmedLevel },
       )}
+    `;
+  }
+
+  private renderMilitaryCareer(progress: PublicProgress): TemplateResult {
+    const playerLevel = progress.level;
+
+    const MILITARY_RANKS = [
+      {
+        minLevel: 1,
+        title: "Sous-Lieutenant",
+        badge: "🔰",
+        color: "#94a3b8",
+        border: "border-slate-500/40",
+        doctrine: "Déploiement Tactique Rapide",
+        rewards: ["Drapeau de Commandement", "+25 Plutonium", "+250 Caps"],
+      },
+      {
+        minLevel: 5,
+        title: "Commandant de Front",
+        badge: "⚔️",
+        color: "#38bdf8",
+        border: "border-sky-500/50",
+        doctrine: "Forteresse & Bunkers Renforcés",
+        rewards: ["Camouflage Circuit Émeraude", "+50 Plutonium", "+500 Caps"],
+      },
+      {
+        minLevel: 10,
+        title: "Colonel Tactique",
+        badge: "🦅",
+        color: "#06b6d4",
+        border: "border-cyan-500/50",
+        doctrine: "Artillerie Lourde de Précision",
+        rewards: ["Aura de Sillage Plasma", "+75 Plutonium", "+1 000 Caps"],
+      },
+      {
+        minLevel: 15,
+        title: "Général de Division",
+        badge: "🎖️",
+        color: "#f59e0b",
+        border: "border-amber-500/50",
+        doctrine: "Frappe Nucléaire Tactique",
+        rewards: ["Diadème de Fer de Général", "+100 Plutonium", "+1 500 Caps"],
+      },
+      {
+        minLevel: 22,
+        title: "Maréchal de BorderConflict",
+        badge: "🌟",
+        color: "#a855f7",
+        border: "border-purple-500/50",
+        doctrine: "Déploiement Blitzkrieg Suprême",
+        rewards: ["Camouflage Flammes Solaires", "+150 Plutonium", "+2 500 Caps"],
+      },
+      {
+        minLevel: 30,
+        title: "Stratège Suprême",
+        badge: "👑",
+        color: "#f43f5e",
+        border: "border-rose-500/60",
+        doctrine: "Frappe Orbitale Apocalyptique",
+        rewards: ["Couronne Cyber-Empereur", "Aura Souveraine", "Statut VIP & Légende"],
+      },
+    ];
+
+    return html`
+      <section class=${SECTION} data-military-career>
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class=${SECTION_TITLE}>
+              🎖️ CARRIÈRE MILITAIRE & DÉBLOCAGES TACTIQUES
+            </h3>
+            <p class="text-xs text-white/50 mt-0.5">
+              Montez en grade pour débloquer des doctrines stratégiques, du Plutonium et des camouflages exclusifs.
+            </p>
+          </div>
+          <div class="px-3 py-1 rounded-lg border border-emerald-500/40 bg-emerald-950/40 text-emerald-400 font-mono text-xs font-bold">
+            NIVEAU ACTUEL : ${playerLevel}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          ${MILITARY_RANKS.map((rank) => {
+            const isUnlocked = playerLevel >= rank.minLevel;
+            const isCurrent = !isUnlocked && (playerLevel < rank.minLevel && (rank === MILITARY_RANKS[0] || playerLevel >= (MILITARY_RANKS[MILITARY_RANKS.indexOf(rank) - 1]?.minLevel || 0)));
+
+            return html`
+              <div
+                class="relative rounded-xl border p-3.5 transition-all ${isUnlocked
+                  ? "border-emerald-500/40 bg-emerald-950/20 shadow-[0_0_15px_rgba(16,185,129,0.06)]"
+                  : isCurrent
+                  ? "border-amber-400/60 bg-amber-950/20 shadow-[0_0_15px_rgba(245,158,11,0.08)]"
+                  : "border-white/5 bg-black/25 opacity-70"}"
+              >
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl">${rank.badge}</span>
+                    <div>
+                      <div class="font-bold text-sm text-white" style="color: ${rank.color}">
+                        ${rank.title}
+                      </div>
+                      <div class="text-[10px] text-white/50 font-mono">
+                        Requis : Niveau ${rank.minLevel}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    ${isUnlocked
+                      ? html`<span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✓ ACQUIS</span>`
+                      : isCurrent
+                      ? html`<span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">EN COURS</span>`
+                      : html`<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700">🔒 BLOQUÉ</span>`}
+                  </div>
+                </div>
+
+                <div class="mt-2.5 pt-2.5 border-t border-white/5 text-xs space-y-1.5">
+                  <div class="flex items-center gap-1.5 text-sky-300 font-medium text-[11px]">
+                    <span class="text-[12px]">⚡</span> Doctrine : <span class="font-bold text-white">${rank.doctrine}</span>
+                  </div>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    ${rank.rewards.map(
+                      (rew) => html`
+                        <span class="inline-block px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] text-zinc-300 font-mono">
+                          + ${rew}
+                        </span>
+                      `,
+                    )}
+                  </div>
+                </div>
+              </div>
+            `;
+          })}
+        </div>
+      </section>
+    `;
+  }
+
+  private renderPrestigePerks(): TemplateResult {
+    return html`
+      <section class=${SECTION} data-prestige-perks>
+        <h3 class="mb-2 ${SECTION_TITLE}">
+          ⭐ AVANTAGES DU PRESTIGE & RECONNAISSANCE DE GUERRE
+        </h3>
+        <p class="text-xs text-white/50 mb-3.5">
+          Atteignez le Niveau 100 pour passer Prestige. Chaque passage réinitialise le grade tout en vous conférant des privilèges stratégiques permanents :
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div class="p-3 rounded-lg bg-black/20 border border-amber-500/30 flex items-start gap-2.5">
+            <span class="text-xl">⭐</span>
+            <div>
+              <div class="font-bold text-amber-300">Étoile de Prestige</div>
+              <div class="text-white/60 text-[11px] mt-0.5">Gravée sur votre insigne visible par tous les joueurs.</div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-black/20 border border-emerald-500/30 flex items-start gap-2.5">
+            <span class="text-xl">📈</span>
+            <div>
+              <div class="font-bold text-emerald-300">+20% XP Cumulatif</div>
+              <div class="text-white/60 text-[11px] mt-0.5">Multiplicateur permanent d'expérience sur tous les fronts.</div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-black/20 border border-sky-500/30 flex items-start gap-2.5">
+            <span class="text-xl">💎</span>
+            <div>
+              <div class="font-bold text-sky-300">Prime de Réarmement</div>
+              <div class="text-white/60 text-[11px] mt-0.5">+1 000 Capsules et +50 Plutonium octroyés sur-le-champ.</div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-black/20 border border-purple-500/30 flex items-start gap-2.5">
+            <span class="text-xl">🛡️</span>
+            <div>
+              <div class="font-bold text-purple-300">Honneurs de Vétéran</div>
+              <div class="text-white/60 text-[11px] mt-0.5">Auras et titres d'officier supérieur de l'état-major.</div>
+            </div>
+          </div>
+        </div>
+      </section>
     `;
   }
 
