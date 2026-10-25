@@ -61,6 +61,66 @@ export class ControlPanel extends LitElement implements Controller {
   @state()
   private _tutorialHighlight: TutorialHighlight | null = null;
 
+  @state()
+  private _hoveredTooltip: {
+    title: string;
+    description: string;
+    extra?: string;
+    rect: DOMRect;
+    accentColor: string;
+  } | null = null;
+
+  private showControlTooltip(
+    title: string,
+    description: string,
+    accentColor: string,
+    e: MouseEvent,
+    extra?: string,
+  ) {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    this._hoveredTooltip = {
+      title,
+      description,
+      extra,
+      rect,
+      accentColor,
+    };
+  }
+
+  private hideControlTooltip() {
+    this._hoveredTooltip = null;
+  }
+
+  private renderFloatingControlTooltip() {
+    if (!this._hoveredTooltip) return null;
+    const { title, description, extra, rect, accentColor } =
+      this._hoveredTooltip;
+    const bottomPos = Math.max(80, window.innerHeight - rect.top + 12);
+    const centerX = rect.left + rect.width / 2;
+    const leftPos = Math.max(160, Math.min(window.innerWidth - 160, centerX));
+
+    return html`
+      <div
+        class="fixed text-slate-100 text-center w-max max-w-[320px] text-xs bg-[#121813]/98 border-2 border-[#2b3a2d] rounded-xl p-3 z-[99999] shadow-[0_16px_40px_rgba(0,0,0,0.95)] pointer-events-none font-mono"
+        style="bottom: ${bottomPos}px; left: ${leftPos}px; transform: translateX(-50%); border-top: 3px solid ${accentColor};"
+      >
+        <div class="font-bold text-sm mb-1" style="color: ${accentColor};">
+          ${title}
+        </div>
+        <div class="px-1 py-1 text-slate-300 leading-relaxed text-[11.5px]">
+          ${description}
+        </div>
+        ${extra
+          ? html`<div
+              class="mt-1 pt-1.5 border-t border-[#2b3a2d] text-amber-300 font-bold text-xs"
+            >
+              ${extra}
+            </div>`
+          : null}
+      </div>
+    `;
+  }
+
   private _troopRateIsIncreasing: boolean = true;
 
   private _lastTroopIncreaseRate: number;
@@ -537,12 +597,20 @@ export class ControlPanel extends LitElement implements Controller {
         >
           <!-- Troop rate -->
           <div
-            class="flex items-center justify-center gap-1.5 shrink-0 bg-[#0e1410] border-2 rounded-lg font-mono font-bold text-xs h-7 px-2 shadow-inner ${this.tutorialHighlightClass(
+            class="flex items-center justify-center gap-1.5 shrink-0 bg-[#0e1410] border-2 rounded-lg font-mono font-bold text-xs h-7 px-2 shadow-inner cursor-help ${this.tutorialHighlightClass(
               "troop_rate",
             )} ${this._troopRateIsIncreasing
               ? "border-[#22c55e]/50 text-emerald-400"
               : "border-amber-500/50 text-amber-400"}"
             translate="no"
+            @mouseenter=${(e: MouseEvent) =>
+              this.showControlTooltip(
+                "Production de Troupes",
+                `Génération actuelle de +${renderTroops(this.troopRate)} troupes par seconde, produites par vos territoires et villes sous contrôle.`,
+                "#22c55e",
+                e,
+              )}
+            @mouseleave=${() => this.hideControlTooltip()}
           >
             <img
               src=${soldierIcon}
@@ -564,15 +632,33 @@ export class ControlPanel extends LitElement implements Controller {
             >
           </div>
           <!-- Troop bar -->
-          <div class="flex-1 ${this.tutorialHighlightClass("troops")}">
+          <div
+            class="flex-1 cursor-help ${this.tutorialHighlightClass("troops")}"
+            @mouseenter=${(e: MouseEvent) =>
+              this.showControlTooltip(
+                "Effectifs & Garnison",
+                `Effectifs déployés : ${renderTroops(this._troops)} sur ${renderTroops(this._maxTroops)} de capacité maximale (${Math.round((this._troops / Math.max(1, this._maxTroops)) * 100)}%). Au-delà de 100%, la génération passive s'arrête.`,
+                "#10b981",
+                e,
+              )}
+            @mouseleave=${() => this.hideControlTooltip()}
+          >
             ${this.renderDesktopTroopBar()}
           </div>
           <!-- Gold -->
           <div
-            class="flex items-center justify-center gap-1.5 shrink-0 bg-[#0e1410] border-2 rounded-lg border-amber-500/40 font-mono font-bold text-amber-300 text-xs h-7 px-2.5 relative shadow-inner ${this.tutorialHighlightClass(
+            class="flex items-center justify-center gap-1.5 shrink-0 bg-[#0e1410] border-2 rounded-lg border-amber-500/40 font-mono font-bold text-amber-300 text-xs h-7 px-2.5 relative shadow-inner cursor-help ${this.tutorialHighlightClass(
               "gold",
             )}"
             translate="no"
+            @mouseenter=${(e: MouseEvent) =>
+              this.showControlTooltip(
+                "Trésor Impérial",
+                `Réserve financière de guerre : ${renderNumber(this._gold)} Or. Alimentée par vos usines, ports maritimes et dividendes de territoires.`,
+                "#f59e0b",
+                e,
+              )}
+            @mouseleave=${() => this.hideControlTooltip()}
           >
             ${this._goldGain !== null
               ? keyed(
@@ -596,10 +682,20 @@ export class ControlPanel extends LitElement implements Controller {
 
         <!-- Attack ratio & Presets group -->
         <div
-          class="flex items-center gap-2 px-2 py-0.5 rounded-lg bg-[#0e1410]/80 border border-[#232f25] shrink-0 flex-1 min-[1180px]:flex-initial justify-between ${this.tutorialHighlightClass(
+          class="flex items-center gap-2 px-2 py-0.5 rounded-lg bg-[#0e1410]/80 border border-[#232f25] shrink-0 flex-1 min-[1180px]:flex-initial justify-between cursor-help ${this.tutorialHighlightClass(
             "attack_ratio",
           )}"
           translate="no"
+          @mouseenter=${(e: MouseEvent) =>
+            this.showControlTooltip(
+              "Puissance d'Assaut",
+              `Ratio engagé : ${(this.attackRatio * 100).toFixed(0)}% (${renderTroops(
+                (this.game?.myPlayer()?.troops() ?? 0) * this.attackRatio,
+              )} troupes mobilisées à chaque attaque). Utilisez le curseur ou les raccourcis rapides.`,
+              "#38bdf8",
+              e,
+            )}
+          @mouseleave=${() => this.hideControlTooltip()}
         >
           <div
             class="flex items-center justify-center gap-1.5 shrink-0 bg-[#151f17] border border-[#2b3a2d] rounded px-2 py-0.5 text-xs font-mono font-bold text-emerald-200 cursor-pointer w-[8.2rem] shadow-inner"
@@ -788,6 +884,7 @@ export class ControlPanel extends LitElement implements Controller {
         <div class="lg:hidden">${this.renderMobile()}</div>
         <div class="hidden lg:block">${this.renderDesktop()}</div>
       </div>
+      ${this.renderFloatingControlTooltip()}
     `;
   }
 
