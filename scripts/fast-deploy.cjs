@@ -35,7 +35,10 @@ async function main() {
     const status = execSync("git status --porcelain").toString().trim();
     if (status) {
       console.log("ℹ️ Modifications locales détectées, commit et push...");
-      execSync('git add -A && git commit -m "chore: automatic deploy sync" || true', { stdio: "ignore" });
+      execSync("git add -A");
+      try {
+        execSync('git commit -m "chore: automatic deploy sync"');
+      } catch {}
     }
     execSync("git push origin main", { stdio: "inherit" });
   } catch (err) {
@@ -93,9 +96,9 @@ async function main() {
             "tar -xzf build-assets.tar.gz -C static",
             "rm -f build-assets.tar.gz",
             "pm2 restart borderconflict",
-            "sleep 2",
+            "sleep 3",
             "pm2 status",
-            "curl -s -o /dev/null -w 'HTTP Status: %{http_code}\n' http://127.0.0.1:3000/cosmetics.json",
+            "curl --retry 5 --retry-connrefused --retry-delay 1 -s -o /dev/null -w 'HTTP Status: %{http_code}\n' http://127.0.0.1:3000/cosmetics.json",
           ].join(" && ");
 
           conn.exec(remoteCommands, (execErr, stream) => {
