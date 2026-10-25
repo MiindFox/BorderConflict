@@ -650,15 +650,49 @@ export class HostLobbyModal extends BaseModal {
     return html`
       <div class="flex flex-col h-full">
         <div
-          class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-3 pb-6 mx-auto w-full max-w-4xl"
+          class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-3 sm:px-6 pt-3 pb-6 mx-auto w-full max-w-4xl"
         >
+          ${this.isDuelMode
+            ? html`
+                <!-- Bannière Mode Défi 1v1 Pleine Largeur -->
+                <div
+                  class="mb-4 p-4 rounded-xl border-2 border-amber-500 bg-gradient-to-r from-[#2c1d0b] via-[#1b1e16] to-[#2c1d0b] shadow-[0_0_20px_rgba(245,158,11,0.25)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                >
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="size-11 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0 shadow-inner"
+                    >
+                      ⚔️
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span
+                          class="text-xs sm:text-sm font-black font-mono text-amber-300 uppercase tracking-wider"
+                        >
+                          MODE DÉFI ACTIVÉ · 1v1 + IA
+                        </span>
+                        <span
+                          class="px-2 py-0.5 rounded bg-amber-500/30 text-amber-200 border border-amber-400/50 text-[10px] font-black uppercase tracking-wider"
+                        >
+                          PRÊT AU COMBAT
+                        </span>
+                      </div>
+                      <span class="text-[11px] sm:text-xs text-amber-100/90 font-terminal mt-1">
+                        Le lien a été copié automatiquement ! Partagez-le à votre ami pour qu'il rejoigne votre duel immédiatement.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              `
+            : nothing}
+
           <!-- Bannière Clé du Salon Privé & Partage Rapide -->
           <div
-            class="mb-6 p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-[#182119] via-[#223023] to-[#182119] border-2 border-amber-500/50 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4"
+            class="mb-6 p-4 rounded-xl bg-gradient-to-r from-[#182119] via-[#223023] to-[#182119] border-2 border-amber-500/50 shadow-2xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4"
           >
-            <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="flex items-center gap-3 min-w-0">
               <div
-                class="size-10 sm:size-11 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shrink-0 text-amber-300 shadow-inner"
+                class="size-11 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shrink-0 text-amber-300 shadow-inner"
               >
                 🔑
               </div>
@@ -666,54 +700,27 @@ export class HostLobbyModal extends BaseModal {
                 <span
                   class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-400 font-pixel flex items-center gap-1.5"
                 >
-                  CLE DU SALON PRIVE (CODE INVITATION)
+                  CLÉ DU SALON PRIVÉ (CODE INVITATION)
                 </span>
-                <div class="flex items-center gap-2 mt-1">
+                <div class="flex flex-wrap items-center gap-2 mt-1">
                   <span
                     class="font-mono text-sm sm:text-base font-black tracking-widest text-amber-100 select-all bg-black/60 px-3 py-1 rounded border border-amber-500/30 shadow-inner"
                   >
                     ${this.lobbyId || "GÉNÉRATION..."}
                   </span>
-                  <span class="text-[10px] sm:text-[11px] text-[#8fa382] font-terminal hidden sm:inline">
+                  <span class="text-[10px] sm:text-[11px] text-[#8fa382] font-terminal">
                     (À coller dans "CODE PRIVÉ" sur l'accueil)
                   </span>
                 </div>
               </div>
             </div>
 
-            ${this.isDuelMode
-              ? html`
-                  <div
-                    class="mb-3 p-3 rounded-xl border-2 border-amber-500/50 bg-gradient-to-r from-amber-950/70 via-slate-900 to-amber-950/70 shadow-[0_0_15px_rgba(245,158,11,0.25)] flex flex-wrap items-center justify-between gap-3"
-                  >
-                    <div class="flex items-center gap-2.5">
-                      <span class="text-xl animate-bounce">⚔️</span>
-                      <div>
-                        <span
-                          class="text-xs font-black font-mono text-amber-300 uppercase tracking-wider block"
-                        >
-                          MODE DÉFI ACTIF · 1v1 + IA
-                        </span>
-                        <span class="text-[10px] text-slate-300 font-mono">
-                          Le lien a été copié automatiquement ! Partagez-le à votre ami pour qu'il rejoigne la partie.
-                        </span>
-                      </div>
-                    </div>
-                    <span
-                      class="px-2 py-0.5 rounded bg-amber-500/30 text-amber-300 border border-amber-400/50 text-[10px] font-black uppercase shrink-0"
-                    >
-                      PRÊT AU COMBAT
-                    </span>
-                  </div>
-                `
-              : nothing}
-
-            <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start lg:justify-end shrink-0">
               <button
                 type="button"
                 @click=${this.copyLobbyCodeOnly}
                 ?disabled=${!this.lobbyId}
-                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-amber-200 hover:text-white uppercase tracking-wider cursor-pointer"
+                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-amber-200 hover:text-white uppercase tracking-wider cursor-pointer whitespace-nowrap"
                 title="Copier le code clé pour vos amis"
               >
                 <span>📋</span>
@@ -723,7 +730,7 @@ export class HostLobbyModal extends BaseModal {
                 type="button"
                 @click=${this.copyLobbyFullLink}
                 ?disabled=${!this.lobbyId}
-                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-cyan-200 hover:text-white uppercase tracking-wider cursor-pointer"
+                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-cyan-200 hover:text-white uppercase tracking-wider cursor-pointer whitespace-nowrap"
                 title="Copier le lien direct vers ce salon"
               >
                 <span>🔗</span>
@@ -742,7 +749,7 @@ export class HostLobbyModal extends BaseModal {
                 )}"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-emerald-300 hover:text-white uppercase tracking-wider cursor-pointer border border-emerald-500/50 bg-emerald-950/40"
+                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-emerald-300 hover:text-white uppercase tracking-wider cursor-pointer border border-emerald-500/50 bg-emerald-950/40 whitespace-nowrap"
                 title="Inviter directement via WhatsApp"
               >
                 <span>💬</span>
