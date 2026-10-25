@@ -29,6 +29,7 @@ uniform float uSaturation;         // 1 = full color, 0 = grayscale
 uniform float uTerritoryAlpha;     // absolute fill opacity; 1 = fully opaque
 uniform sampler2D uAffiliation;    // RGBA8 — alt-view relation colors (row 0)
 uniform float uAltFillAlpha;       // alt-view translucent fill opacity
+uniform float uTime;               // elapsed time in seconds for subtle effects
 
 in vec2 vWorldPos;
 out vec4 fragColor;
@@ -111,6 +112,29 @@ void main() {
         color = texture(uPalette, vec2(u, 0.75));
       }
     }
+  }
+
+  // --- Animation Légère des Skins & Motifs d'Halloween ---
+  vec3 secColor = texture(uPalette, vec2(u, 0.75)).rgb;
+  bool isHalloweenBlaze = (secColor.r > 0.85 && secColor.g > 0.2 && secColor.g < 0.5 && secColor.b < 0.1);
+  bool isHalloweenNecropolis = (secColor.g > 0.85 && secColor.r < 0.4 && secColor.b < 0.2);
+
+  if (isHalloweenBlaze) {
+    // Pack Citrouille Infernale :
+    // Subtile pulsation de braises volcaniques et chaleur de Jack-o'-Lantern
+    float emberWave = sin(uTime * 2.8 + float(tc.x) * 0.12 + float(tc.y) * 0.08) * 0.05
+                    + cos(uTime * 1.9 - float(tc.y) * 0.14) * 0.04;
+    // Balayage d'onde incandescente douce traversant les terres
+    float sweep = sin((float(tc.x) + float(tc.y)) * 0.06 - uTime * 1.6);
+    float glow = smoothstep(0.85, 1.0, sweep) * 0.12;
+    color.rgb = clamp(color.rgb * (1.0 + emberWave) + vec3(glow * 1.2, glow * 0.5, 0.0), 0.0, 1.0);
+  } else if (isHalloweenNecropolis) {
+    // Pack Nécropole Maudite :
+    // Lueur spectrale ectoplasmique et respiration nécromantique
+    float ghostPulse = sin(uTime * 2.2 + float(tc.x - tc.y) * 0.1) * 0.06;
+    float sweep = sin((float(tc.x) * 0.7 - float(tc.y) * 0.7) * 0.07 - uTime * 1.4);
+    float glow = smoothstep(0.82, 1.0, sweep) * 0.10;
+    color.rgb = clamp(color.rgb * (1.0 + ghostPulse) + vec3(0.0, glow * 1.3, glow * 0.4), 0.0, 1.0);
   }
 
   // Hover highlight: boost contrast on the hovered player's tiles, pushing
