@@ -160,6 +160,25 @@ export class GameView implements GameLike {
       humans.map((h) => [h.clientID, h.cosmetics ?? {}]),
     );
 
+    // Ensure local player has skin populated from UserSettings if absent
+    if (this._myClientID) {
+      const userSettings = new UserSettings();
+      const localSkinName = userSettings.getSelectedSkinName();
+      if (localSkinName) {
+        const myCosm = this._cosmetics.get(this._myClientID) ?? {};
+        if (!myCosm.skin) {
+          const safeId = localSkinName
+            .replace("custom_", "")
+            .replace(/[^a-zA-Z0-9_-]/g, "_");
+          myCosm.skin = {
+            name: localSkinName,
+            url: `/static/skins/custom/skin_${safeId}.png`,
+          };
+          this._cosmetics.set(this._myClientID, myCosm);
+        }
+      }
+    }
+
     // Nation-type players carry their own flag on the wire (PlayerUpdate.nationFlag,
     // sourced from the manifest via PlayerInfo) rather than being looked up here by
     // name — some maps define multiple nations with the same display name (e.g.

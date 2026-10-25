@@ -501,6 +501,14 @@ export class WebGLFrameBuilder {
    */
   refreshCosmetics(gameView: GameView): void {
     gameView.refreshPlayerCosmetics();
+    const urls = new Set<string>();
+    for (const p of gameView.players()) {
+      const url = p.equippedCosmetics.skin?.url;
+      if (url) urls.add(assetUrl(url));
+    }
+    if (urls.size > 0) {
+      this.view.initSkinAtlas([...urls]);
+    }
     const players: PlayerStatic[] = [];
     for (const p of gameView.players()) {
       if (!this.knownSmallIDs.has(p.smallID())) continue;

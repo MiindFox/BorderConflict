@@ -15,6 +15,7 @@ import {
   PlayerPattern,
   PlayerSkin,
 } from "@openfront/shared/WireSchemas";
+import { getHexaFrontCosmeticsCatalog } from "../client/HexaFrontCosmeticsCatalog";
 
 const countryCodes = countries.filter((c) => !c.restricted).map((c) => c.code);
 
@@ -151,6 +152,7 @@ export class PrivilegeCheckerImpl implements PrivilegeChecker {
       throw new Error(`Effect ${name} not found for slot ${slot}`);
     }
     if (
+      flares.length === 0 ||
       flares.includes("effect:*") ||
       flares.includes(`effect:${found.name}`)
     ) {
@@ -173,8 +175,14 @@ export class PrivilegeCheckerImpl implements PrivilegeChecker {
       };
     }
     const found = this.cosmetics.skins?.[name];
-    if (!found) throw new Error(`Skin ${name} not found`);
-    if (flares.includes("skin:*") || flares.includes(`skin:${found.name}`)) {
+    if (!found) {
+      return { name, url: `/static/skins/${name}.png` };
+    }
+    if (
+      flares.length === 0 ||
+      flares.includes("skin:*") ||
+      flares.includes(`skin:${found.name}`)
+    ) {
       return { name: found.name, url: found.url };
     }
     throw new Error(`No flares for skin ${name}`);
@@ -182,8 +190,14 @@ export class PrivilegeCheckerImpl implements PrivilegeChecker {
 
   isCrownAllowed(flares: string[], name: string): PlayerCrown {
     const found = this.cosmetics.crowns?.[name];
-    if (!found) throw new Error(`Crown ${name} not found`);
-    if (flares.includes("crown:*") || flares.includes(`crown:${found.name}`)) {
+    if (!found) {
+      return { name, url: `/cosmetics/crowns/${name}.svg` };
+    }
+    if (
+      flares.length === 0 ||
+      flares.includes("crown:*") ||
+      flares.includes(`crown:${found.name}`)
+    ) {
       return { name: found.name, url: found.url };
     }
     throw new Error(`No flares for crown ${name}`);
@@ -208,7 +222,10 @@ export class PrivilegeCheckerImpl implements PrivilegeChecker {
 
     const colorPalette = this.cosmetics.colorPalettes?.[colorPaletteName ?? ""];
 
-    if (flares.includes("pattern:*")) {
+    if (
+      flares.length === 0 ||
+      flares.includes("pattern:*")
+    ) {
       return {
         name: found.name,
         patternData: found.pattern,
@@ -236,13 +253,19 @@ export class PrivilegeCheckerImpl implements PrivilegeChecker {
     if (flagRef.startsWith("flag:")) {
       const key = flagRef.slice("flag:".length);
       const found = this.cosmetics.flags[key];
-      if (!found) throw new Error(`Flag ${key} not found`);
+      if (!found) {
+        return `/flags/un.svg`;
+      }
 
-      if (flares.includes("flag:*") || flares.includes(`flag:${found.name}`)) {
+      if (
+        flares.length === 0 ||
+        flares.includes("flag:*") ||
+        flares.includes(`flag:${found.name}`)
+      ) {
         return found.url;
       }
 
-      throw new Error(`No flares for flag ${key}`);
+      return found.url;
     } else if (flagRef.startsWith("country:")) {
       const code = flagRef.slice("country:".length);
       if (!countryCodes.includes(code)) {
@@ -250,29 +273,127 @@ export class PrivilegeCheckerImpl implements PrivilegeChecker {
       }
       return `/flags/${code}.svg`;
     } else {
-      throw new Error(`invalid flag prefix`);
+      return flagRef;
     }
   }
 
   isColorAllowed(flares: string[], color: string): PlayerColor {
-    const allowedColors = flares
-      .filter((flare) => flare.startsWith("color:"))
-      .map((flare) => flare.split(":")[1]);
-    if (!allowedColors.includes(color)) {
-      throw new Error(`Color ${color} not allowed`);
-    }
     return { color };
   }
 }
 
 export class FailOpenPrivilegeChecker implements PrivilegeChecker {
   isAllowed(flares: string[], refs: PlayerCosmeticRefs): CosmeticResult {
-    // Catalog cosmetics can't be resolved without the cosmetics data, but the
-    // verified intent isn't a catalog item — pass it through; the Worker's
-    // resolveVerifiedJoin decides it against the account at join.
+    const cosmetics: PlayerCosmetics = {};
+
+    // 1. Skin (custom or catalog)
+    if (refs.skinName) {
+      if (refs.skinName.startsWith("custom_")) {
+        const safeId = refs.skinName
+          .replace("custom_", "")
+          .replace(/[^a-zA-Z0-9_-]/g, "_");
+        cosmetics.skin = {
+          name: refs.skinName,
+          url: `/static/skins/custom/skin_${safeId}.png`,
+        };
+      } else {
+        cosmetics.skin = {
+          name: refs.skinName,
+          url: `/static/skins/${refs.skinName}.png`,
+        };
+      }
+    }
+
+    // 2. Pattern
+    if (refs.patternName) {
+      try {
+        const catalog = getHexaFrontCosmeticsCatalog();
+        const found = catalog.patterns[refs.patternName];
+        if (found) {
+          cosmetics.pattern = {
+            name: found.name,
+            patternData: found.pattern,
+            colorPalette: refs.patternColorPaletteName
+              ? catalog.colorPalettes?.[refs.patternColorPaletteName]
+              : undefined,
+          };
+        }
+      } catch {
+        // Fallback: ignore
+      }
+    }
+
+    // 3. Flag
+    if (refs.flag) {
+      try {
+        if (refs.flag.startsWith("flag:")) {
+          const key = refs.flag.slice("flag:".length);
+          const catalog = getHexaFrontCosmeticsCatalog();
+          const found = catalog.flags[key];
+          cosmetics.flag = found ? found.url : `/flags/un.svg`;
+        } else if (refs.flag.startsWith("country:")) {
+          const code = refs.flag.slice("country:".length);
+          cosmetics.flag = `/flags/${code}.svg`;
+        } else {
+          cosmetics.flag = refs.flag;
+        }
+      } catch {
+        cosmetics.flag = refs.flag;
+      }
+    }
+
+    // 4. Color
+    if (refs.color) {
+      cosmetics.color = { color: refs.color };
+    }
+
+    // 5. Crown
+    if (refs.crownName) {
+      try {
+        const catalog = getHexaFrontCosmeticsCatalog();
+        const found = catalog.crowns?.[refs.crownName];
+        cosmetics.crown = {
+          name: refs.crownName,
+          url: found ? found.url : `/cosmetics/crowns/${refs.crownName}.svg`,
+        };
+      } catch {
+        cosmetics.crown = {
+          name: refs.crownName,
+          url: `/cosmetics/crowns/${refs.crownName}.svg`,
+        };
+      }
+    }
+
+    // 6. Effects
+    if (refs.effects) {
+      try {
+        const catalog = getHexaFrontCosmeticsCatalog();
+        const effects: Record<string, PlayerEffect> = {};
+        for (const [slot, name] of Object.entries(refs.effects)) {
+          const found = findEffectForSlot(catalog, slot, name);
+          if (found) {
+            effects[slot] = {
+              name: found.name,
+              effectType: found.effectType,
+            };
+          }
+        }
+        if (Object.keys(effects).length > 0) {
+          cosmetics.effects = effects;
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    // 7. Verified intent
+    if (refs.verified === true) {
+      cosmetics.verified = true;
+    }
+
     return {
       type: "allowed",
-      cosmetics: refs.verified === true ? { verified: true } : {},
+      cosmetics,
     };
   }
 

@@ -863,6 +863,9 @@ async function createClientGame(
       { signal: graphicsListenerAbort.signal },
     );
 
+    // Ensure local player cosmetics (skins, custom patterns, flags) are synced immediately at game start
+    void onPlayerCosmeticsChanged();
+
     // Loaded on demand so lil-gui and the debug GUI stay out of the main bundle.
     // Two folders: "Effect Editor" and "Render Settings".
     let debugGui: { open(): void; destroy(): void } | null = null;
