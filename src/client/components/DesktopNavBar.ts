@@ -218,6 +218,29 @@ export class DesktopNavBar extends LitElement {
           >
             CLANS
           </button>
+
+          <!-- CONSOLE ADMIN (Visible uniquement pour les administrateurs) -->
+          ${commanderStore.isAdmin()
+            ? html`
+                <button
+                  class="nav-menu-item retro-metal-btn ${currentPage ===
+                  "page-admin"
+                    ? "ring-2 ring-red-500 bg-red-950/90 text-red-100"
+                    : "border-red-500/60 bg-red-950/40 text-red-400 hover:text-red-300"} px-3 py-1.5 rounded cursor-pointer transition-all text-[11px] font-retro font-black tracking-wider uppercase flex items-center gap-1.5 shadow-[0_0_14px_rgba(239,68,68,0.4)]"
+                  data-page="page-admin"
+                  @click=${() =>
+                    window.dispatchEvent(
+                      new CustomEvent("showPage", { detail: "page-admin" }),
+                    )}
+                  title="Console d'Administration Stratégique BorderConflict"
+                >
+                  <span class="text-xs text-red-400 animate-pulse">🛡️</span>
+                  <span class="text-red-300 font-extrabold tracking-widest">
+                    ADMIN
+                  </span>
+                </button>
+              `
+            : ""}
         </div>
 
         <!-- Right: Utility Buttons & Mini Green Radar -->

@@ -44,6 +44,9 @@ export interface CommanderProfile {
   hasCustomSkinUnlocked?: boolean;
   customSkinUrl?: string;
   customSkinName?: string;
+  isAdmin?: boolean;
+  role?: string;
+  isBanned?: boolean;
 }
 
 interface StoredEmailAccount {
@@ -594,6 +597,22 @@ class CommanderStore {
 
   getProfile(): CommanderProfile {
     return { ...this.profile };
+  }
+
+  isAdmin(): boolean {
+    return Boolean(
+      this.profile.isAdmin ||
+        this.profile.role === "admin" ||
+        this.profile.username?.toLowerCase() === "darkgdooo" ||
+        this.profile.email?.toLowerCase() === "darkgdooo@gmail.com",
+    );
+  }
+
+  getCredentials(): { email: string; password?: string } {
+    return {
+      email: this.profile.email || "",
+      password: localStorage.getItem(ACCOUNT_PASS_KEY) || "",
+    };
   }
 
   getDoctrineMask(): number {

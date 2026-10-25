@@ -11,6 +11,7 @@ import { whenPageIdle } from "./WhenPageIdle";
  * views) import each other, so a handoff between them never waits.
  */
 const modules: Record<string, () => Promise<unknown>> = {
+  "admin-modal": () => import("./AdminModal"),
   "account-modal": () => import("./AccountModal"),
   "account-settings-modal": () => import("./AccountSettingsModal"),
   "change-username-modal": () => import("./ChangeUsernameModal"),

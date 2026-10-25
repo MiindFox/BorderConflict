@@ -142,13 +142,63 @@ export class MapPlaylist {
   // Queued playlists were built from the old weights, so drop them: a map
   // pulled to 0 must stop appearing now, not after a full rotation.
   public setWeightOverrides(overrides: MapWeightOverrides) {
-    if (JSON.stringify(overrides) === JSON.stringify(this.weightOverrides)) {
-      return;
-    }
     this.weightOverrides = overrides;
     for (const key of Object.keys(this.playlists) as PlaylistKey[]) {
       this.playlists[key] = [];
     }
+  }
+
+  public forceNextMap(
+    type: ScheduledPublicGameType,
+    map: GameMapType,
+    mode?: GameMode,
+  ) {
+    const key = this.playlistKey(type, mode);
+    this.playlists[key].unshift(map);
+  }
+
+  private forcedConfigs: Partial<
+    Record<ScheduledPublicGameType, Partial<GameConfig>>
+  > = {};
+
+  public setForcedConfig(
+    type: ScheduledPublicGameType,
+    config: Partial<GameConfig>,
+  ) {
+    this.forcedConfigs[type] = config;
+  }
+
+  public getPlaylistSnapshot(): {
+    queues: Record<PlaylistKey, GameMapType[]>;
+    weightOverrides: MapWeightOverrides;
+  } {
+    for (const key of [
+      "ffa",
+      "team",
+      "specialFfa",
+      "specialTeam",
+    ] as PlaylistKey[]) {
+      if (this.playlists[key].length === 0) {
+        const type =
+          key === "ffa" ? "ffa" : key === "team" ? "team" : "special";
+        const mode =
+          key === "specialFfa"
+            ? GameMode.FFA
+            : key === "specialTeam"
+              ? GameMode.Team
+              : undefined;
+        this.playlists[key].push(...this.generateNewPlaylist(type, mode));
+      }
+    }
+    return {
+      queues: {
+        ffa: this.playlists.ffa.slice(0, 8),
+        team: this.playlists.team.slice(0, 8),
+        specialFfa: this.playlists.specialFfa.slice(0, 8),
+        specialTeam: this.playlists.specialTeam.slice(0, 8),
+      },
+      weightOverrides: this.weightOverrides,
+    };
   }
 
   public async gameConfig(type: ScheduledPublicGameType): Promise<GameConfig> {
@@ -157,6 +207,11 @@ export class MapPlaylist {
     const config = await this.rollConfig(type, trusted);
     if (trusted) {
       config.trusted = true;
+    }
+    if (this.forcedConfigs[type]) {
+      const forced = this.forcedConfigs[type]!;
+      delete this.forcedConfigs[type];
+      Object.assign(config, forced);
     }
     return config;
   }

@@ -55,6 +55,18 @@ class AccountDatabase {
         const raw = fs.readFileSync(DB_FILE, "utf-8");
         this.db = JSON.parse(raw);
       }
+
+      // Guarantee darkgdooo is registered as master administrator
+      for (const [em, acc] of Object.entries(this.db)) {
+        if (
+          em.toLowerCase() === "darkgdooo@gmail.com" ||
+          acc.username?.toLowerCase() === "darkgdooo"
+        ) {
+          acc.profile = acc.profile || {};
+          acc.profile.isAdmin = true;
+          acc.profile.role = "admin";
+        }
+      }
       if (fs.existsSync(CLANS_FILE)) {
         const rawClans = fs.readFileSync(CLANS_FILE, "utf-8");
         this.clans = JSON.parse(rawClans);
@@ -197,6 +209,15 @@ class AccountDatabase {
         plutonium: 0,
         caps: 0,
         ownedFlares: [],
+        isAdmin:
+          username.toLowerCase() === "darkgdooo" ||
+          email === "darkgdooo@gmail.com",
+        role:
+          username.toLowerCase() === "darkgdooo" ||
+          email === "darkgdooo@gmail.com"
+            ? "admin"
+            : "player",
+        isBanned: false,
       },
     };
 
@@ -218,6 +239,21 @@ class AccountDatabase {
     if (hash !== account.passwordHash) {
       return { ok: false, error: "Mot de passe incorrect." };
     }
+    if (account.profile?.isBanned) {
+      return {
+        ok: false,
+        error: "Votre compte a été suspendu par l'administration.",
+      };
+    }
+    // Auto-grant admin for darkgdooo
+    if (
+      account.username?.toLowerCase() === "darkgdooo" ||
+      email === "darkgdooo@gmail.com"
+    ) {
+      account.profile = account.profile || {};
+      account.profile.isAdmin = true;
+      account.profile.role = "admin";
+    }
     return { ok: true, account };
   }
 
@@ -233,6 +269,21 @@ class AccountDatabase {
     const hash = hashPassword(passwordRaw, account.salt);
     if (hash !== account.passwordHash) {
       return { ok: false, error: "Mot de passe incorrect." };
+    }
+    if (account.profile?.isBanned) {
+      return {
+        ok: false,
+        error: "Votre compte a été suspendu par l'administration.",
+      };
+    }
+    // Auto-grant admin for darkgdooo
+    if (
+      account.username?.toLowerCase() === "darkgdooo" ||
+      email === "darkgdooo@gmail.com"
+    ) {
+      account.profile = account.profile || {};
+      account.profile.isAdmin = true;
+      account.profile.role = "admin";
     }
     return { ok: true, profile: account.profile };
   }
@@ -1003,6 +1054,257 @@ class AccountDatabase {
       console.error("saveCustomSkin error:", e);
       return { ok: false, error: "Erreur lors de la sauvegarde de l'image." };
     }
+  }
+
+  // ==========================================================================
+  // ADMINISTRATION MODULE & CONTROLS
+  // ==========================================================================
+
+  public isAdmin(emailRaw: string, passwordRaw?: string): boolean {
+    const email = (emailRaw || "").trim().toLowerCase();
+    if (email === "darkgdooo@gmail.com") return true;
+
+    const account = this.db[email];
+    if (!account) return false;
+
+    if (account.username?.toLowerCase() === "darkgdooo") return true;
+    if (passwordRaw) {
+      const hash = hashPassword(passwordRaw, account.salt);
+      if (hash !== account.passwordHash) return false;
+    }
+
+    return (
+      account.profile?.isAdmin === true || account.profile?.role === "admin"
+    );
+  }
+
+  public getAllAccounts(): any[] {
+    return Object.values(this.db).map((acc) => {
+      const p = acc.profile || {};
+      return {
+        email: acc.email,
+        username: acc.username || p.username || acc.email.split("@")[0],
+        createdAt: acc.createdAt,
+        updatedAt: acc.updatedAt,
+        level: p.level || 0,
+        xp: p.xp || 0,
+        plutonium: p.plutonium || 0,
+        caps: p.caps || 0,
+        isVip: Boolean(p.isVip && p.vipUntil && p.vipUntil > Date.now()),
+        vipUntil: p.vipUntil || null,
+        isBanned: Boolean(p.isBanned),
+        role: p.role || (p.isAdmin ? "admin" : "player"),
+        isAdmin: Boolean(p.isAdmin),
+        victories: p.victories || 0,
+        gamesPlayed: p.gamesPlayed || 0,
+        hasCustomSkinUnlocked: Boolean(p.hasCustomSkinUnlocked),
+        hasBattlePass: Boolean(p.hasBattlePass),
+        ownedFlaresCount: (p.ownedFlares || []).length,
+      };
+    });
+  }
+
+  public setPlayerBan(
+    emailRaw: string,
+    banned: boolean,
+  ): { ok: boolean; error?: string } {
+    const email = (emailRaw || "").trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) return { ok: false, error: "Compte introuvable." };
+
+    if (
+      email === "darkgdooo@gmail.com" ||
+      account.username?.toLowerCase() === "darkgdooo"
+    ) {
+      return {
+        ok: false,
+        error: "Impossible de bannir le Compte Administrateur Maître.",
+      };
+    }
+
+    account.profile = account.profile || {};
+    account.profile.isBanned = banned;
+    account.updatedAt = Date.now();
+    this.save();
+    return { ok: true };
+  }
+
+  public setPlayerVip(
+    emailRaw: string,
+    isVip: boolean,
+    durationDays = 30,
+  ): { ok: boolean; error?: string } {
+    const email = (emailRaw || "").trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) return { ok: false, error: "Compte introuvable." };
+
+    account.profile = account.profile || {};
+    account.profile.isVip = isVip;
+    if (isVip) {
+      const now = Date.now();
+      const currentExpiry =
+        account.profile.vipUntil && account.profile.vipUntil > now
+          ? account.profile.vipUntil
+          : now;
+      account.profile.vipUntil =
+        currentExpiry + durationDays * 24 * 60 * 60 * 1000;
+    } else {
+      account.profile.vipUntil = 0;
+    }
+    account.updatedAt = Date.now();
+    this.save();
+    return { ok: true };
+  }
+
+  public setPlayerRole(
+    emailRaw: string,
+    role: "admin" | "moderator" | "player",
+  ): { ok: boolean; error?: string } {
+    const email = (emailRaw || "").trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) return { ok: false, error: "Compte introuvable." };
+
+    account.profile = account.profile || {};
+    account.profile.role = role;
+    account.profile.isAdmin = role === "admin";
+    account.updatedAt = Date.now();
+    this.save();
+    return { ok: true };
+  }
+
+  public setPlayerCurrency(
+    emailRaw: string,
+    plutonium: number,
+    caps: number,
+  ): { ok: boolean; error?: string } {
+    const email = (emailRaw || "").trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) return { ok: false, error: "Compte introuvable." };
+
+    account.profile = account.profile || {};
+    account.profile.plutonium = Math.max(0, Number(plutonium) || 0);
+    account.profile.caps = Math.max(0, Number(caps) || 0);
+    account.updatedAt = Date.now();
+    this.save();
+    return { ok: true };
+  }
+
+  public setPlayerUnlockAll(
+    emailRaw: string,
+  ): { ok: boolean; error?: string } {
+    const email = (emailRaw || "").trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) return { ok: false, error: "Compte introuvable." };
+
+    account.profile = account.profile || {};
+    account.profile.hasCustomSkinUnlocked = true;
+    account.profile.hasBattlePass = true;
+    account.profile.battlePassSeason = 1;
+    account.profile.isVip = true;
+    account.profile.vipUntil = Date.now() + 365 * 24 * 60 * 60 * 1000;
+
+    const masterFlares = [
+      "skin:*",
+      "crown:*",
+      "pattern:*",
+      "flag:*",
+      "effect:*",
+      "crown:supernova_royale",
+      "crown:cyber_emperor",
+      "crown:atomic_conqueror",
+      "crown:spectral_horns",
+      "crown:crown_pumpkin_king",
+      "boat_trail:electric_plasma",
+      "nuke_impact:mirv_custom",
+    ];
+
+    account.profile.ownedFlares = Array.from(
+      new Set([...(account.profile.ownedFlares || []), ...masterFlares]),
+    );
+
+    account.updatedAt = Date.now();
+    this.save();
+    return { ok: true };
+  }
+
+  public resetPlayerPassword(
+    emailRaw: string,
+    newPasswordRaw: string,
+  ): { ok: boolean; error?: string } {
+    const email = (emailRaw || "").trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) return { ok: false, error: "Compte introuvable." };
+    if (!newPasswordRaw || newPasswordRaw.length < 4) {
+      return {
+        ok: false,
+        error: "Le mot de passe doit comporter au moins 4 caractères.",
+      };
+    }
+
+    const salt = crypto.randomBytes(16).toString("hex");
+    account.salt = salt;
+    account.passwordHash = hashPassword(newPasswordRaw, salt);
+    account.updatedAt = Date.now();
+    this.save();
+    return { ok: true };
+  }
+
+  public updatePlayerStats(
+    emailRaw: string,
+    stats: {
+      level?: number;
+      xp?: number;
+      victories?: number;
+      gamesPlayed?: number;
+      username?: string;
+    },
+  ): { ok: boolean; error?: string } {
+    const email = (emailRaw || "").trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) return { ok: false, error: "Compte introuvable." };
+
+    account.profile = account.profile || {};
+    if (typeof stats.level === "number") account.profile.level = stats.level;
+    if (typeof stats.xp === "number") account.profile.xp = stats.xp;
+    if (typeof stats.victories === "number")
+      account.profile.victories = stats.victories;
+    if (typeof stats.gamesPlayed === "number")
+      account.profile.gamesPlayed = stats.gamesPlayed;
+    if (stats.username) {
+      account.username = stats.username.slice(0, 20);
+      account.profile.username = account.username;
+    }
+
+    account.updatedAt = Date.now();
+    this.save();
+    return { ok: true };
+  }
+
+  public deleteAccount(emailRaw: string): { ok: boolean; error?: string } {
+    const email = (emailRaw || "").trim().toLowerCase();
+    const account = this.db[email];
+    if (!account) return { ok: false, error: "Compte introuvable." };
+
+    if (
+      email === "darkgdooo@gmail.com" ||
+      account.username?.toLowerCase() === "darkgdooo"
+    ) {
+      return {
+        ok: false,
+        error: "Action refusée : suppression de l'Administrateur Maître interdite.",
+      };
+    }
+
+    delete this.db[email];
+    this.save();
+    return { ok: true };
+  }
+
+  public getDatabaseBackup(): { accounts: any; clans: any } {
+    return {
+      accounts: this.db,
+      clans: this.clans,
+    };
   }
 }
 

@@ -1,6 +1,7 @@
 import { UserMeResponse } from "@openfront/shared/ApiSchemas";
 import { GameEnv } from "@openfront/shared/configuration/Env";
 import { GameRegistry } from "@openfront/shared/GameRegistry";
+import { maps as allMaps, GameMode } from "@openfront/engine-api/game/GameTypes";
 import cluster, { Worker } from "cluster";
 import crypto from "crypto";
 import express from "express";
@@ -11,6 +12,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getHexaFrontCosmeticsCatalog } from "../client/HexaFrontCosmeticsCatalog";
 import { verifyClientToken } from "./jwt";
+import { purchaseTracker } from "./PurchaseTracker";
 import {
   applyCheckinState,
   CHECKIN_INTERVAL_MS,
@@ -165,6 +167,100 @@ const stripeClient = stripeSecretKey
     })
   : null;
 
+const BUNDLE_DEFINITIONS: Record<
+  string,
+  { name: string; description: string; priceCents: number }
+> = {
+  // Packs Événement Spécial Halloween
+  halloween_necropolis: {
+    name: "🎃 Pack Nécropole Maudite (Édition Halloween)",
+    description:
+      "Cornes Démoniaques, Toile Nécromantique, Étendard Faucheuse d'Âmes, Sillage Ectoplasme, Déflagration Toxique + 500 Plutonium & 8 000 Caps offerts !",
+    priceCents: 399, // 3.99 EUR
+  },
+  halloween_pumpkin_infernal: {
+    name: "🔥 Pack Citrouille Infernale (Édition Halloween)",
+    description:
+      "Couronne Roi Citrouille, Lanterne d'Effroi, Blason Samhain, Coque Citrouille Infernale, Traînée d'Âmes + 600 Plutonium & 10 000 Caps offerts !",
+    priceCents: 449, // 4.49 EUR
+  },
+
+  // 3 Starter Bundles
+  bundle_recrue: {
+    name: "Kit de Recrue Stratégique",
+    description: "150 Plutonium + 2 000 Caps + Couronne Vanguard d'Argent",
+    priceCents: 99, // 0.99 EUR
+  },
+  bundle_officier: {
+    name: "Pack Officier de Terrain",
+    description:
+      "500 Plutonium + 7 000 Caps + Couronne Animée Plasma Pulsar + Sillage Plasma",
+    priceCents: 299, // 2.99 EUR
+  },
+  bundle_supreme: {
+    name: "Édition Suprême Commandant",
+    description:
+      "1 100 Plutonium + 18 000 Caps + Couronne Animée Supernova Royale + Impact MIRV",
+    priceCents: 499, // 4.99 EUR
+  },
+
+  // Point 1: Pass de Saison (Battle Pass)
+  battle_pass_s1: {
+    name: "Pass de Saison 1 : Tempête Nucléaire",
+    description:
+      "Débloque la voie Premium du Pass de Saison : couronnes légendaires, caisses et bonus exclusifs",
+    priceCents: 499, // 4.99 EUR
+  },
+
+  // Point 2: Statut VIP / Vétéran
+  vip_status_30d: {
+    name: "Abonnement Statut VIP Commandant (30 Jours)",
+    description:
+      "Pseudo doré, Badge VIP, +25% de Caps par partie, création de clan débloquée, hébergement prioritaire",
+    priceCents: 299, // 2.99 EUR
+  },
+
+  // Point 5: Recharges directes de Plutonium
+  plutonium_250: {
+    name: "Réserve de 250 Plutonium",
+    description: "250 Plutonium pour la boutique et les caisses",
+    priceCents: 149, // 1.49 EUR
+  },
+  plutonium_600: {
+    name: "Cargaison de 600 Plutonium",
+    description: "600 Plutonium pour la boutique et les caisses",
+    priceCents: 299, // 2.99 EUR
+  },
+  plutonium_1350: {
+    name: "Stock Tactique de 1 350 Plutonium (1 200 + 150 Offerts)",
+    description: "1 350 Plutonium pour la boutique et les caisses",
+    priceCents: 499, // 4.99 EUR
+  },
+  plutonium_1700: {
+    name: "Stock Stratégique de 1 700 Plutonium (1 500 + 200 Offerts)",
+    description: "1 700 Plutonium pour la boutique et les caisses",
+    priceCents: 699, // 6.99 EUR
+  },
+  plutonium_3000: {
+    name: "Réserve Suprême de 3 000 Plutonium (2 500 + 500 Offerts)",
+    description: "3 000 Plutonium pour la boutique et les caisses",
+    priceCents: 999, // 9.99 EUR
+  },
+  plutonium_7500: {
+    name: "Dépôt d'Arsenal de 7 500 Plutonium (6 000 + 1 500 Offerts)",
+    description: "7 500 Plutonium pour la boutique et les caisses",
+    priceCents: 2299, // 22.99 EUR
+  },
+
+  // Module Forge de Skin de Territoire Personnalisé
+  custom_skin_pass: {
+    name: "Pass Forge de Skin de Territoire Personnalisé",
+    description:
+      "Débloque la création, l'importation illimitée d'images et l'équipement de votre propre skin de territoire en jeu",
+    priceCents: 399, // 3.99 EUR
+  },
+};
+
 // Stripe Checkout Session Creation for 3 Bundles
 app.post("/api/stripe/create-checkout-session", async (req, res) => {
   if (!stripeClient) {
@@ -178,101 +274,7 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
     return res.status(400).json({ error: "Email et bundleId requis." });
   }
 
-  const bundleDefinitions: Record<
-    string,
-    { name: string; description: string; priceCents: number }
-  > = {
-    // Packs Événement Spécial Halloween
-    halloween_necropolis: {
-      name: "🎃 Pack Nécropole Maudite (Édition Halloween)",
-      description:
-        "Cornes Démoniaques, Toile Nécromantique, Étendard Faucheuse d'Âmes, Sillage Ectoplasme, Déflagration Toxique + 500 Plutonium & 8 000 Caps offerts !",
-      priceCents: 399, // 3.99 EUR
-    },
-    halloween_pumpkin_infernal: {
-      name: "🔥 Pack Citrouille Infernale (Édition Halloween)",
-      description:
-        "Couronne Roi Citrouille, Lanterne d'Effroi, Blason Samhain, Coque Citrouille Infernale, Traînée d'Âmes + 600 Plutonium & 10 000 Caps offerts !",
-      priceCents: 449, // 4.49 EUR
-    },
-
-    // 3 Starter Bundles
-    bundle_recrue: {
-      name: "Kit de Recrue Stratégique",
-      description: "150 Plutonium + 2 000 Caps + Couronne Vanguard d'Argent",
-      priceCents: 99, // 0.99 EUR
-    },
-    bundle_officier: {
-      name: "Pack Officier de Terrain",
-      description:
-        "500 Plutonium + 7 000 Caps + Couronne Animée Plasma Pulsar + Sillage Plasma",
-      priceCents: 299, // 2.99 EUR
-    },
-    bundle_supreme: {
-      name: "Édition Suprême Commandant",
-      description:
-        "1 100 Plutonium + 18 000 Caps + Couronne Animée Supernova Royale + Impact MIRV",
-      priceCents: 499, // 4.99 EUR
-    },
-
-    // Point 1: Pass de Saison (Battle Pass)
-    battle_pass_s1: {
-      name: "Pass de Saison 1 : Tempête Nucléaire",
-      description:
-        "Débloque la voie Premium du Pass de Saison : couronnes légendaires, caisses et bonus exclusifs",
-      priceCents: 499, // 4.99 EUR
-    },
-
-    // Point 2: Statut VIP / Vétéran
-    vip_status_30d: {
-      name: "Abonnement Statut VIP Commandant (30 Jours)",
-      description:
-        "Pseudo doré, Badge VIP, +25% de Caps par partie, création de clan débloquée, hébergement prioritaire",
-      priceCents: 299, // 2.99 EUR
-    },
-
-    // Point 5: Recharges directes de Plutonium
-    plutonium_250: {
-      name: "Réserve de 250 Plutonium",
-      description: "250 Plutonium pour la boutique et les caisses",
-      priceCents: 149, // 1.49 EUR
-    },
-    plutonium_600: {
-      name: "Cargaison de 600 Plutonium",
-      description: "600 Plutonium pour la boutique et les caisses",
-      priceCents: 299, // 2.99 EUR
-    },
-    plutonium_1350: {
-      name: "Stock Tactique de 1 350 Plutonium (1 200 + 150 Offerts)",
-      description: "1 350 Plutonium pour la boutique et les caisses",
-      priceCents: 499, // 4.99 EUR
-    },
-    plutonium_1700: {
-      name: "Stock Stratégique de 1 700 Plutonium (1 500 + 200 Offerts)",
-      description: "1 700 Plutonium pour la boutique et les caisses",
-      priceCents: 699, // 6.99 EUR
-    },
-    plutonium_3000: {
-      name: "Réserve Suprême de 3 000 Plutonium (2 500 + 500 Offerts)",
-      description: "3 000 Plutonium pour la boutique et les caisses",
-      priceCents: 999, // 9.99 EUR
-    },
-    plutonium_7500: {
-      name: "Dépôt d'Arsenal de 7 500 Plutonium (6 000 + 1 500 Offerts)",
-      description: "7 500 Plutonium pour la boutique et les caisses",
-      priceCents: 2299, // 22.99 EUR
-    },
-
-    // Module Forge de Skin de Territoire Personnalisé
-    custom_skin_pass: {
-      name: "Pass Forge de Skin de Territoire Personnalisé",
-      description:
-        "Débloque la création, l'importation illimitée d'images et l'équipement de votre propre skin de territoire en jeu",
-      priceCents: 399, // 3.99 EUR
-    },
-  };
-
-  const item = bundleDefinitions[bundleId];
+  const item = BUNDLE_DEFINITIONS[bundleId];
   if (!item) {
     return res.status(400).json({ error: "Bundle inconnu." });
   }
@@ -332,6 +334,19 @@ app.post("/api/stripe/verify-session", async (req, res) => {
       const bundleId = session.metadata?.bundleId;
       if (email && bundleId) {
         const creditRes = accountDb.creditBundle(email, bundleId);
+        const itemDef = BUNDLE_DEFINITIONS[bundleId];
+        purchaseTracker.record({
+          type: "stripe",
+          email,
+          username:
+            accountDb.getProfile(email, "")?.profile?.username ||
+            email.split("@")[0],
+          itemId: bundleId,
+          itemName: itemDef ? itemDef.name : bundleId,
+          priceEur: itemDef ? itemDef.priceCents / 100 : 0,
+          granted: creditRes.granted,
+          timestamp: Date.now(),
+        });
         return res.json({ ok: true, paid: true, granted: creditRes.granted });
       }
     }
@@ -424,11 +439,276 @@ app.post("/api/account/currency", (req, res) => {
   if (!result.ok) {
     return res.status(400).json({ ok: false, error: result.error });
   }
+
+  if (Number(deltaPlutonium) < 0 || Number(deltaCaps) < 0) {
+    const isCrate =
+      reason?.toLowerCase().includes("crate") ||
+      reason?.toLowerCase().includes("coffre");
+    const isPack = reason?.toLowerCase().includes("pack");
+    purchaseTracker.record({
+      type: isCrate ? "crate" : isPack ? "pack" : "crate",
+      email,
+      username: result.profile?.username || email.split("@")[0],
+      itemId: reason || "boutique_purchase",
+      itemName: reason || "Achat Boutique",
+      pricePlutonium: Math.abs(Number(deltaPlutonium) || 0),
+      priceCaps: Math.abs(Number(deltaCaps) || 0),
+      timestamp: Date.now(),
+    });
+  }
+
   return res.json({
     ok: true,
     profile: result.profile,
     plutonium: result.profile?.plutonium,
     caps: result.profile?.caps,
+  });
+});
+
+// Broadcast state in memory
+let activeGlobalBroadcast: {
+  text: string;
+  level: "info" | "warning" | "alert";
+  author: string;
+  expiresAt: number;
+} | null = null;
+
+// Public Broadcast query for all game clients
+app.get("/api/system/broadcast", (_req, res) => {
+  const active =
+    activeGlobalBroadcast && activeGlobalBroadcast.expiresAt > Date.now()
+      ? activeGlobalBroadcast
+      : null;
+  return res.json({ ok: true, broadcast: active });
+});
+
+// Explicit in-game purchase logging endpoint
+app.post("/api/shop/log-purchase", (req, res) => {
+  const {
+    email,
+    type,
+    itemId,
+    itemName,
+    pricePlutonium,
+    priceCaps,
+    grantedCount,
+  } = req.body || {};
+  if (email) {
+    purchaseTracker.record({
+      type: type || "crate",
+      email,
+      username: email.split("@")[0],
+      itemId: itemId || "item",
+      itemName: itemName || "Achat Boutique",
+      pricePlutonium: Number(pricePlutonium) || 0,
+      priceCaps: Number(priceCaps) || 0,
+      granted: {
+        cosmetics: grantedCount ? new Array(grantedCount).fill("drop") : [],
+      },
+      timestamp: Date.now(),
+    });
+  }
+  return res.json({ ok: true });
+});
+
+// Dedicated Administrator Authentication Guard
+function requireAdmin(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  const email = (req.body?.adminEmail ||
+    req.query?.adminEmail ||
+    req.headers["x-admin-email"] ||
+    req.headers["x-account-email"]) as string;
+  const password = (req.body?.adminPassword ||
+    req.query?.adminPassword ||
+    req.headers["x-admin-pass"] ||
+    req.headers["x-account-pass"]) as string;
+
+  if (!email) {
+    return res
+      .status(401)
+      .json({ ok: false, error: "Identifiant administrateur requis." });
+  }
+
+  if (!accountDb.isAdmin(email, password)) {
+    return res
+      .status(403)
+      .json({ ok: false, error: "Accès refusé : privilèges administrateur requis." });
+  }
+
+  next();
+}
+
+// ============================================================================
+// ADMIN PANEL BACKEND ROUTES
+// ============================================================================
+
+app.all("/api/admin/overview", requireAdmin, (_req, res) => {
+  const accounts = accountDb.getAllAccounts();
+  const stats = purchaseTracker.getStats();
+  return res.json({
+    ok: true,
+    overview: {
+      totalAccounts: accounts.length,
+      bannedCount: accounts.filter((a) => a.isBanned).length,
+      vipCount: accounts.filter((a) => a.isVip).length,
+      totalRevenueEur: stats.totalRevenueEur,
+      totalPlutoniumSpent: stats.totalPlutoniumSpent,
+      totalCapsSpent: stats.totalCapsSpent,
+      totalTransactions: stats.totalTransactions,
+      uptimeSeconds: Math.floor(process.uptime()),
+      memoryMb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+      serverTime: Date.now(),
+      activeBroadcast:
+        activeGlobalBroadcast && activeGlobalBroadcast.expiresAt > Date.now()
+          ? activeGlobalBroadcast
+          : null,
+    },
+  });
+});
+
+app.all("/api/admin/players", requireAdmin, (_req, res) => {
+  return res.json({ ok: true, players: accountDb.getAllAccounts() });
+});
+
+app.post("/api/admin/players/action", requireAdmin, (req, res) => {
+  const { action, targetEmail, payload } = req.body || {};
+  if (!targetEmail || !action) {
+    return res
+      .status(400)
+      .json({ ok: false, error: "Action et targetEmail requis." });
+  }
+
+  let result: { ok: boolean; error?: string } = {
+    ok: false,
+    error: "Action inconnue.",
+  };
+
+  if (action === "ban") {
+    result = accountDb.setPlayerBan(targetEmail, true);
+  } else if (action === "unban") {
+    result = accountDb.setPlayerBan(targetEmail, false);
+  } else if (action === "set_vip") {
+    result = accountDb.setPlayerVip(
+      targetEmail,
+      Boolean(payload?.isVip),
+      payload?.durationDays || 30,
+    );
+  } else if (action === "set_role") {
+    result = accountDb.setPlayerRole(targetEmail, payload?.role || "player");
+  } else if (action === "set_currency") {
+    result = accountDb.setPlayerCurrency(
+      targetEmail,
+      payload?.plutonium,
+      payload?.caps,
+    );
+  } else if (action === "unlock_all") {
+    result = accountDb.setPlayerUnlockAll(targetEmail);
+  } else if (action === "reset_password") {
+    result = accountDb.resetPlayerPassword(targetEmail, payload?.newPassword);
+  } else if (action === "update_stats") {
+    result = accountDb.updatePlayerStats(targetEmail, payload || {});
+  } else if (action === "delete_account") {
+    result = accountDb.deleteAccount(targetEmail);
+  }
+
+  if (!result.ok) {
+    return res.status(400).json(result);
+  }
+  return res.json({ ok: true, players: accountDb.getAllAccounts() });
+});
+
+app.all("/api/admin/purchases", requireAdmin, (_req, res) => {
+  return res.json({
+    ok: true,
+    stats: purchaseTracker.getStats(),
+    purchases: purchaseTracker.getPurchases(250),
+  });
+});
+
+app.all("/api/admin/rotation", requireAdmin, (_req, res) => {
+  return res.json({
+    ok: true,
+    rotation: playlist.getPlaylistSnapshot(),
+    allMaps: allMaps.map((m) => ({
+      type: m.type,
+      category: m.categories ? m.categories.join(", ") : "Standard",
+      multiplayerFrequency: m.multiplayerFrequency,
+      specialTeamCount: m.specialTeamCount,
+    })),
+    gameModes: ["FFA", "Team", "Duos", "Trios", "Quads", "HumansVsNations"],
+  });
+});
+
+app.post("/api/admin/rotation/set-next", requireAdmin, (req, res) => {
+  const { slot, mapType, mode } = req.body || {};
+  if (!slot || !mapType) {
+    return res
+      .status(400)
+      .json({ ok: false, error: "slot et mapType requis." });
+  }
+  const typedSlot =
+    slot === "ffa" ? "ffa" : slot === "team" ? "team" : "special";
+  const typedMode = mode === "Team" ? GameMode.Team : GameMode.FFA;
+  playlist.forceNextMap(typedSlot, mapType, typedMode);
+  return res.json({
+    ok: true,
+    message: `Prochaine carte pour ${slot} définie sur "${mapType}".`,
+    rotation: playlist.getPlaylistSnapshot(),
+  });
+});
+
+app.post("/api/admin/rotation/set-weights", requireAdmin, (req, res) => {
+  const { weights } = req.body || {};
+  if (!weights)
+    return res.status(400).json({ ok: false, error: "Poids manquants." });
+  playlist.setWeightOverrides(weights);
+  return res.json({ ok: true, rotation: playlist.getPlaylistSnapshot() });
+});
+
+app.post("/api/admin/rotation/spawn-lobby", requireAdmin, async (req, res) => {
+  const { type, map, mode, maxPlayers, modifiers } = req.body || {};
+  try {
+    const gameID = await lobbyService.spawnCustomLobby(type || "special", {
+      gameMap: map,
+      gameMode: mode === "FFA" ? GameMode.FFA : GameMode.Team,
+      maxPlayers: Number(maxPlayers) || 50,
+      publicGameModifiers: modifiers || {},
+    });
+    return res.json({ ok: true, gameID, message: "Salon lancé avec succès !" });
+  } catch (err: any) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post("/api/admin/broadcast", requireAdmin, (req, res) => {
+  const { text, level, durationMinutes, adminEmail } = req.body || {};
+  if (!text || text.trim() === "") {
+    activeGlobalBroadcast = null;
+    return res.json({
+      ok: true,
+      broadcast: null,
+      message: "Annonce retirée.",
+    });
+  }
+  activeGlobalBroadcast = {
+    text: text.trim(),
+    level:
+      level === "alert" ? "alert" : level === "warning" ? "warning" : "info",
+    author: adminEmail || "Commandement Suprême",
+    expiresAt: Date.now() + (Number(durationMinutes) || 60) * 60 * 1000,
+  };
+  return res.json({ ok: true, broadcast: activeGlobalBroadcast });
+});
+
+app.all("/api/admin/backup", requireAdmin, (_req, res) => {
+  return res.json({
+    ok: true,
+    exportedAt: new Date().toISOString(),
+    backup: accountDb.getDatabaseBackup(),
+    purchases: purchaseTracker.getPurchases(1000),
   });
 });
 

@@ -2,7 +2,9 @@ import {
   MAX_HOSTED_LOBBIES,
   PublicGameType,
   SCHEDULED_PUBLIC_GAME_TYPES,
+  ScheduledPublicGameType,
 } from "@openfront/shared/WireSchemas";
+import { GameConfig } from "@openfront/engine-api/Schemas";
 import { Worker } from "cluster";
 import winston from "winston";
 import {
@@ -467,6 +469,24 @@ export class MasterLobbyService {
         publicGameType: type,
       } satisfies MasterCreateGame);
     }
+  }
+
+  public async spawnCustomLobby(
+    type: ScheduledPublicGameType,
+    customConfig?: Partial<GameConfig>,
+  ): Promise<string> {
+    const gameID = ServerEnv.generateGameId();
+    const config = await this.playlist.gameConfig(type);
+    if (customConfig) {
+      Object.assign(config, customConfig);
+    }
+    this.sendMessageToWorker({
+      type: "createGame",
+      gameID,
+      gameConfig: config,
+      publicGameType: type,
+    } satisfies MasterCreateGame);
+    return gameID;
   }
 
   private sendMessageToWorker(msg: MasterCreateGame | MasterUpdateGame): void {
