@@ -2407,6 +2407,367 @@ export function getDirectiveCurrentValue(
 }
 
 // ============================================================================
+// 4.1 SYSTÈME DE DIRECTIVES DU JOUR DU QG (DAILY HQ DIRECTIVES - 3 OBJECTIFS EXPONENTIELS)
+// ============================================================================
+
+export type DailyDirectiveCategory =
+  | "tiles"
+  | "wins"
+  | "gold"
+  | "troops"
+  | "megastructures"
+  | "defense"
+  | "events"
+  | "games";
+
+export interface DailyDirectiveTemplate {
+  id: string;
+  tier: 1 | 2 | 3;
+  category: DailyDirectiveCategory;
+  title: string;
+  icon: string;
+  description: string;
+  target: number;
+  rewardCaps: number;
+  rewardXp: number;
+}
+
+export interface ActiveDailyDirective extends DailyDirectiveTemplate {
+  progress: number;
+  completed: boolean;
+  claimed: boolean;
+}
+
+export interface DailyDirectivesProgress {
+  date: string; // "YYYY-MM-DD"
+  directives: ActiveDailyDirective[];
+  allCompletedBonusClaimed: boolean;
+}
+
+export const DAILY_DIRECTIVES_ALL_CLEAR_BONUS = {
+  plutonium: 1,
+  caps: 25,
+  xp: 45,
+};
+
+// POOL TIER 1 : OBJECTIFS ACCESSIBLES / ÉCHAUFFEMENT (10 Caps, 15 XP)
+export const DAILY_DIRECTIVES_POOL_TIER_1: DailyDirectiveTemplate[] = [
+  {
+    id: "d1_tiles",
+    tier: 1,
+    category: "tiles",
+    title: "Reconnaissance de Front",
+    icon: "🗺️",
+    description: "Conquérir au moins 200 cases de territoire en une partie.",
+    target: 200,
+    rewardCaps: 10,
+    rewardXp: 15,
+  },
+  {
+    id: "d1_wins",
+    tier: 1,
+    category: "wins",
+    title: "Baptême du Feu",
+    icon: "⚔️",
+    description: "Remporter 1 victoire militaire sur les fronts.",
+    target: 1,
+    rewardCaps: 10,
+    rewardXp: 15,
+  },
+  {
+    id: "d1_gold",
+    tier: 1,
+    category: "gold",
+    title: "Ravitaillement Rapide",
+    icon: "💰",
+    description: "Amasser 80 000 Or en réserve au cours d'une partie.",
+    target: 80_000,
+    rewardCaps: 10,
+    rewardXp: 15,
+  },
+  {
+    id: "d1_troops",
+    tier: 1,
+    category: "troops",
+    title: "Mobilisation Initiale",
+    icon: "👥",
+    description: "Mobiliser au moins 80 000 troupes sous vos ordres.",
+    target: 80_000,
+    rewardCaps: 10,
+    rewardXp: 15,
+  },
+  {
+    id: "d1_cities",
+    tier: 1,
+    category: "megastructures",
+    title: "Implantation Urbaine",
+    icon: "🏙️",
+    description: "Posséder au moins 3 niveaux de Villes ou Ports en une partie.",
+    target: 3,
+    rewardCaps: 10,
+    rewardXp: 15,
+  },
+  {
+    id: "d1_defense",
+    tier: 1,
+    category: "defense",
+    title: "Sentinelle du Secteur",
+    icon: "🛡️",
+    description: "Construire 3 Postes de Défense ou tourelles SAM.",
+    target: 3,
+    rewardCaps: 10,
+    rewardXp: 15,
+  },
+  {
+    id: "d1_events",
+    tier: 1,
+    category: "events",
+    title: "Épreuve du Feu",
+    icon: "🌪️",
+    description: "Survivre à 1 Événement Mondial en cours de partie.",
+    target: 1,
+    rewardCaps: 10,
+    rewardXp: 15,
+  },
+  {
+    id: "d1_games",
+    tier: 1,
+    category: "games",
+    title: "Engagement au Front",
+    icon: "🎖️",
+    description: "Disputer 2 batailles complètes aujourd'hui.",
+    target: 2,
+    rewardCaps: 10,
+    rewardXp: 15,
+  },
+];
+
+// POOL TIER 2 : OPÉRATIONS STRATÉGIQUES INTERMÉDIAIRES (~3.5x à 4x) (20 Caps, 30 XP)
+export const DAILY_DIRECTIVES_POOL_TIER_2: DailyDirectiveTemplate[] = [
+  {
+    id: "d2_tiles",
+    tier: 2,
+    category: "tiles",
+    title: "Percée Opérationnelle",
+    icon: "🗺️",
+    description: "Conquérir au moins 800 cases de territoire en une partie.",
+    target: 800,
+    rewardCaps: 20,
+    rewardXp: 30,
+  },
+  {
+    id: "d2_wins",
+    tier: 2,
+    category: "wins",
+    title: "Campagne Triomphale",
+    icon: "🏆",
+    description: "Triompher dans 3 victoires de guerre aujourd'hui.",
+    target: 3,
+    rewardCaps: 20,
+    rewardXp: 30,
+  },
+  {
+    id: "d2_gold",
+    tier: 2,
+    category: "gold",
+    title: "Trésor de Campagne",
+    icon: "💰",
+    description: "Amasser 350 000 Or dans vos réserves d'état-major.",
+    target: 350_000,
+    rewardCaps: 20,
+    rewardXp: 30,
+  },
+  {
+    id: "d2_troops",
+    tier: 2,
+    category: "troops",
+    title: "Division Blindée",
+    icon: "👥",
+    description: "Mobiliser au moins 350 000 troupes actives.",
+    target: 350_000,
+    rewardCaps: 20,
+    rewardXp: 30,
+  },
+  {
+    id: "d2_megas",
+    tier: 2,
+    category: "megastructures",
+    title: "Complexe Continental",
+    icon: "🏛️",
+    description: "Activer au moins 1 Mégastructure mondiale en cours de partie.",
+    target: 1,
+    rewardCaps: 20,
+    rewardXp: 30,
+  },
+  {
+    id: "d2_defense",
+    tier: 2,
+    category: "defense",
+    title: "Ligne Fortifiée",
+    icon: "🧱",
+    description: "Déployer 8 Postes de Défense ou tourelles SAM.",
+    target: 8,
+    rewardCaps: 20,
+    rewardXp: 30,
+  },
+  {
+    id: "d2_events",
+    tier: 2,
+    category: "events",
+    title: "Résilience Géopolitique",
+    icon: "🌋",
+    description: "Traverser avec succès 3 Événements Mondiaux.",
+    target: 3,
+    rewardCaps: 20,
+    rewardXp: 30,
+  },
+  {
+    id: "d2_games",
+    tier: 2,
+    category: "games",
+    title: "Vétérance Opérationnelle",
+    icon: "🪖",
+    description: "Participer à 4 batailles complètes aujourd'hui.",
+    target: 4,
+    rewardCaps: 20,
+    rewardXp: 30,
+  },
+];
+
+// POOL TIER 3 : DIRECTIVES SUPRÊMES & DÉFIS EXPONENTIELS (~12x à 15x) (35 Caps, 55 XP)
+export const DAILY_DIRECTIVES_POOL_TIER_3: DailyDirectiveTemplate[] = [
+  {
+    id: "d3_tiles",
+    tier: 3,
+    category: "tiles",
+    title: "Hégémonie Mondiale",
+    icon: "🪐",
+    description: "Contrôler un empire gigantesque de 2 500 cases de territoire.",
+    target: 2_500,
+    rewardCaps: 35,
+    rewardXp: 55,
+  },
+  {
+    id: "d3_wins",
+    tier: 3,
+    category: "wins",
+    title: "Imperator du Jour",
+    icon: "👑",
+    description: "Enchaîner 5 victoires militaires écrasantes aujourd'hui.",
+    target: 5,
+    rewardCaps: 35,
+    rewardXp: 55,
+  },
+  {
+    id: "d3_gold",
+    tier: 3,
+    category: "gold",
+    title: "Coffre-Fort Impérial",
+    icon: "🏦",
+    description: "Accumuler 1 200 000 Or en réserve au cours d'une partie.",
+    target: 1_200_000,
+    rewardCaps: 35,
+    rewardXp: 55,
+  },
+  {
+    id: "d3_troops",
+    tier: 3,
+    category: "troops",
+    title: "Légion Titanesque",
+    icon: "🦾",
+    description: "Dépasser 1 200 000 troupes sous les drapeaux en temps réel.",
+    target: 1_200_000,
+    rewardCaps: 35,
+    rewardXp: 55,
+  },
+  {
+    id: "d3_megas",
+    tier: 3,
+    category: "megastructures",
+    title: "Monopole des Merveilles",
+    icon: "🌌",
+    description: "Activer au moins 2 Mégastructures mondiales simultanément.",
+    target: 2,
+    rewardCaps: 35,
+    rewardXp: 55,
+  },
+  {
+    id: "d3_defense",
+    tier: 3,
+    category: "defense",
+    title: "Bastion Imprenable",
+    icon: "🏰",
+    description: "Bâtir un réseau hermétique de 16 Postes de Défense et SAM.",
+    target: 16,
+    rewardCaps: 35,
+    rewardXp: 55,
+  },
+  {
+    id: "d3_events",
+    tier: 3,
+    category: "events",
+    title: "Calvaire Cataclysmique",
+    icon: "☢️",
+    description: "Survivre à 7 Événements Mondiaux majeurs sans capituler.",
+    target: 7,
+    rewardCaps: 35,
+    rewardXp: 55,
+  },
+  {
+    id: "d3_games",
+    tier: 3,
+    category: "games",
+    title: "Maître de Guerre Inlassable",
+    icon: "🗿",
+    description: "Combattre dans 7 parties de guerre aujourd'hui.",
+    target: 7,
+    rewardCaps: 35,
+    rewardXp: 55,
+  },
+];
+
+export function getDailyDirectivesSeed(dateStr: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < dateStr.length; i++) {
+    hash ^= dateStr.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+export function generateDailyDirectives(dateStr: string): ActiveDailyDirective[] {
+  const seed = getDailyDirectivesSeed(dateStr);
+  const t1 = DAILY_DIRECTIVES_POOL_TIER_1[seed % DAILY_DIRECTIVES_POOL_TIER_1.length];
+
+  let t2Idx = (seed >>> 8) % DAILY_DIRECTIVES_POOL_TIER_2.length;
+  if (DAILY_DIRECTIVES_POOL_TIER_2[t2Idx].category === t1.category) {
+    t2Idx = (t2Idx + 1) % DAILY_DIRECTIVES_POOL_TIER_2.length;
+  }
+  const t2 = DAILY_DIRECTIVES_POOL_TIER_2[t2Idx];
+
+  let t3Idx = (seed >>> 16) % DAILY_DIRECTIVES_POOL_TIER_3.length;
+  if (
+    DAILY_DIRECTIVES_POOL_TIER_3[t3Idx].category === t1.category ||
+    DAILY_DIRECTIVES_POOL_TIER_3[t3Idx].category === t2.category
+  ) {
+    t3Idx = (t3Idx + 1) % DAILY_DIRECTIVES_POOL_TIER_3.length;
+    if (
+      DAILY_DIRECTIVES_POOL_TIER_3[t3Idx].category === t1.category ||
+      DAILY_DIRECTIVES_POOL_TIER_3[t3Idx].category === t2.category
+    ) {
+      t3Idx = (t3Idx + 1) % DAILY_DIRECTIVES_POOL_TIER_3.length;
+    }
+  }
+  const t3 = DAILY_DIRECTIVES_POOL_TIER_3[t3Idx];
+
+  return [
+    { ...t1, progress: 0, completed: false, claimed: false },
+    { ...t2, progress: 0, completed: false, claimed: false },
+    { ...t3, progress: 0, completed: false, claimed: false },
+  ];
+}
+
+// ============================================================================
 // 5. SYSTÈME DE MÉDAILLES DE GUERRE & HAUTS FAITS (ACHIEVEMENTS)
 // ============================================================================
 

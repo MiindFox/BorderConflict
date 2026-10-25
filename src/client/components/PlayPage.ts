@@ -20,6 +20,7 @@ import "../UsernameInput";
 @customElement("play-page")
 export class PlayPage extends LitElement {
   @state() private commanderProfile = commanderStore.getProfile();
+  private _resetTimerInterval: number | null = null;
 
   private onCommanderUpdated = () => {
     this.commanderProfile = commanderStore.getProfile();
@@ -32,6 +33,9 @@ export class PlayPage extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener(COMMANDER_UPDATED_EVENT, this.onCommanderUpdated);
+    this._resetTimerInterval = window.setInterval(() => {
+      this.requestUpdate();
+    }, 30_000);
   }
 
   disconnectedCallback() {
@@ -40,6 +44,10 @@ export class PlayPage extends LitElement {
       COMMANDER_UPDATED_EVENT,
       this.onCommanderUpdated,
     );
+    if (this._resetTimerInterval !== null) {
+      clearInterval(this._resetTimerInterval);
+      this._resetTimerInterval = null;
+    }
   }
 
   /**
@@ -175,32 +183,204 @@ export class PlayPage extends LitElement {
           </div>
         </div>
 
-        <!-- Secret Directive du Jour (Manila Clipboard Folder) -->
+        <!-- 3 Directives du Jour QG (Dossier Militaire Manila avec Objectifs Exponentiels) -->
+        ${this.renderDailyDirectivesDossier()}
+      </div>
+    `;
+  }
+
+  private renderDailyDirectivesDossier() {
+    const daily = commanderStore.getDailyDirectives();
+    const directives = daily.directives;
+    const completedCount = directives.filter((d) => d.completed).length;
+    const resetTime = commanderStore.getTimeUntilDailyReset().formatted;
+    const allDone = completedCount === 3;
+
+    return html`
+      <div
+        class="retro-dossier relative p-2.5 sm:p-3 rounded-xl flex flex-col gap-2 shadow-xl border-2 border-[#9c7c4c] select-none"
+      >
+        <!-- Top Heavy Military Binder Clip -->
         <div
-          class="retro-dossier relative p-2.5 rounded-lg flex flex-col gap-1 shadow-md border border-[#9c7c4c]"
+          class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-16 h-3 bg-gradient-to-r from-zinc-500 via-zinc-200 to-zinc-500 rounded-xs border border-zinc-700 shadow-md flex items-center justify-center"
         >
-          <!-- Top Metal Binder Clip -->
-          <div
-            class="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-2.5 bg-gradient-to-r from-zinc-400 via-zinc-200 to-zinc-400 rounded-xs border border-zinc-600 shadow"
-          ></div>
-          <div class="flex items-center justify-between pt-0.5">
+          <div class="w-8 h-0.5 bg-zinc-600/70 rounded-full"></div>
+        </div>
+
+        <!-- Header: Title + Countdown + Counter Badge -->
+        <div
+          class="flex items-center justify-between pt-1 border-b border-[#9c7c4c]/40 pb-1.5"
+        >
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="text-xs">🎯</span>
             <span
-              class="font-pixel text-[8.5px] font-black text-[#292524] uppercase tracking-wider flex items-center gap-1"
+              class="font-pixel text-[8.5px] sm:text-[9.5px] font-black text-[#241a0e] uppercase tracking-wider truncate"
             >
-              <span>🎯</span>
-              <span>DIRECTIVE DU JOUR</span>
-            </span>
-            <span
-              class="px-1.5 py-0.2 rounded bg-red-600 border border-red-800 text-white font-pixel text-[8px] font-black animate-pulse shadow"
-            >
-              +100 💎 / +250 XP
+              DIRECTIVES DU JOUR QG
             </span>
           </div>
-          <p
-            class="font-terminal text-[11px] text-[#292524] font-bold leading-tight"
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span
+              class="font-mono text-[8.5px] text-[#5c4627] font-bold tracking-tight bg-[#d9c29c]/50 px-1.5 py-0.5 rounded border border-[#9c7c4c]/50"
+              title="Réinitialisation quotidienne à minuit UTC"
+            >
+              ⏱️ ${resetTime}
+            </span>
+            <span
+              class="px-2 py-0.5 rounded font-pixel text-[8px] font-black uppercase ${allDone
+                ? "bg-emerald-700 text-emerald-100 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                : "bg-[#3d2b17] text-amber-200"}"
+            >
+              ${completedCount}/3
+            </span>
+          </div>
+        </div>
+
+        <!-- The 3 Exponential Daily Directives -->
+        <div class="flex flex-col gap-1.5">
+          ${directives.map((d) => {
+            const pct = Math.min(
+              100,
+              Math.floor((d.progress / d.target) * 100),
+            );
+            const tierBadge =
+              d.tier === 1
+                ? {
+                    label: "NIV. 1 · ÉCHAUFFEMENT",
+                    bg: "bg-sky-800/80 text-sky-100 border-sky-600",
+                  }
+                : d.tier === 2
+                  ? {
+                      label: "NIV. 2 · STRATÉGIQUE",
+                      bg: "bg-amber-700/80 text-amber-100 border-amber-600",
+                    }
+                  : {
+                      label: "NIV. 3 · EXPONENTIEL",
+                      bg: "bg-rose-900/90 text-rose-100 border-rose-600",
+                    };
+
+            return html`
+              <div
+                class="rounded-lg border p-1.5 sm:p-2 flex flex-col gap-1 transition-all ${d.completed
+                  ? "bg-[#32452b]/15 border-emerald-700/60 shadow-sm"
+                  : "bg-[#edd6b1]/60 border-[#ab8b5c]/70 hover:border-[#805e32]"}"
+              >
+                <!-- Line 1: Tier Pill & Rewards -->
+                <div class="flex items-center justify-between gap-1">
+                  <span
+                    class="px-1.5 py-0.2 rounded text-[7px] sm:text-[7.5px] font-pixel font-bold uppercase border ${tierBadge.bg}"
+                  >
+                    ${tierBadge.label}
+                  </span>
+                  <div class="flex items-center gap-1">
+                    <span
+                      class="px-1.5 py-0.2 rounded bg-[#2e1d0f] text-amber-300 font-pixel text-[8px] font-black shadow-inner flex items-center gap-1"
+                      title="Capsules de Territoire"
+                    >
+                      <span>+${d.rewardCaps}</span>
+                      <span>🍾</span>
+                    </span>
+                    <span
+                      class="px-1.5 py-0.2 rounded bg-[#1e2e1a] text-emerald-300 font-pixel text-[8px] font-black shadow-inner"
+                      title="XP Tactique"
+                    >
+                      +${d.rewardXp} XP
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Line 2: Title & Description -->
+                <div class="min-w-0">
+                  <div
+                    class="font-terminal text-[11px] font-bold text-[#1f170e] flex items-center gap-1.5"
+                  >
+                    <span>${d.icon}</span>
+                    <span class="truncate">${d.title}</span>
+                  </div>
+                  <p
+                    class="font-terminal text-[10px] text-[#42311f] leading-snug"
+                  >
+                    ${d.description}
+                  </p>
+                </div>
+
+                <!-- Line 3: Progress Bar & Status -->
+                <div class="flex items-center gap-2 pt-0.5">
+                  <div
+                    class="flex-1 h-2 rounded bg-[#2a1d0f]/20 border border-[#8a6b3f]/60 overflow-hidden p-0.2"
+                  >
+                    <div
+                      class="h-full rounded-xs transition-all duration-500 ${d.completed
+                        ? "bg-gradient-to-r from-emerald-600 to-green-400"
+                        : "bg-gradient-to-r from-amber-600 to-amber-400"}"
+                      style="width: ${pct}%"
+                    ></div>
+                  </div>
+                  <span
+                    class="font-pixel text-[7.5px] sm:text-[8px] shrink-0 font-bold ${d.completed
+                      ? "text-emerald-800 font-black"
+                      : "text-[#3b2915]"}"
+                  >
+                    ${d.completed
+                      ? "✓ VALIDÉE"
+                      : `${d.progress.toLocaleString("fr-FR")} / ${d.target.toLocaleString("fr-FR")}`}
+                  </span>
+                </div>
+              </div>
+            `;
+          })}
+        </div>
+
+        <!-- Grand Chelem QG Bonus Box (Si les 3 sont faites -> +1 Plutonium) -->
+        <div
+          class="rounded-lg p-2 flex flex-col gap-0.5 border-2 transition-all ${allDone
+            ? "bg-gradient-to-r from-[#17301c] to-[#204026] border-emerald-400 text-emerald-200 shadow-[0_0_12px_rgba(16,185,129,0.4)]"
+            : "bg-[#2b1f13] border-[#7d5e38] text-amber-200"}"
+        >
+          <div class="flex items-center justify-between">
+            <span
+              class="font-pixel text-[8px] sm:text-[8.5px] font-black uppercase tracking-wider flex items-center gap-1.5 ${allDone
+                ? "text-emerald-300 animate-pulse"
+                : "text-amber-300"}"
+            >
+              <span>${allDone ? "🏆" : "🌟"}</span>
+              <span>BONUS GRAND CHELEM (3/3)</span>
+            </span>
+            <span
+              class="px-1.5 py-0.2 rounded text-[7.5px] font-pixel font-black ${allDone
+                ? "bg-emerald-500 text-black shadow"
+                : "bg-black/40 text-amber-400 border border-amber-500/30"}"
+            >
+              ${allDone ? "ACCORDÉ !" : `${completedCount}/3`}
+            </span>
+          </div>
+
+          <div
+            class="flex items-center justify-between text-[9px] font-terminal pt-0.5"
           >
-            Conquérir 10 capitales mondiales ou éliminer 3 nations ennemies.
-          </p>
+            <span
+              class="${allDone
+                ? "text-emerald-100 font-bold"
+                : "text-[#c2ab87]"}"
+            >
+              ${allDone
+                ? "Récompense suprême décernée au dossier !"
+                : "Accomplissez les 3 directives :"}
+            </span>
+            <div
+              class="flex items-center gap-1.5 font-pixel text-[8.5px] font-bold"
+            >
+              <span class="text-green-400 flex items-center gap-0.5">
+                <span>+1</span>
+                <plutonium-icon .size=${12}></plutonium-icon>
+              </span>
+              <span class="text-amber-300 flex items-center gap-0.5">
+                <span>+25</span>
+                <span>🍾</span>
+              </span>
+              <span class="text-emerald-300">+45 XP</span>
+            </div>
+          </div>
         </div>
       </div>
     `;

@@ -1,5 +1,9 @@
 import {
+  ActiveDailyDirective,
   computeDoctrineModifiers,
+  DAILY_DIRECTIVES_ALL_CLEAR_BONUS,
+  DailyDirectivesProgress,
+  generateDailyDirectives,
   getActiveMegastructures,
   getTalentRankFromMask,
   getTotalSpentPointsInMask,
@@ -16,6 +20,7 @@ import {
   getHexaFrontCosmeticsCatalog,
   HEXAFRONT_COSMETIC_LABELS,
 } from "./HexaFrontCosmeticsCatalog";
+import { showToast } from "./Utils";
 
 const STORAGE_KEY = "hexafront_commander_profile_v2";
 const ACCOUNTS_STORAGE_KEY = "hexafront_email_accounts_v2";
@@ -38,6 +43,7 @@ export interface CommanderProfile {
   plutonium: number;
   caps: number;
   prestige?: number;
+  dailyDirectives?: DailyDirectivesProgress;
   ownedFlares: string[];
   isVip?: boolean;
   vipUntil?: number;
@@ -134,6 +140,7 @@ class CommanderStore {
   constructor() {
     this.profile = this.load();
     this.checkCareerMedals();
+    this.getDailyDirectives();
     if (typeof window !== "undefined") {
       setTimeout(() => {
         this.syncWithServerInBackground();
@@ -202,6 +209,10 @@ class CommanderStore {
         plutonium: Math.max(0, parsed.plutonium ?? DEFAULT_PROFILE.plutonium),
         caps: Math.max(0, parsed.caps ?? DEFAULT_PROFILE.caps),
         prestige: Math.max(0, parsed.prestige ?? 0),
+        dailyDirectives:
+          parsed.dailyDirectives && typeof parsed.dailyDirectives === "object"
+            ? parsed.dailyDirectives
+            : undefined,
         ownedFlares: Array.isArray(parsed.ownedFlares)
           ? parsed.ownedFlares
           : [],
@@ -851,6 +862,8 @@ class CommanderStore {
       clanTag: null,
     };
     this.saveGameToHistory(newGame);
+    this.updateDailyDirectivesProgress({ won, games: 1 });
+    this.checkCareerMedals();
 
     return { xpGained, leveledUp: res.leveledUp };
   }
@@ -954,6 +967,7 @@ class CommanderStore {
     this.sendCurrencyDelta(0, 2, "world_event_survived");
     this.addXp(4);
     this.checkCareerMedals();
+    this.updateDailyDirectivesProgress({ events: 1 });
   }
 
   recordDirectiveCompleted(xpReward: number = 25): void {
@@ -962,6 +976,150 @@ class CommanderStore {
     this.sendCurrencyDelta(0, 3, "directive_completed");
     this.addXp(Math.min(xpReward, 6));
     this.checkCareerMedals();
+  }
+
+  getTodayDateString(): string {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  getDailyDirectives(): DailyDirectivesProgress {
+    const today = this.getTodayDateString();
+    if (
+      !this.profile.dailyDirectives ||
+      this.profile.dailyDirectives.date !== today ||
+      !Array.isArray(this.profile.dailyDirectives.directives) ||
+      this.profile.dailyDirectives.directives.length !== 3
+    ) {
+      this.profile.dailyDirectives = {
+        date: today,
+        directives: generateDailyDirectives(today),
+        allCompletedBonusClaimed: false,
+      };
+      this.saveLocalAndBroadcast();
+    }
+    return this.profile.dailyDirectives;
+  }
+
+  updateDailyDirectivesProgress(stats: {
+    tiles?: number;
+    gold?: number;
+    troops?: number;
+    won?: boolean;
+    cities?: number;
+    megas?: number;
+    defenses?: number;
+    events?: number;
+    games?: number;
+  }): { completedDirectives: ActiveDailyDirective[]; allCompleted: boolean } {
+    const daily = this.getDailyDirectives();
+    const newlyCompleted: ActiveDailyDirective[] = [];
+
+    for (const d of daily.directives) {
+      if (d.completed) continue;
+
+      let newProgress = d.progress;
+      switch (d.category) {
+        case "tiles":
+          if (typeof stats.tiles === "number") {
+            newProgress = Math.max(newProgress, stats.tiles);
+          }
+          break;
+        case "gold":
+          if (typeof stats.gold === "number") {
+            newProgress = Math.max(newProgress, stats.gold);
+          }
+          break;
+        case "troops":
+          if (typeof stats.troops === "number") {
+            newProgress = Math.max(newProgress, stats.troops);
+          }
+          break;
+        case "megastructures":
+          if (typeof stats.megas === "number") {
+            newProgress = Math.max(newProgress, stats.megas);
+          } else if (typeof stats.cities === "number") {
+            newProgress = Math.max(newProgress, stats.cities);
+          }
+          break;
+        case "defense":
+          if (typeof stats.defenses === "number") {
+            newProgress = Math.max(newProgress, stats.defenses);
+          }
+          break;
+        case "wins":
+          if (stats.won) {
+            newProgress += 1;
+          }
+          break;
+        case "events":
+          if (typeof stats.events === "number") {
+            newProgress += stats.events;
+          }
+          break;
+        case "games":
+          if (typeof stats.games === "number") {
+            newProgress += stats.games;
+          }
+          break;
+      }
+
+      d.progress = Math.min(d.target, newProgress);
+
+      if (d.progress >= d.target && !d.completed) {
+        d.completed = true;
+        d.claimed = true;
+        this.profile.caps += d.rewardCaps;
+        this.addXp(d.rewardXp);
+        this.profile.directivesCompleted++;
+        this.sendCurrencyDelta(0, d.rewardCaps, `daily_directive_${d.tier}`);
+        newlyCompleted.push(d);
+        if (typeof window !== "undefined") {
+          showToast(
+            `🎯 DIRECTIVE DU JOUR VALIDÉE : ${d.title} (+${d.rewardCaps} 🍾 Capsules, +${d.rewardXp} XP) !`,
+            "green",
+            3500,
+          );
+        }
+      }
+    }
+
+    const allCompleted = daily.directives.every((d) => d.completed);
+    if (allCompleted && !daily.allCompletedBonusClaimed) {
+      daily.allCompletedBonusClaimed = true;
+      const b = DAILY_DIRECTIVES_ALL_CLEAR_BONUS;
+      this.profile.plutonium += b.plutonium;
+      this.profile.caps += b.caps;
+      this.addXp(b.xp);
+      this.sendCurrencyDelta(
+        b.plutonium,
+        b.caps,
+        "daily_directives_all_completed_bonus",
+      );
+      if (typeof window !== "undefined") {
+        showToast(
+          `🌟 GRAND CHELEM DU JOUR ! 3/3 Directives terminées (+${b.plutonium} ☢️ Plutonium, +${b.caps} 🍾 Capsules, +${b.xp} XP) !`,
+          "green",
+          5000,
+        );
+      }
+    }
+
+    this.checkCareerMedals();
+    this.saveLocalAndBroadcast();
+
+    return { completedDirectives: newlyCompleted, allCompleted };
+  }
+
+  getTimeUntilDailyReset(): { hours: number; minutes: number; formatted: string } {
+    const now = new Date();
+    const midnight = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0),
+    );
+    const diffMs = Math.max(0, midnight.getTime() - now.getTime());
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const formatted = `${hours.toString().padStart(2, "0")}h ${minutes.toString().padStart(2, "0")}m`;
+    return { hours, minutes, formatted };
   }
 
   addCurrency(

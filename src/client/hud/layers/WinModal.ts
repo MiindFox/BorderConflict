@@ -853,6 +853,16 @@ export class WinModal extends LitElement implements Controller {
         this.isWin,
         this.peakCounts,
       );
+      commanderStore.updateDailyDirectivesProgress({
+        tiles: this.peakCounts.tilesOwned,
+        gold: this.peakCounts.gold,
+        troops: this.peakCounts.troops,
+        won: this.isWin,
+        cities: this.peakCounts.cities,
+        megas: getActiveMegastructures(this.peakCounts).length,
+        defenses: this.peakCounts.defensesAndSam,
+        games: 1,
+      });
       const medalBonusXp = unlocked.reduce((acc, m) => acc + m.xpBonus, 0);
       this.newlyUnlockedMedals = unlocked;
       this.commanderXpEarned = res.xpGained + medalBonusXp;
