@@ -158,6 +158,26 @@ app.get(
   },
 );
 
+// Android TWA Digital Asset Links (removes URL bar in Android app)
+app.get("/.well-known/assetlinks.json", (_req, res) => {
+  res.type("application/json");
+  res.sendFile(
+    path.join(__dirname, "../../assetlinks.json"),
+    { dotfiles: "allow", maxAge: "1d" },
+    (err) => {
+      if (err && !res.headersSent) res.status(404).end();
+    },
+  );
+});
+
+// Direct APK download route for mobile testing
+app.get(["/apk", "/download/apk", "/BorderConflict.apk"], (_req, res) => {
+  const apkPath = path.join(__dirname, "../../BorderConflict.apk");
+  res.download(apkPath, "BorderConflict.apk", (err) => {
+    if (err && !res.headersSent) res.status(404).send("APK not found");
+  });
+});
+
 import Stripe from "stripe";
 import { accountDb } from "./AccountDatabase";
 

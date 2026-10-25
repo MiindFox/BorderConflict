@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "cloud.borderconflict.twa",
+        "sha256_cert_fingerprints": ["21:A1:D5:DF:7D:26:80:59:04:BB:92:72:22:02:5F:3C:7A:E7:96:E1:E7:1F:F4:44:B3:F5:CF:39:5B:EB:3A:9A"]
+      }
+    }]
