@@ -32,12 +32,22 @@ export class DoctrinesModal extends BaseModal {
     this.profile = commanderStore.getProfile();
   };
 
+  private handleOpenMedalsTab = () => {
+    this.currentView = "medals";
+  };
+
+  private handleOpenTalentsTab = () => {
+    this.currentView = "doctrines";
+  };
+
   override connectedCallback() {
     super.connectedCallback();
     window.addEventListener(
       COMMANDER_UPDATED_EVENT,
       this.handleCommanderUpdated,
     );
+    window.addEventListener("open-medals-tab", this.handleOpenMedalsTab);
+    window.addEventListener("open-talents-tab", this.handleOpenTalentsTab);
   }
 
   override disconnectedCallback() {
@@ -46,11 +56,13 @@ export class DoctrinesModal extends BaseModal {
       COMMANDER_UPDATED_EVENT,
       this.handleCommanderUpdated,
     );
+    window.removeEventListener("open-medals-tab", this.handleOpenMedalsTab);
+    window.removeEventListener("open-talents-tab", this.handleOpenTalentsTab);
   }
 
   protected override renderHeaderSlot() {
     return modalHeader({
-      title: "DOCTRINES TACTIQUES & ÉVÉNEMENTS MONDIAUX",
+      title: "TALENTS TACTIQUES & MÉDAILLES DE GUERRE",
       onBack: () => this.close(),
       ariaLabel: "Retour",
     });
@@ -72,7 +84,7 @@ export class DoctrinesModal extends BaseModal {
     const res = commanderStore.addXp(550);
     if (res.leveledUp) {
       showToast(
-        `🎉 Promotion ! Niveau ${res.newLevel} atteint (+1 Point de Doctrine)`,
+        `🎉 Promotion ! Niveau ${res.newLevel} atteint (+1 Point de Talent)`,
         "green",
         2500,
       );
@@ -83,7 +95,7 @@ export class DoctrinesModal extends BaseModal {
 
   private handleResetTalents() {
     commanderStore.resetTalents();
-    showToast("🔄 Arbre des Doctrines réinitialisé !", "green", 2000);
+    showToast("🔄 Arbre des Talents réinitialisé !", "green", 2000);
   }
 
   private handlePreset(branch: DoctrineBranchId) {
@@ -138,7 +150,7 @@ export class DoctrinesModal extends BaseModal {
                 <h2
                   class="mt-1 text-base sm:text-lg font-mono font-bold tracking-tight text-white"
                 >
-                  QUARTIER GÉNÉRAL DES DOCTRINES
+                  CENTRE DE COMMANDEMENT DES TALENTS
                 </h2>
                 <div class="mt-2 w-full max-w-md">
                   <div
@@ -163,7 +175,7 @@ export class DoctrinesModal extends BaseModal {
               </div>
             </div>
 
-            <!-- Right: Doctrine Points & Actions -->
+            <!-- Right: Talent Points & Actions -->
             <div class="flex flex-wrap items-center gap-3">
               <div
                 class="flex items-center gap-3 rounded-lg border-2 border-amber-500/40 bg-[#211a0a] px-3.5 py-2 shadow-inner"
@@ -173,7 +185,7 @@ export class DoctrinesModal extends BaseModal {
                   <div
                     class="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400"
                   >
-                    POINTS DE DOCTRINE
+                    POINTS DE TALENT
                   </div>
                   <div class="text-base font-mono font-bold text-white">
                     <span class="text-amber-300">${availablePoints}</span>
@@ -747,58 +759,87 @@ export class DoctrinesModal extends BaseModal {
             ${MEDAL_DEFINITIONS.map((medal) => {
               const unlocked = p.unlockedMedals.includes(medal.id);
               const equipped = p.equippedMedal === medal.id;
+              const isSecretLocked = medal.secret && !unlocked;
+
+              const displayIcon = isSecretLocked ? "🔒" : medal.icon;
+              const displayName = isSecretLocked ? "OPÉRATION CLASSIFIÉE" : medal.name;
+              const displayRarity = isSecretLocked ? "SECRET DÉFENSE" : medal.rarity;
+              const displayRarityColor = isSecretLocked ? "#f43f5e" : medal.rarityColor;
+              const displayXp = isSecretLocked ? "+??? XP" : `+${medal.xpBonus} XP`;
+              const displayDesc = isSecretLocked
+                ? "Dossier confidentiel QG. Remplissez des conditions secrètes héroïques au combat pour déclassifier ce haut fait."
+                : medal.description;
+
               return html`
                 <div
                   class="rounded-xl border-2 p-3 transition-all flex flex-col justify-between ${equipped
                     ? "border-amber-400 bg-[#242111] shadow-[0_0_15px_rgba(245,158,11,0.3)]"
-                    : unlocked
-                      ? "border-[#2b3a2d] bg-[#141d16] hover:border-[#4ade80]/50"
-                      : "border-[#1e271f] bg-[#0f1510] opacity-50"}"
+                    : isSecretLocked
+                      ? "border-red-900/50 bg-[#170a0a] hover:border-red-500/50 shadow-inner"
+                      : unlocked
+                        ? "border-[#2b3a2d] bg-[#141d16] hover:border-[#4ade80]/50"
+                        : "border-[#1e271f] bg-[#0f1510] opacity-50"}"
                 >
                   <div>
                     <div class="flex items-start justify-between gap-2">
                       <div class="flex items-center gap-2.5 min-w-0 flex-1">
                         <div
-                          class="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[#2b3a2d] bg-[#0c120d] text-2xl"
+                          class="flex h-10 w-10 shrink-0 items-center justify-center rounded border ${isSecretLocked
+                            ? "border-red-900/60 bg-[#250d0d] text-red-400 text-xl"
+                            : "border-[#2b3a2d] bg-[#0c120d] text-2xl"}"
                         >
-                          ${medal.icon}
+                          ${displayIcon}
                         </div>
                         <div class="min-w-0 flex-1">
                           <span
                             class="text-[10px] font-mono font-bold uppercase tracking-wider"
-                            style="color: ${medal.rarityColor}"
+                            style="color: ${displayRarityColor}"
                           >
-                            ● ${medal.rarity}
+                            ● ${displayRarity}
                           </span>
                           <div
-                            class="text-xs sm:text-[13px] font-mono font-bold text-white break-words"
+                            class="text-xs sm:text-[13px] font-mono font-bold ${isSecretLocked
+                              ? "text-red-300 tracking-wider"
+                              : "text-white"} break-words"
                           >
-                            ${medal.name}
+                            ${displayName}
                           </div>
                         </div>
                       </div>
                       <span
-                        class="shrink-0 rounded bg-[#1a291d] border border-[#22c55e]/30 px-2 py-0.5 text-[10px] font-mono font-bold text-[#4ade80]"
+                        class="shrink-0 rounded px-2 py-0.5 text-[10px] font-mono font-bold ${isSecretLocked
+                          ? "bg-[#2b1111] border border-red-500/30 text-red-400"
+                          : "bg-[#1a291d] border border-[#22c55e]/30 text-[#4ade80]"}"
                       >
-                        +${medal.xpBonus} XP
+                        ${displayXp}
                       </span>
                     </div>
                     <p
-                      class="mt-2 text-xs font-mono text-[#cbd5e1] leading-relaxed"
+                      class="mt-2 text-xs font-mono leading-relaxed ${isSecretLocked
+                        ? "text-red-200/70 italic"
+                        : "text-[#cbd5e1]"}"
                     >
-                      ${medal.description}
+                      ${displayDesc}
                     </p>
                   </div>
 
                   <div
-                    class="mt-3 pt-2 border-t border-[#2b3a2d] flex items-center justify-between"
+                    class="mt-3 pt-2 border-t ${isSecretLocked
+                      ? "border-red-900/40"
+                      : "border-[#2b3a2d]"} flex items-center justify-between"
                   >
                     <span
-                      class="text-[10.5px] font-mono font-bold ${unlocked
-                        ? "text-[#4ade80]"
-                        : "text-[#556758]"}"
+                      class="text-[10.5px] font-mono font-bold ${isSecretLocked
+                        ? "text-red-400 font-pixel"
+                        : unlocked
+                          ? "text-[#4ade80]"
+                          : "text-[#556758]"}"
                     >
-                      ${unlocked ? "✅ DÉBLOQUÉE" : "🔒 BLOQUÉE"}
+                      ${isSecretLocked
+                        ? "🔒 CLASSIFIÉ QG"
+                        : unlocked
+                          ? "✅ DÉBLOQUÉE"
+                          : "🔒 BLOQUÉE"}
                     </span>
                     ${unlocked
                       ? html`

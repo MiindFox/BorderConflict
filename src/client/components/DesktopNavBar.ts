@@ -1,3 +1,4 @@
+import { MEDAL_DEFINITIONS } from "@openfront/engine-lib/configuration/HexaFrontSystems";
 import { assetUrl } from "@openfront/shared/AssetUrls";
 import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
@@ -15,11 +16,14 @@ export class DesktopNavBar extends LitElement {
   @state() private _profile = commanderStore.getProfile();
   @state() private _commanderLevel = commanderStore.getProfile().level;
   @state() private _availablePoints = commanderStore.getAvailablePoints();
+  @state() private _unlockedMedalsCount =
+    this._profile.unlockedMedals?.length ?? 0;
 
   private _onCommanderUpdated = () => {
     this._profile = commanderStore.getProfile();
     this._commanderLevel = this._profile.level;
     this._availablePoints = commanderStore.getAvailablePoints();
+    this._unlockedMedalsCount = this._profile.unlockedMedals?.length ?? 0;
   };
 
   createRenderRoot() {
@@ -97,7 +101,7 @@ export class DesktopNavBar extends LitElement {
 
         <!-- Center: Tactile Military Command Buttons -->
         <div class="flex items-center gap-2">
-          <!-- JOUER & DOCTRINES -->
+          <!-- JOUER, TALENTS & MÉDAILLES -->
           <div
             class="flex items-center gap-1.5 p-1 rounded bg-[#171f18] border border-[#2e3b30] shadow-inner"
           >
@@ -109,22 +113,24 @@ export class DesktopNavBar extends LitElement {
             >
               JOUER
             </button>
-            <!-- DOCTRINES (TALENTS) -->
+            <!-- TALENTS -->
             <button
               type="button"
-              @click=${() =>
+              @click=${() => {
+                window.dispatchEvent(new CustomEvent("open-talents-tab"));
                 window.dispatchEvent(
                   new CustomEvent("showPage", { detail: "page-doctrines" }),
-                )}
+                );
+              }}
               class="nav-menu-item retro-metal-btn ${currentPage ===
               "page-doctrines"
                 ? "ring-2 ring-amber-400 brightness-110"
                 : ""} px-3.5 py-1.5 rounded text-[11px] font-retro text-amber-200 hover:text-white font-bold tracking-wider uppercase cursor-pointer flex items-center gap-2 transition-all shadow-md whitespace-nowrap"
               data-page="page-doctrines"
-              title="Accéder aux Doctrines et Talents militaires"
+              title="Accéder à l'arbre des Talents tactiques"
             >
               <span class="text-xs text-amber-400">⚡</span>
-              <span>DOCTRINES</span>
+              <span>TALENTS</span>
               <span
                 class="px-1.5 py-0.5 rounded bg-[#0d130e] border border-[#304032] text-[9px] font-retro font-bold text-green-400 shadow-inner"
               >
@@ -135,12 +141,32 @@ export class DesktopNavBar extends LitElement {
                     <span
                       class="px-1.5 py-0.2 rounded bg-amber-500/20 border border-amber-400 text-[8.5px] font-pixel text-amber-300 animate-pulse"
                       title="${this
-                        ._availablePoints} points de doctrine disponibles"
+                        ._availablePoints} points de talent disponibles"
                     >
                       +${this._availablePoints}
                     </span>
                   `
                 : ""}
+            </button>
+            <!-- MÉDAILLES DE GUERRE -->
+            <button
+              type="button"
+              @click=${() => {
+                window.dispatchEvent(new CustomEvent("open-medals-tab"));
+                window.dispatchEvent(
+                  new CustomEvent("showPage", { detail: "page-doctrines" }),
+                );
+              }}
+              class="nav-menu-item retro-metal-btn px-3 py-1.5 rounded text-[11px] font-retro text-emerald-200 hover:text-white font-bold tracking-wider uppercase cursor-pointer flex items-center gap-1.5 transition-all shadow-md whitespace-nowrap"
+              title="Consulter les Médailles de Guerre & Hauts Faits"
+            >
+              <span class="text-xs">🎖️</span>
+              <span>MÉDAILLES</span>
+              <span
+                class="px-1.5 py-0.5 rounded bg-[#0d130e] border border-[#304032] text-[9px] font-retro font-bold text-amber-300 shadow-inner"
+              >
+                ${this._unlockedMedalsCount}/${MEDAL_DEFINITIONS.length}
+              </span>
             </button>
           </div>
 

@@ -14,21 +14,25 @@ export type TalentId =
   | "assault_pioneer"
   | "assault_blitz"
   | "assault_plunder"
+  | "assault_logistics"
   | "fortress_engineer"
   | "fortress_bastion"
   | "fortress_aegis"
+  | "fortress_radar"
   | "eco_trade"
   | "eco_metropolis"
   | "eco_industry"
+  | "eco_treasury"
   | "apoc_armada"
   | "apoc_silo"
-  | "apoc_fallout";
+  | "apoc_fallout"
+  | "apoc_overcharge";
 
 export interface TalentDefinition {
   id: TalentId;
-  bitOffset: number; // 2 bits per talent (0..22)
+  bitOffset: number; // 2 bits per talent (0..30)
   branch: DoctrineBranchId;
-  tier: 1 | 2 | 3;
+  tier: 1 | 2 | 3 | 4;
   maxRank: 3;
   prerequisite?: TalentId;
   name: string;
@@ -133,6 +137,23 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
       "+9% Or de conquête, -3% pertes d'attaque",
     ],
   },
+  {
+    id: "assault_logistics",
+    bitOffset: 24,
+    branch: "assault",
+    tier: 4,
+    maxRank: 3,
+    prerequisite: "assault_plunder",
+    name: "Logistique Mécanisée",
+    icon: "🚚",
+    shortDesc:
+      "Micro-bonus : réduit légèrement les pertes d'attrition lors des grands mouvements de troupes.",
+    rankDescriptions: [
+      "-1% attrition de déplacement, +0.5% vitesse renforts",
+      "-2% attrition de déplacement, +1% vitesse renforts",
+      "-3% attrition de déplacement, +1.5% vitesse renforts",
+    ],
+  },
 
   // --- BRANCH 2: FORTRESS ---
   {
@@ -182,6 +203,23 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
       "-2% recharge SAM, +1.5% régénération de troupes",
       "-4% recharge SAM, +3% régénération de troupes",
       "-6% recharge SAM, +4.5% régénération de troupes",
+    ],
+  },
+  {
+    id: "fortress_radar",
+    bitOffset: 26,
+    branch: "fortress",
+    tier: 4,
+    maxRank: 3,
+    prerequisite: "fortress_aegis",
+    name: "Réseau Radar d'Alerte",
+    icon: "📡",
+    shortDesc:
+      "Micro-bonus : accroît légèrement la vision radar et la portée d'interception SAM.",
+    rankDescriptions: [
+      "+1% vision radar, +1% portée d'interception SAM",
+      "+2% vision radar, +2% portée d'interception SAM",
+      "+3% vision radar, +3% portée d'interception SAM",
     ],
   },
 
@@ -236,6 +274,23 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
       "-4.5% coût (Villes/Ports/Usines), +6% Or passif",
     ],
   },
+  {
+    id: "eco_treasury",
+    bitOffset: 28,
+    branch: "economy",
+    tier: 4,
+    maxRank: 3,
+    prerequisite: "eco_industry",
+    name: "Chambre du Trésor",
+    icon: "🏦",
+    shortDesc:
+      "Micro-bonus : génère un intérêt passif minime sur les réserves d'Or et allège les coûts de transport.",
+    rankDescriptions: [
+      "+0.5% intérêt passif Or, -1% coût des convois",
+      "+1% intérêt passif Or, -2% coût des convois",
+      "+1.5% intérêt passif Or, -3% coût des convois",
+    ],
+  },
 
   // --- BRANCH 4: APOCALYPSE ---
   {
@@ -288,6 +343,23 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
       "-9% pénalité de radiation, +6% vitesse missiles",
     ],
   },
+  {
+    id: "apoc_overcharge",
+    bitOffset: 30,
+    branch: "apocalypse",
+    tier: 4,
+    maxRank: 3,
+    prerequisite: "apoc_fallout",
+    name: "Surchauffe Atomique",
+    icon: "⚡",
+    shortDesc:
+      "Micro-bonus : réduit légèrement le temps de vol des missiles et augmente la zone de blast.",
+    rankDescriptions: [
+      "-1% temps de vol des missiles, +1% rayon de souffle",
+      "-2% temps de vol des missiles, +2% rayon de souffle",
+      "-3% temps de vol des missiles, +3% rayon de souffle",
+    ],
+  },
 ];
 
 export function getTalentRankFromMask(
@@ -325,21 +397,29 @@ export interface ComputedDoctrineModifiers {
   attackSpeedMult: number;
   attackerLossMult: number;
   conquerGoldMult: number;
+  attritionLossMult: number;
+  reinforceSpeedMult: number;
   defensePostCostMult: number;
   defensePostStrengthMult: number;
   samCooldownMult: number;
   troopRegenMult: number;
+  radarVisionMult: number;
+  samRangeMult: number;
   tradeAndTrainGoldMult: number;
   bonusStartingGold: number;
   cityCapacityMult: number;
   econBuildingCostMult: number;
   passiveGoldMult: number;
+  treasuryInterestRate: number;
+  conveyCostMult: number;
   warshipCostMult: number;
   warshipRangeMult: number;
   nukeAndSiloCostMult: number;
   siloCooldownMult: number;
   falloutPenaltyReduction: number;
   nukeSpeedMult: number;
+  nukeBlastRadiusMult: number;
+  nukeFlightTimeMult: number;
 }
 
 export function computeDoctrineModifiers(
@@ -348,18 +428,22 @@ export function computeDoctrineModifiers(
   const rPioneer = getTalentRankFromMask(mask, "assault_pioneer");
   const rBlitz = getTalentRankFromMask(mask, "assault_blitz");
   const rPlunder = getTalentRankFromMask(mask, "assault_plunder");
+  const rLogistics = getTalentRankFromMask(mask, "assault_logistics");
 
   const rEngineer = getTalentRankFromMask(mask, "fortress_engineer");
   const rBastion = getTalentRankFromMask(mask, "fortress_bastion");
   const rAegis = getTalentRankFromMask(mask, "fortress_aegis");
+  const rRadar = getTalentRankFromMask(mask, "fortress_radar");
 
   const rTrade = getTalentRankFromMask(mask, "eco_trade");
   const rMetro = getTalentRankFromMask(mask, "eco_metropolis");
   const rIndustry = getTalentRankFromMask(mask, "eco_industry");
+  const rTreasury = getTalentRankFromMask(mask, "eco_treasury");
 
   const rArmada = getTalentRankFromMask(mask, "apoc_armada");
   const rSilo = getTalentRankFromMask(mask, "apoc_silo");
   const rFallout = getTalentRankFromMask(mask, "apoc_fallout");
+  const rOvercharge = getTalentRankFromMask(mask, "apoc_overcharge");
 
   return {
     terraNulliusLossMult: 1 - rPioneer * 0.02,
@@ -367,21 +451,29 @@ export function computeDoctrineModifiers(
     attackSpeedMult: 1 + rBlitz * 0.015,
     attackerLossMult: 1 - rPlunder * 0.01,
     conquerGoldMult: 1 + rPlunder * 0.03,
+    attritionLossMult: 1 - rLogistics * 0.01,
+    reinforceSpeedMult: 1 + rLogistics * 0.005,
     defensePostCostMult: 1 - rEngineer * 0.02,
     defensePostStrengthMult: 1 + rBastion * 0.02,
     samCooldownMult: 1 - rAegis * 0.02,
     troopRegenMult: 1 + rAegis * 0.015,
+    radarVisionMult: 1 + rRadar * 0.01,
+    samRangeMult: 1 + rRadar * 0.01,
     tradeAndTrainGoldMult: 1 + rTrade * 0.02,
     bonusStartingGold: rTrade * 2_500,
     cityCapacityMult: 1 + rMetro * 0.02,
     econBuildingCostMult: 1 - rIndustry * 0.015,
     passiveGoldMult: 1 + rIndustry * 0.02,
+    treasuryInterestRate: rTreasury * 0.005,
+    conveyCostMult: 1 - rTreasury * 0.01,
     warshipCostMult: 1 - rArmada * 0.02,
     warshipRangeMult: 1 + rArmada * 0.015,
     nukeAndSiloCostMult: 1 - rSilo * 0.015,
     siloCooldownMult: 1 - rSilo * 0.02,
     falloutPenaltyReduction: rFallout * 0.03,
     nukeSpeedMult: 1 + rFallout * 0.02,
+    nukeBlastRadiusMult: 1 + rOvercharge * 0.01,
+    nukeFlightTimeMult: 1 - rOvercharge * 0.01,
   };
 }
 
@@ -2319,30 +2411,77 @@ export function getDirectiveCurrentValue(
 // ============================================================================
 
 export type MedalId =
+  // Carrière & Victoires
   | "first_victory"
-  | "hegemon"
-  | "arcology_builder"
-  | "industrial_tycoon"
-  | "grand_admiral"
-  | "atomic_master"
-  | "iron_sentinel"
-  | "directive_operative"
-  | "cataclysm_survivor"
+  | "veteran_5_wins"
+  | "master_15_wins"
+  | "warlord_50_wins"
+  | "imperator_100_wins"
   | "front_veteran"
+  | "veteran_25_battles"
+  | "hardened_50_battles"
+  | "centurion_100_battles"
+  | "titan_200_battles"
+  | "hexafront_legend"
+  | "level_30_overlord"
+  | "level_50_demigod"
+  | "prestige_pioneer"
+  | "prestige_veteran"
+  // Conquête & Expansion
+  | "hegemon"
+  | "continental_dominator"
+  | "world_emperor"
+  | "neutral_cleanser"
+  | "capital_hunter"
+  | "capital_annihilator"
+  // Mégastructures & Économie
+  | "arcology_builder"
+  | "megalopolis_ruler"
+  | "industrial_tycoon"
+  | "gold_billionaire"
+  | "grand_admiral"
+  | "naval_armada"
+  | "atomic_master"
+  | "atomic_rain"
+  | "iron_sentinel"
+  | "impenetrable_wall"
+  | "iron_curtain"
   | "supreme_architect"
-  | "hexafront_legend";
+  | "wonder_monopolist"
+  // Directives, Cataclysmes & Troupes
+  | "directive_operative"
+  | "directive_mastermind"
+  | "cataclysm_survivor"
+  | "calamity_walker"
+  | "million_manpower"
+  | "colossus_standing"
+  // Opérations Secrètes Classifiées QG
+  | "secret_phoenix"
+  | "secret_pacifist"
+  | "secret_nuclear_storm"
+  | "secret_solitary_wolf"
+  | "secret_ghost_army";
+
+export type MedalRarity =
+  | "Commun"
+  | "Rare"
+  | "Épique"
+  | "Légendaire"
+  | "Secret Défense";
 
 export interface MedalDefinition {
   id: MedalId;
   name: string;
   icon: string;
-  rarity: "Commun" | "Rare" | "Épique" | "Légendaire";
+  rarity: MedalRarity;
   rarityColor: string;
   description: string;
   xpBonus: number;
+  secret?: boolean;
 }
 
 export const MEDAL_DEFINITIONS: MedalDefinition[] = [
+  // --- VICTOIRES & CARRIÈRE ---
   {
     id: "first_victory",
     name: "Premier Sang Tactique",
@@ -2353,79 +2492,40 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     xpBonus: 25,
   },
   {
-    id: "hegemon",
-    name: "Conquérant Hégémonique",
-    icon: "🦅",
-    rarity: "Épique",
-    rarityColor: "#a855f7",
-    description:
-      "Contrôler plus de 1 500 cases de territoire au cours d'une partie.",
-    xpBonus: 40,
-  },
-  {
-    id: "arcology_builder",
-    name: "Architecte d'Arcologie",
-    icon: "🏙️",
-    rarity: "Rare",
-    rarityColor: "#06b6d4",
-    description:
-      "Ériger la Mégastructure Arcologie Cybernétique (3+ niveaux de Villes).",
-    xpBonus: 30,
-  },
-  {
-    id: "industrial_tycoon",
-    name: "Magnat Cybernétique",
-    icon: "🏭",
-    rarity: "Rare",
-    rarityColor: "#f59e0b",
-    description: "Activer le Complexe Industriel Titan ou accumuler 500k+ Or.",
-    xpBonus: 30,
-  },
-  {
-    id: "grand_admiral",
-    name: "Amiral des Sept Mers",
-    icon: "⚓",
-    rarity: "Rare",
-    rarityColor: "#06b6d4",
-    description: "Activer le Chantier Naval Hégémonique (3+ niveaux de Ports).",
-    xpBonus: 30,
-  },
-  {
-    id: "atomic_master",
-    name: "Maître de l'Atome",
-    icon: "☢️",
-    rarity: "Épique",
-    rarityColor: "#f43f5e",
-    description:
-      "Déployer le Centre de Commandement Orbital (2+ niveaux de Silos).",
-    xpBonus: 45,
-  },
-  {
-    id: "iron_sentinel",
-    name: "Sentinelle Immuable",
-    icon: "🛡️",
-    rarity: "Rare",
-    rarityColor: "#10b981",
-    description: "Activer le Dôme Énergétique Continental (4+ Défenses/SAM).",
-    xpBonus: 25,
-  },
-  {
-    id: "directive_operative",
-    name: "Agent de Directives",
-    icon: "🎯",
-    rarity: "Rare",
+    id: "veteran_5_wins",
+    name: "Capitaine de Campagne",
+    icon: "⚔️",
+    rarity: "Commun",
     rarityColor: "#38bdf8",
-    description: "Accomplir au moins 3 Directives Secrètes du QG.",
-    xpBonus: 30,
+    description: "Remporter 5 victoires en opérations de guerre.",
+    xpBonus: 35,
   },
   {
-    id: "cataclysm_survivor",
-    name: "Survivant du Cataclysme",
-    icon: "🌪️",
+    id: "master_15_wins",
+    name: "Général de Corps d'Armée",
+    icon: "⭐",
+    rarity: "Rare",
+    rarityColor: "#06b6d4",
+    description: "Cumuler 15 victoires militaires sur les fronts.",
+    xpBonus: 50,
+  },
+  {
+    id: "warlord_50_wins",
+    name: "Seigneur de Guerre Incontesté",
+    icon: "👑",
     rarity: "Épique",
     rarityColor: "#a855f7",
-    description: "Survivre à au moins 5 Événements Mondiaux Dynamiques.",
-    xpBonus: 40,
+    description: "Remporter 50 victoires majeures. Votre bannière inspire la terreur.",
+    xpBonus: 85,
+  },
+  {
+    id: "imperator_100_wins",
+    name: "Imperator Invaincu",
+    icon: "🔱",
+    rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Triompher dans 100 victoires de guerre. Une prouesse d'état-major absolu.",
+    xpBonus: 150,
   },
   {
     id: "front_veteran",
@@ -2437,22 +2537,367 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     xpBonus: 20,
   },
   {
+    id: "veteran_25_battles",
+    name: "Combattant des Tranchées",
+    icon: "🪖",
+    rarity: "Commun",
+    rarityColor: "#38bdf8",
+    description: "Participer à 25 affrontements sur les théâtres d'opérations.",
+    xpBonus: 30,
+  },
+  {
+    id: "hardened_50_battles",
+    name: "Vétéran Endurci",
+    icon: "🛡️",
+    rarity: "Rare",
+    rarityColor: "#06b6d4",
+    description: "Avoir combattu dans 50 batailles sans jamais abandonner le terrain.",
+    xpBonus: 45,
+  },
+  {
+    id: "centurion_100_battles",
+    name: "Centurion d'Airain",
+    icon: "⚜️",
+    rarity: "Épique",
+    rarityColor: "#a855f7",
+    description: "Survivre à 100 batailles sur les différents secteurs du front.",
+    xpBonus: 70,
+  },
+  {
+    id: "titan_200_battles",
+    name: "Légende Vivante du Conflit",
+    icon: "🗿",
+    rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Disputer 200 parties. Les académies militaires étudient vos déploiements.",
+    xpBonus: 120,
+  },
+  {
+    id: "hexafront_legend",
+    name: "Commandeur Suprême",
+    icon: "🎖️",
+    rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Atteindre le Niveau 15 de Commandant.",
+    xpBonus: 75,
+  },
+  {
+    id: "level_30_overlord",
+    name: "Grand Maréchal d'Empire",
+    icon: "🦅",
+    rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Atteindre le Niveau 30 de Commandant.",
+    xpBonus: 110,
+  },
+  {
+    id: "level_50_demigod",
+    name: "Stratège Démiurge",
+    icon: "✨",
+    rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Atteindre le Niveau 50 de Commandant. Sommet absolu de la doctrine de guerre.",
+    xpBonus: 200,
+  },
+  {
+    id: "prestige_pioneer",
+    name: "Initiation au Prestige",
+    icon: "💎",
+    rarity: "Épique",
+    rarityColor: "#a855f7",
+    description: "Activer votre première réinitialisation de Prestige d'officier supérieur.",
+    xpBonus: 60,
+  },
+  {
+    id: "prestige_veteran",
+    name: "Maître du Renouveau Éternel",
+    icon: "🌌",
+    rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Atteindre le Prestige 3. Votre prestige militaire est gravé dans l'histoire.",
+    xpBonus: 130,
+  },
+
+  // --- CONQUÊTE & EXPANSION ---
+  {
+    id: "hegemon",
+    name: "Conquérant Hégémonique",
+    icon: "🗺️",
+    rarity: "Épique",
+    rarityColor: "#a855f7",
+    description: "Contrôler plus de 1 500 cases de territoire au cours d'une partie.",
+    xpBonus: 40,
+  },
+  {
+    id: "continental_dominator",
+    name: "Souverain Continental",
+    icon: "🌍",
+    rarity: "Épique",
+    rarityColor: "#a855f7",
+    description: "Contrôler au moins 3 000 cases de territoire simultanément.",
+    xpBonus: 65,
+  },
+  {
+    id: "world_emperor",
+    name: "Empereur du Globe",
+    icon: "🪐",
+    rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Contrôler plus de 6 000 cases de territoire dans une démonstration titanesque.",
+    xpBonus: 140,
+  },
+  {
+    id: "neutral_cleanser",
+    name: "Pacification des Terres Neutres",
+    icon: "🚜",
+    rarity: "Rare",
+    rarityColor: "#10b981",
+    description: "Conquérir au moins 500 cases de terres neutres abandonnées.",
+    xpBonus: 35,
+  },
+  {
+    id: "capital_hunter",
+    name: "Chasseur de Capitales",
+    icon: "🎯",
+    rarity: "Rare",
+    rarityColor: "#06b6d4",
+    description: "Capturer 3 capitales ennemies au cours d'une même partie.",
+    xpBonus: 45,
+  },
+  {
+    id: "capital_annihilator",
+    name: "Fléau des Régimes",
+    icon: "⚡",
+    rarity: "Épique",
+    rarityColor: "#a855f7",
+    description: "Renverser 8 capitales ennemies dans une même partie.",
+    xpBonus: 80,
+  },
+
+  // --- MÉGASTRUCTURES & ÉCONOMIE ---
+  {
+    id: "arcology_builder",
+    name: "Architecte d'Arcologie",
+    icon: "🏙️",
+    rarity: "Rare",
+    rarityColor: "#06b6d4",
+    description: "Ériger la Mégastructure Arcologie Cybernétique (3+ niveaux de Villes).",
+    xpBonus: 30,
+  },
+  {
+    id: "megalopolis_ruler",
+    name: "Mégalopole Démesurée",
+    icon: "🌆",
+    rarity: "Épique",
+    rarityColor: "#a855f7",
+    description: "Détenir un réseau urbain de 8 Villes fortifiées de haute densité.",
+    xpBonus: 50,
+  },
+  {
+    id: "industrial_tycoon",
+    name: "Magnat Cybernétique",
+    icon: "🏭",
+    rarity: "Rare",
+    rarityColor: "#f59e0b",
+    description: "Activer le Complexe Industriel Titan ou accumuler 500k+ Or.",
+    xpBonus: 30,
+  },
+  {
+    id: "gold_billionaire",
+    name: "Trésor Impérial",
+    icon: "💰",
+    rarity: "Épique",
+    rarityColor: "#f59e0b",
+    description: "Accumuler plus de 1 500 000 Or dans les caisses de l'état-major.",
+    xpBonus: 65,
+  },
+  {
+    id: "grand_admiral",
+    name: "Amiral des Sept Mers",
+    icon: "⚓",
+    rarity: "Rare",
+    rarityColor: "#06b6d4",
+    description: "Activer le Chantier Naval Hégémonique (3+ niveaux de Ports).",
+    xpBonus: 30,
+  },
+  {
+    id: "naval_armada",
+    name: "Armada Insubmersible",
+    icon: "🚢",
+    rarity: "Épique",
+    rarityColor: "#06b6d4",
+    description: "Contrôler un chapelet maritime de 6 Ports opérationnels simultanément.",
+    xpBonus: 55,
+  },
+  {
+    id: "atomic_master",
+    name: "Maître de l'Atome",
+    icon: "☢️",
+    rarity: "Épique",
+    rarityColor: "#f43f5e",
+    description: "Déployer le Centre de Commandement Orbital (2+ niveaux de Silos).",
+    xpBonus: 45,
+  },
+  {
+    id: "atomic_rain",
+    name: "Déluge Nucléaire",
+    icon: "🚀",
+    rarity: "Épique",
+    rarityColor: "#f43f5e",
+    description: "Posséder au moins 4 Silos atomiques parés au tir simultané.",
+    xpBonus: 60,
+  },
+  {
+    id: "iron_sentinel",
+    name: "Sentinelle Immuable",
+    icon: "🛡️",
+    rarity: "Rare",
+    rarityColor: "#10b981",
+    description: "Activer le Dôme Énergétique Continental (4+ Défenses/SAM).",
+    xpBonus: 25,
+  },
+  {
+    id: "impenetrable_wall",
+    name: "Ligne Maginot Moderne",
+    icon: "🧱",
+    rarity: "Épique",
+    rarityColor: "#10b981",
+    description: "Fortifier votre territoire avec 12 Postes de Défense et tourelles SAM.",
+    xpBonus: 50,
+  },
+  {
+    id: "iron_curtain",
+    name: "Bouclier Anti-Missile",
+    icon: "📡",
+    rarity: "Épique",
+    rarityColor: "#38bdf8",
+    description: "Déployer 6 systèmes sol-air SAM quadrillant l'espace aérien.",
+    xpBonus: 55,
+  },
+  {
     id: "supreme_architect",
     name: "Architecte Suprême",
     icon: "🏛️",
     rarity: "Légendaire",
     rarityColor: "#f59e0b",
-    description:
-      "Contrôler 3 Mégastructures simultanément dans une même partie.",
+    description: "Contrôler 3 Mégastructures simultanément dans une même partie.",
     xpBonus: 60,
   },
   {
-    id: "hexafront_legend",
-    name: "Légende d'HexaFront",
-    icon: "👑",
+    id: "wonder_monopolist",
+    name: "Monopole Absolu des Merveilles",
+    icon: "🌌",
     rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Activer TOUTES les 5 Mégastructures en une même partie. Exploit quasi-impossible.",
+    xpBonus: 200,
+  },
+
+  // --- DIRECTIVES, CATACLYSMES & TROUPES ---
+  {
+    id: "directive_operative",
+    name: "Agent de Directives",
+    icon: "🎯",
+    rarity: "Rare",
+    rarityColor: "#38bdf8",
+    description: "Accomplir au moins 3 Directives Secrètes du QG.",
+    xpBonus: 30,
+  },
+  {
+    id: "directive_mastermind",
+    name: "Éminence Grise du QG",
+    icon: "♟️",
+    rarity: "Épique",
+    rarityColor: "#a855f7",
+    description: "Accomplir avec succès 10 Directives Secrètes d'état-major.",
+    xpBonus: 60,
+  },
+  {
+    id: "cataclysm_survivor",
+    name: "Survivant du Cataclysme",
+    icon: "🌪️",
+    rarity: "Épique",
+    rarityColor: "#a855f7",
+    description: "Survivre à au moins 5 Événements Mondiaux Dynamiques.",
+    xpBonus: 40,
+  },
+  {
+    id: "calamity_walker",
+    name: "Forge de l'Apocalypse",
+    icon: "🌋",
+    rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Endurer et traverser 20 Événements Mondiaux sans capituler.",
+    xpBonus: 85,
+  },
+  {
+    id: "million_manpower",
+    name: "Légion du Million",
+    icon: "👥",
+    rarity: "Épique",
+    rarityColor: "#38bdf8",
+    description: "Mobiliser 1 000 000 troupes sous les drapeaux en temps réel.",
+    xpBonus: 50,
+  },
+  {
+    id: "colossus_standing",
+    name: "Armée Titanesque",
+    icon: "🦾",
+    rarity: "Légendaire",
+    rarityColor: "#f59e0b",
+    description: "Maintenir une armée colossale de plus de 3 000 000 troupes en faction.",
+    xpBonus: 100,
+  },
+
+  // --- MÉDAILLES SECRÈTES (CLASSIFIÉES QG) ---
+  {
+    id: "secret_phoenix",
+    name: "Résurrection du Phénix",
+    icon: "🔥",
+    rarity: "Secret Défense",
     rarityColor: "#f43f5e",
-    description: "Atteindre le Niveau 15 de Commandant.",
-    xpBonus: 75,
+    description: "Tomber à moins de 500 troupes / 0 capitale et remonter jusqu'à la victoire absolue.",
+    xpBonus: 100,
+    secret: true,
+  },
+  {
+    id: "secret_pacifist",
+    name: "Diplomate de l'Ombre",
+    icon: "🕊️",
+    rarity: "Secret Défense",
+    rarityColor: "#f43f5e",
+    description: "Passer les 3 premières minutes sans engager de joueur ennemi, puis triompher.",
+    xpBonus: 80,
+    secret: true,
+  },
+  {
+    id: "secret_nuclear_storm",
+    name: "Tempête Atomique Déchaînée",
+    icon: "☢️",
+    rarity: "Secret Défense",
+    rarityColor: "#f43f5e",
+    description: "Construire 5 Silos nucléaires actifs simultanément prêts à déchaîner l'atome.",
+    xpBonus: 120,
+    secret: true,
+  },
+  {
+    id: "secret_solitary_wolf",
+    name: "Loup Solitaire Intouchable",
+    icon: "🐺",
+    rarity: "Secret Défense",
+    rarityColor: "#f43f5e",
+    description: "Remporter une partie sans jamais former de coalition ni accepter de trêve.",
+    xpBonus: 90,
+    secret: true,
+  },
+  {
+    id: "secret_ghost_army",
+    name: "L'Armée Fantôme",
+    icon: "👻",
+    rarity: "Secret Défense",
+    rarityColor: "#f43f5e",
+    description: "Atteindre 1 000 000 de troupes sans jamais avoir construit une seule Usine.",
+    xpBonus: 110,
+    secret: true,
   },
 ];

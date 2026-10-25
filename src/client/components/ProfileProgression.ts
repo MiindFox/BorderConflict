@@ -569,7 +569,7 @@ export class ProfileProgression extends LitElement {
               🎖️ CARRIÈRE MILITAIRE & DÉBLOCAGES TACTIQUES
             </h3>
             <p class="text-xs text-white/50 mt-0.5">
-              Montez en grade pour débloquer des doctrines stratégiques, du Plutonium et des camouflages exclusifs.
+              Montez en grade pour débloquer des talents stratégiques, du Plutonium et des camouflages exclusifs.
             </p>
           </div>
           <div class="px-3 py-1 rounded-lg border border-emerald-500/40 bg-emerald-950/40 text-emerald-400 font-mono text-xs font-bold">
@@ -613,7 +613,7 @@ export class ProfileProgression extends LitElement {
 
                 <div class="mt-2.5 pt-2.5 border-t border-white/5 text-xs space-y-1.5">
                   <div class="flex items-center gap-1.5 text-sky-300 font-medium text-[11px]">
-                    <span class="text-[12px]">⚡</span> Doctrine : <span class="font-bold text-white">${rank.doctrine}</span>
+                    <span class="text-[12px]">⚡</span> Talent : <span class="font-bold text-white">${rank.doctrine}</span>
                   </div>
                   <div class="flex flex-wrap gap-1 mt-1">
                     ${rank.rewards.map(

@@ -110,8 +110,22 @@ export class MobileNavBar extends LitElement {
             ? "active"
             : ""} text-amber-200 font-pixel text-xs"
           data-page="page-doctrines"
+          @click=${() =>
+            window.dispatchEvent(new CustomEvent("open-talents-tab"))}
         >
-          ⚡ Doctrines & Talents
+          ⚡ Talents Militaires
+        </button>
+        <button
+          class="${MOBILE_ITEM} text-emerald-300 font-pixel text-xs"
+          data-page="page-doctrines"
+          @click=${() => {
+            window.dispatchEvent(new CustomEvent("open-medals-tab"));
+            window.dispatchEvent(
+              new CustomEvent("showPage", { detail: "page-doctrines" }),
+            );
+          }}
+        >
+          🎖️ Médailles de Guerre
         </button>
         <div
           class="no-game-portal nav-menu-item flex items-center w-full cursor-pointer"

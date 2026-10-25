@@ -37,6 +37,7 @@ export interface CommanderProfile {
   equippedMedal: MedalId | null;
   plutonium: number;
   caps: number;
+  prestige?: number;
   ownedFlares: string[];
   isVip?: boolean;
   vipUntil?: number;
@@ -87,6 +88,7 @@ const DEFAULT_PROFILE: CommanderProfile = {
   equippedMedal: null,
   plutonium: 0,
   caps: 0,
+  prestige: 0,
   ownedFlares: [],
 };
 
@@ -131,6 +133,7 @@ class CommanderStore {
 
   constructor() {
     this.profile = this.load();
+    this.checkCareerMedals();
     if (typeof window !== "undefined") {
       setTimeout(() => {
         this.syncWithServerInBackground();
@@ -198,6 +201,7 @@ class CommanderStore {
         equippedMedal: parsed.equippedMedal ?? null,
         plutonium: Math.max(0, parsed.plutonium ?? DEFAULT_PROFILE.plutonium),
         caps: Math.max(0, parsed.caps ?? DEFAULT_PROFILE.caps),
+        prestige: Math.max(0, parsed.prestige ?? 0),
         ownedFlares: Array.isArray(parsed.ownedFlares)
           ? parsed.ownedFlares
           : [],
@@ -1199,11 +1203,32 @@ class CommanderStore {
       if (def) newlyUnlocked.push(def);
     };
 
+    // Victoires & Expérience
     tryUnlock("first_victory", this.profile.victories >= 1);
-    tryUnlock("directive_operative", this.profile.directivesCompleted >= 3);
-    tryUnlock("cataclysm_survivor", this.profile.worldEventsSurvived >= 5);
+    tryUnlock("veteran_5_wins", this.profile.victories >= 5);
+    tryUnlock("master_15_wins", this.profile.victories >= 15);
+    tryUnlock("warlord_50_wins", this.profile.victories >= 50);
+    tryUnlock("imperator_100_wins", this.profile.victories >= 100);
+
+    // Vétérance & Combats
     tryUnlock("front_veteran", this.profile.gamesPlayed >= 5);
+    tryUnlock("veteran_25_battles", this.profile.gamesPlayed >= 25);
+    tryUnlock("hardened_50_battles", this.profile.gamesPlayed >= 50);
+    tryUnlock("centurion_100_battles", this.profile.gamesPlayed >= 100);
+    tryUnlock("titan_200_battles", this.profile.gamesPlayed >= 200);
+
+    // Niveaux de Commandant
     tryUnlock("hexafront_legend", this.profile.level >= 15);
+    tryUnlock("level_30_overlord", this.profile.level >= 30);
+    tryUnlock("level_50_demigod", this.profile.level >= 50);
+    tryUnlock("prestige_pioneer", (this.profile.prestige ?? 0) >= 1);
+    tryUnlock("prestige_veteran", (this.profile.prestige ?? 0) >= 3);
+
+    // Directives & Cataclysmes
+    tryUnlock("directive_operative", this.profile.directivesCompleted >= 3);
+    tryUnlock("directive_mastermind", this.profile.directivesCompleted >= 10);
+    tryUnlock("cataclysm_survivor", this.profile.worldEventsSurvived >= 5);
+    tryUnlock("calamity_walker", this.profile.worldEventsSurvived >= 20);
 
     if (newlyUnlocked.length > 0) {
       let bonusXp = 0;
@@ -1225,21 +1250,75 @@ class CommanderStore {
       if (def) newlyUnlocked.push(def);
     };
 
+    // Victoires & Carrière
     tryUnlock("first_victory", won || this.profile.victories >= 1);
+    tryUnlock("veteran_5_wins", this.profile.victories >= 5);
+    tryUnlock("master_15_wins", this.profile.victories >= 15);
+    tryUnlock("warlord_50_wins", this.profile.victories >= 50);
+    tryUnlock("imperator_100_wins", this.profile.victories >= 100);
+
+    // Conquête de Territoire
     tryUnlock("hegemon", counts.tilesOwned >= 1500);
+    tryUnlock("continental_dominator", counts.tilesOwned >= 3000);
+    tryUnlock("world_emperor", counts.tilesOwned >= 6000);
+    tryUnlock("neutral_cleanser", counts.tilesOwned >= 500);
+    tryUnlock("capital_hunter", counts.tilesOwned >= 1000 && won);
+    tryUnlock("capital_annihilator", counts.tilesOwned >= 3500 && won);
+
+    // Bâtiments, Mégastructures & Économie
     tryUnlock("arcology_builder", counts.cities >= 3);
+    tryUnlock("megalopolis_ruler", counts.cities >= 8);
     tryUnlock(
       "industrial_tycoon",
       counts.factories >= 3 || counts.gold >= 500_000,
     );
+    tryUnlock("gold_billionaire", counts.gold >= 1_500_000);
     tryUnlock("grand_admiral", counts.ports >= 3);
+    tryUnlock("naval_armada", counts.ports >= 6);
     tryUnlock("atomic_master", counts.silos >= 2);
+    tryUnlock("atomic_rain", counts.silos >= 4);
     tryUnlock("iron_sentinel", counts.defensesAndSam >= 4);
-    tryUnlock("directive_operative", this.profile.directivesCompleted >= 3);
-    tryUnlock("cataclysm_survivor", this.profile.worldEventsSurvived >= 5);
-    tryUnlock("front_veteran", this.profile.gamesPlayed >= 5);
+    tryUnlock("impenetrable_wall", counts.defensesAndSam >= 12);
+    tryUnlock("iron_curtain", counts.defensesAndSam >= 6);
     tryUnlock("supreme_architect", activeMegas.length >= 3);
+    tryUnlock("wonder_monopolist", activeMegas.length >= 5);
+
+    // Troupes et Effectifs
+    tryUnlock("million_manpower", counts.troops >= 1_000_000);
+    tryUnlock("colossus_standing", counts.troops >= 3_000_000);
+
+    // Carrière
+    tryUnlock("front_veteran", this.profile.gamesPlayed >= 5);
+    tryUnlock("veteran_25_battles", this.profile.gamesPlayed >= 25);
+    tryUnlock("hardened_50_battles", this.profile.gamesPlayed >= 50);
+    tryUnlock("centurion_100_battles", this.profile.gamesPlayed >= 100);
+    tryUnlock("titan_200_battles", this.profile.gamesPlayed >= 200);
     tryUnlock("hexafront_legend", this.profile.level >= 15);
+    tryUnlock("level_30_overlord", this.profile.level >= 30);
+    tryUnlock("level_50_demigod", this.profile.level >= 50);
+    tryUnlock("prestige_pioneer", (this.profile.prestige ?? 0) >= 1);
+    tryUnlock("prestige_veteran", (this.profile.prestige ?? 0) >= 3);
+    tryUnlock("directive_operative", this.profile.directivesCompleted >= 3);
+    tryUnlock("directive_mastermind", this.profile.directivesCompleted >= 10);
+    tryUnlock("cataclysm_survivor", this.profile.worldEventsSurvived >= 5);
+    tryUnlock("calamity_walker", this.profile.worldEventsSurvived >= 20);
+
+    // MÉDAILLES SECRÈTES
+    if (counts.troops >= 1_000_000 && counts.factories === 0) {
+      tryUnlock("secret_ghost_army", true);
+    }
+    if (counts.silos >= 5) {
+      tryUnlock("secret_nuclear_storm", true);
+    }
+    if (won && counts.troops > 0 && counts.troops < 1000 && counts.tilesOwned >= 800) {
+      tryUnlock("secret_phoenix", true);
+    }
+    if (won && activeMegas.length >= 2 && counts.tilesOwned >= 1200) {
+      tryUnlock("secret_solitary_wolf", true);
+    }
+    if (won && counts.tilesOwned >= 1500) {
+      tryUnlock("secret_pacifist", true);
+    }
 
     if (newlyUnlocked.length > 0) {
       let bonusXp = 0;
