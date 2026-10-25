@@ -25,6 +25,7 @@ void main() {
 
   // --- Border detection ---
   float borderType = 0.0; // 0=interior, ~0.5=normal border, ~1.0=highlight border
+  float combatFrontline = 0.0; // 0=none, 0.75=rival enemy, 1.0=embargo war
   uint maxRel = 0u;       // 0=neutral, 1=friendly, 2=embargo
 
   if (owner != 0u) {
@@ -39,11 +40,23 @@ void main() {
     if (isBorder) {
       borderType = 0.5; // normal border
 
-      // Relationship lookup for each cardinal neighbor with different owner
-      if (n != owner && n != 0u) maxRel = max(maxRel, texelFetch(uRelationTex, ivec2(owner, n), 0).r);
-      if (s != owner && s != 0u) maxRel = max(maxRel, texelFetch(uRelationTex, ivec2(owner, s), 0).r);
-      if (w != owner && w != 0u) maxRel = max(maxRel, texelFetch(uRelationTex, ivec2(owner, w), 0).r);
-      if (e != owner && e != 0u) maxRel = max(maxRel, texelFetch(uRelationTex, ivec2(owner, e), 0).r);
+      // Relationship lookup & enemy contact detection for each cardinal neighbor
+      #define CHECK_NEIGHBOR(nbr) \
+        if (nbr != owner && nbr != 0u) { \
+          uint r = texelFetch(uRelationTex, ivec2(owner, nbr), 0).r; \
+          maxRel = max(maxRel, r); \
+          if (r == 2u) { \
+            combatFrontline = 1.0; \
+          } else if (r == 0u && combatFrontline < 0.75) { \
+            combatFrontline = 0.75; \
+          } \
+        }
+
+      CHECK_NEIGHBOR(n)
+      CHECK_NEIGHBOR(s)
+      CHECK_NEIGHBOR(w)
+      CHECK_NEIGHBOR(e)
+      #undef CHECK_NEIGHBOR
     }
 
     // Highlight: N-tile Chebyshev expansion
@@ -79,8 +92,7 @@ void main() {
 
   // A = relationship: 0.0=neutral, 0.5=friendly, 1.0=embargo
   float relation = float(maxRel) * 0.5;
-  // G channel is unused (formerly emberIntensity; ember is now computed in
-  // FalloutBloomPass and FalloutLightPass). B channel is unused (defense post
-  // proximity is now computed per-tile by DefenseCoveragePass).
-  fragColor = vec4(borderType, 0.0, 0.0, relation);
+  // G channel = combatFrontline (0.0=none, 0.75=rival enemy, 1.0=embargo war).
+  // B channel is unused.
+  fragColor = vec4(borderType, combatFrontline, 0.0, relation);
 }
