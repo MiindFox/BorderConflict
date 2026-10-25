@@ -35,8 +35,60 @@ flat in float vMarkedForDeletion;
 flat in float vZoom;
 flat in float vAtlasIdx;
 flat in float vShapeScale;
+flat in float vMega;   // 1 = structure powers an active megastructure of its owner
+flat in float vSeed;   // per-structure random phase so auras don't pulse in sync
 
 out vec4 fragColor;
+
+// Megastructure accent colors (match MEGASTRUCTURE_DEFINITIONS.accentColor).
+// Atlas indices: 0=City, 1=Port, 2=Factory, 3=DefensePost, 4=SAM, 5=Silo
+vec3 megaAccent() {
+  if (vAtlasIdx < 0.5) return vec3(0.22, 0.74, 0.97); // Arcologie Cybernétique  #38bdf8
+  if (vAtlasIdx < 1.5) return vec3(0.02, 0.71, 0.83); // Chantier Hégémonique   #06b6d4
+  if (vAtlasIdx < 2.5) return vec3(0.96, 0.62, 0.04); // Complexe Titan         #f59e0b
+  if (vAtlasIdx < 4.5) return vec3(0.06, 0.73, 0.51); // Dôme Continental       #10b981
+  return vec3(0.96, 0.25, 0.37);                      // Commandement Orbital   #f43f5e
+}
+
+// Megastructure aura drawn around the icon (outside its shape):
+// breathing halo + staggered harmonic rings + rotating orbital arcs +
+// a shimmering vertical uplink beam rising above the structure.
+vec4 megaAura(vec2 p, float r) {
+  const float R0 = 0.45;   // icon radius (matches main())
+  const float RMAX = 1.3;  // 0.5 * MEGA_EXPAND (structure.vert.glsl)
+  float t = uTime + vSeed * 10.0;
+  vec3 accent = megaAccent();
+  float edgeFade = 1.0 - smoothstep(RMAX * 0.75, RMAX, r);
+
+  // Soft breathing halo
+  float breath = 0.75 + 0.25 * sin(t * 2.2);
+  float halo = exp(-max(r - R0, 0.0) * 5.5) * 0.5 * breath;
+
+  // Harmonic rings expanding outward (two, staggered)
+  float rings = 0.0;
+  for (int i = 0; i < 2; i++) {
+    float ph = fract(t * 0.42 + float(i) * 0.5);
+    float rr = R0 + ph * (RMAX * 0.75 - R0);
+    rings += (1.0 - smoothstep(0.0, 0.035, abs(r - rr))) * (1.0 - ph) * 0.8;
+  }
+
+  // Rotating orbital arcs (3 segments)
+  float ang = atan(p.y, p.x);
+  float arcSeg = step(0.55, fract(ang / 6.2831853 * 3.0 + t * 0.18));
+  float orbit = (1.0 - smoothstep(0.0, 0.022, abs(r - 0.68))) * arcSeg * 0.75;
+
+  // Vertical uplink beam (screen-up = -y), fading out toward the top
+  float beamW = 0.07 * (0.85 + 0.15 * sin(t * 6.0));
+  float beamCore = 1.0 - smoothstep(beamW * 0.3, beamW, abs(p.x));
+  float beamLen = smoothstep(-RMAX, -R0, p.y) * step(p.y, 0.0);
+  float shimmer = 0.65 + 0.35 * sin(p.y * 28.0 + t * 9.0);
+  float beam = beamCore * beamLen * shimmer * 0.85;
+
+  float a = (halo + rings + orbit) * edgeFade + beam;
+  vec3 col = mix(accent, vec3(1.0),
+                 clamp(rings * 0.5 + beam * 0.6 + orbit * 0.3, 0.0, 1.0));
+  return vec4(col, clamp(a, 0.0, 0.95));
+}
 
 vec3 rgb2hsv(vec3 c) {
   vec4 K = vec4(0.0, -1.0/3.0, 2.0/3.0, -1.0);
@@ -141,7 +193,16 @@ void main() {
   float highlightOutlineW = uHighlightMask != 0 ? uHighlightOutlineW / vShapeScale : 0.0;
   float outerAlpha = 1.0 - smoothstep(-fw, fw, sdf - highlightOutlineW);
 
-  if (outerAlpha <= 0.0) discard;
+  if (outerAlpha <= 0.0) {
+    // Outside the icon: megastructure aura (skipped in alt view).
+    if (vMega > 0.5 && uAltView == 0) {
+      vec4 aura = megaAura(vLocalPos, dist);
+      if (aura.a <= 0.003) discard;
+      fragColor = vec4(aura.rgb, aura.a * uIconAlpha * uGhostAlpha);
+      return;
+    }
+    discard;
+  }
 
   float borderMask = 1.0 - smoothstep(-fw, fw, sdf + borderWidth);
 
@@ -169,6 +230,11 @@ void main() {
     borderColor.rgb = darken(borderColor.rgb, uBorderDarken);
     fillColor.a = 1.0;
     borderColor.a = 1.0;
+    // Megastructure: the icon rim glows in the megastructure's accent color.
+    if (vMega > 0.5) {
+      float rimPulse = 0.55 + 0.3 * sin((uTime + vSeed * 10.0) * 2.2);
+      borderColor.rgb = mix(borderColor.rgb, megaAccent(), rimPulse);
+    }
   }
 
   // structures cosmetic: recolor the fill with the owner's effect (raw catalog

@@ -32,6 +32,10 @@ export class TerrainPass {
   private tex: WebGLTexture;
   private vao: WebGLVertexArrayObject;
   private uCamera: WebGLUniformLocation;
+  // Animated ocean (swell, caustics, coastal foam).
+  private uTime: WebGLUniformLocation;
+  private uMapSize: WebGLUniformLocation;
+  private readonly startTime = performance.now();
   private mapW: number;
   private mapH: number;
   // Base ocean (deep water) color; reused by applyTerrainRects and rebuilds.
@@ -62,6 +66,8 @@ export class TerrainPass {
       "TerrainPass",
     );
     this.uCamera = gl.getUniformLocation(this.program, "uCamera")!;
+    this.uTime = gl.getUniformLocation(this.program, "uTime")!;
+    this.uMapSize = gl.getUniformLocation(this.program, "uMapSize")!;
 
     this.tex = createTexture2D(gl, {
       width: mapW,
@@ -151,6 +157,8 @@ export class TerrainPass {
     const gl = this.gl;
     gl.useProgram(this.program);
     gl.uniformMatrix3fv(this.uCamera, false, cameraMatrix);
+    gl.uniform1f(this.uTime, (performance.now() - this.startTime) / 1000);
+    gl.uniform2f(this.uMapSize, this.mapW, this.mapH);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.tex);

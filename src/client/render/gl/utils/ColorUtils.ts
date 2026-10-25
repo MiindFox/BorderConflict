@@ -180,7 +180,7 @@ export function encodeTerrainTile(
   out[offset] = r;
   out[offset + 1] = g;
   out[offset + 2] = b;
-  out[offset + 3] = 255;
+  out[offset + 3] = isLand ? 255 : isShoreline ? 128 : 0;
 }
 
 export function buildTerrainRGBA(

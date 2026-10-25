@@ -32,6 +32,7 @@ import {
 } from "../utils/ColorUtils";
 import { createProgram, shaderSrc } from "../utils/GlUtils";
 
+import { MEGASTRUCTURE_DEFINITIONS } from "@openfront/engine-lib/configuration/HexaFrontSystems";
 import { assetUrl } from "@openfront/shared/AssetUrls";
 import structureFragSrc from "../shaders/structure/structure.frag.glsl?raw";
 import structureVertSrc from "../shaders/structure/structure.vert.glsl?raw";
@@ -61,8 +62,17 @@ const ATLAS_COLS = STRUCTURE_ORDER.length;
 // Instance data layout
 // ---------------------------------------------------------------------------
 
-// Per-instance: x, y, ownerID, underConstruction, atlasIdx, markedForDeletion
-const FLOATS_PER_INSTANCE = 6;
+// Per-instance: x, y, ownerID, underConstruction, atlasIdx, markedForDeletion,
+// megaAura (1 = this structure powers one of its owner's active megastructures)
+const FLOATS_PER_INSTANCE = 7;
+
+/**
+ * Atlas column → megastructure index in MEGASTRUCTURE_DEFINITIONS
+ * (0 Arcology/cities, 1 Titan/factories, 2 Shipyard/ports, 3 Orbital/silos,
+ * 4 Dome/defenses+SAM). Atlas order: City, Port, Factory, DefensePost, SAM, Silo.
+ */
+const ATLAS_COL_TO_MEGA = [0, 2, 1, 4, 4, 3] as const;
+const MEGA_THRESHOLDS = MEGASTRUCTURE_DEFINITIONS.map((m) => m.targetCount);
 const BYTES_PER_INSTANCE = FLOATS_PER_INSTANCE * 4;
 
 // ---------------------------------------------------------------------------
@@ -270,9 +280,9 @@ export class StructurePass {
     gl.vertexAttribPointer(1, 4, gl.FLOAT, false, BYTES_PER_INSTANCE, 0);
     gl.vertexAttribDivisor(1, 1);
 
-    // Attribute 2: per-instance vec2 (atlasIdx, markedForDeletion)
+    // Attribute 2: per-instance vec3 (atlasIdx, markedForDeletion, megaAura)
     gl.enableVertexAttribArray(2);
-    gl.vertexAttribPointer(2, 2, gl.FLOAT, false, BYTES_PER_INSTANCE, 16);
+    gl.vertexAttribPointer(2, 3, gl.FLOAT, false, BYTES_PER_INSTANCE, 16);
     gl.vertexAttribDivisor(2, 1);
 
     gl.bindVertexArray(null);
@@ -307,6 +317,22 @@ export class StructurePass {
   updateStructures(units: Map<number, UnitState>): void {
     let count = 0;
 
+    // Megastructure detection — mirrors the engine (sum of structure levels
+    // per owner, construction included) so the aura lights up exactly when
+    // the owner's megastructure bonus is active.
+    const megaLevels = new Map<number, number[]>();
+    for (const unit of units.values()) {
+      if (!unit.isActive) continue;
+      const col = this.typeToAtlasCol.get(unit.unitType);
+      if (col === undefined) continue;
+      let sums = megaLevels.get(unit.ownerID);
+      if (!sums) {
+        sums = [0, 0, 0, 0, 0];
+        megaLevels.set(unit.ownerID, sums);
+      }
+      sums[ATLAS_COL_TO_MEGA[col]] += Math.max(1, unit.level);
+    }
+
     for (const unit of units.values()) {
       if (!unit.isActive) continue;
       const atlasIdx = this.typeToAtlasCol.get(unit.unitType);
@@ -325,6 +351,10 @@ export class StructurePass {
       this.instanceBuf.float32[off + 4] = atlasIdx;
       this.instanceBuf.float32[off + 5] =
         unit.markedForDeletion !== false ? 1 : 0;
+      const megaIdx = ATLAS_COL_TO_MEGA[atlasIdx];
+      const sums = megaLevels.get(unit.ownerID);
+      this.instanceBuf.float32[off + 6] =
+        sums && sums[megaIdx] >= MEGA_THRESHOLDS[megaIdx] ? 1 : 0;
 
       count++;
     }
@@ -443,7 +473,7 @@ export class StructurePass {
       // Temporarily rebind instance attrs to ghost buffer
       gl.bindBuffer(gl.ARRAY_BUFFER, this.ghostInstanceBuf);
       gl.vertexAttribPointer(1, 4, gl.FLOAT, false, BYTES_PER_INSTANCE, 0);
-      gl.vertexAttribPointer(2, 2, gl.FLOAT, false, BYTES_PER_INSTANCE, 16);
+      gl.vertexAttribPointer(2, 3, gl.FLOAT, false, BYTES_PER_INSTANCE, 16);
 
       // -- Green highlight on existing structure being upgraded --
       if (g.canUpgrade && g.upgradeTargetTile !== null) {
@@ -484,7 +514,7 @@ export class StructurePass {
       // Restore instance attrs to main buffer
       gl.bindBuffer(gl.ARRAY_BUFFER, this.instanceBuf.buffer);
       gl.vertexAttribPointer(1, 4, gl.FLOAT, false, BYTES_PER_INSTANCE, 0);
-      gl.vertexAttribPointer(2, 2, gl.FLOAT, false, BYTES_PER_INSTANCE, 16);
+      gl.vertexAttribPointer(2, 3, gl.FLOAT, false, BYTES_PER_INSTANCE, 16);
     }
   }
 
