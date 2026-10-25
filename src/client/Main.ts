@@ -88,6 +88,7 @@ import "./LangSelector";
 import { LangSelector } from "./LangSelector";
 import { initLayout } from "./Layout";
 import { loadModal, prefetchModals, whenModalLoaded } from "./LazyModals";
+import { lobbyModalManager } from "./LobbyModalManager";
 import {
   SendKickPlayerIntentEvent,
   SendToggleGameStartTimer,
@@ -1081,6 +1082,8 @@ class Client {
         this.joinModal.eventBus = this.eventBus;
       });
     }
+
+    lobbyModalManager.init(this.eventBus);
 
     // Attempt to join lobby from the current URL once the document is ready.
     if (document.readyState === "loading") {
