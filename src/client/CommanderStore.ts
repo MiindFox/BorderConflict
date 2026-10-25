@@ -131,12 +131,46 @@ class CommanderStore {
   constructor() {
     this.profile = this.load();
     if (typeof window !== "undefined") {
-      setTimeout(() => this.syncWithServerInBackground(), 10);
-      window.addEventListener("focus", () => this.syncWithServerInBackground());
-      window.addEventListener("online", () =>
-        this.syncWithServerInBackground(),
-      );
+      setTimeout(() => {
+        this.syncWithServerInBackground();
+        this.sendPresencePing();
+      }, 10);
+      setInterval(() => this.sendPresencePing(), 20_000);
+      window.addEventListener("focus", () => {
+        this.syncWithServerInBackground();
+        this.sendPresencePing();
+      });
+      window.addEventListener("online", () => {
+        this.syncWithServerInBackground();
+        this.sendPresencePing();
+      });
     }
+  }
+
+  public sendPresencePing(): void {
+    if (typeof window === "undefined") return;
+    try {
+      let sessionId = sessionStorage.getItem("bc_session_id");
+      if (!sessionId) {
+        sessionId =
+          "sess_" +
+          Math.random().toString(36).substring(2) +
+          Date.now().toString(36);
+        sessionStorage.setItem("bc_session_id", sessionId);
+      }
+      const inGame = document.body.classList.contains("in-game");
+      fetch("/api/presence/ping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId,
+          username: this.profile.username || "Commandant",
+          email: this.profile.email || undefined,
+          state: inGame ? "in_game" : "menu",
+          currentPage: window.currentPageId || "play",
+        }),
+      }).catch(() => {});
+    } catch {}
   }
 
   private load(): CommanderProfile {

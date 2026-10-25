@@ -13,6 +13,7 @@ import { fileURLToPath } from "url";
 import { getHexaFrontCosmeticsCatalog } from "../client/HexaFrontCosmeticsCatalog";
 import { verifyClientToken } from "./jwt";
 import { purchaseTracker } from "./PurchaseTracker";
+import { presenceTracker } from "./PresenceTracker";
 import {
   applyCheckinState,
   CHECKIN_INTERVAL_MS,
@@ -542,18 +543,61 @@ function requireAdmin(
 }
 
 // ============================================================================
+// Presence heartbeat endpoint for all online commanders
+app.post("/api/presence/ping", (req, res) => {
+  const { sessionId, username, email, state, currentPage } = req.body || {};
+  const ip =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "";
+  const userAgent = req.headers["user-agent"] || "";
+  const key = sessionId || `${ip}_${username || email || "anon"}`;
+
+  presenceTracker.recordHeartbeat(key, {
+    username,
+    email,
+    ip,
+    userAgent,
+    state,
+    currentPage,
+  });
+
+  return res.json({
+    ok: true,
+    onlineCount: presenceTracker.getOnlineCount(),
+    serverTime: Date.now(),
+  });
+});
+
 // ADMIN PANEL BACKEND ROUTES
 // ============================================================================
 
 app.all("/api/admin/overview", requireAdmin, (_req, res) => {
   const accounts = accountDb.getAllAccounts();
   const stats = purchaseTracker.getStats();
+  const activeSessions = presenceTracker.getActiveSessions();
+  const onlineCount = activeSessions.length;
+  const lobbyPlayers = lobbyService?.getLobbyPlayerCount() ?? 0;
+  const liveGames = lobbyService?.liveGames() ?? 0;
+
   return res.json({
     ok: true,
     overview: {
       totalAccounts: accounts.length,
       bannedCount: accounts.filter((a) => a.isBanned).length,
       vipCount: accounts.filter((a) => a.isVip).length,
+      livePlayers: {
+        totalOnline: Math.max(onlineCount, lobbyPlayers),
+        inMenus: Math.max(0, onlineCount - lobbyPlayers),
+        inLobbies: lobbyPlayers,
+        liveGames: liveGames,
+        sessions: activeSessions.slice(0, 50).map((s) => ({
+          username: s.username,
+          state: s.state,
+          currentPage: s.currentPage,
+          lastSeenAgoSeconds: Math.floor((Date.now() - s.lastSeen) / 1000),
+        })),
+      },
       totalRevenueEur: stats.totalRevenueEur,
       totalPlutoniumSpent: stats.totalPlutoniumSpent,
       totalCapsSpent: stats.totalCapsSpent,
@@ -570,7 +614,14 @@ app.all("/api/admin/overview", requireAdmin, (_req, res) => {
 });
 
 app.all("/api/admin/players", requireAdmin, (_req, res) => {
-  return res.json({ ok: true, players: accountDb.getAllAccounts() });
+  const rawPlayers = accountDb.getAllAccounts();
+  const playersWithStatus = rawPlayers.map((p) => ({
+    ...p,
+    isOnline:
+      presenceTracker.isUserOnline(p.username) ||
+      presenceTracker.isUserOnline(p.email),
+  }));
+  return res.json({ ok: true, players: playersWithStatus });
 });
 
 app.post("/api/admin/players/action", requireAdmin, (req, res) => {
@@ -714,6 +765,19 @@ app.all("/api/admin/backup", requireAdmin, (_req, res) => {
 
 app.post("/api/account/sync", (req, res) => {
   const { email, password, profile } = req.body || {};
+  const ip =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "";
+  if (email || profile?.username) {
+    presenceTracker.recordHeartbeat(email || profile?.username, {
+      username: profile?.username,
+      email,
+      ip,
+      state: "menu",
+      currentPage: "sync",
+    });
+  }
   const result = accountDb.syncProfile(email, password, profile);
   if (!result.ok) {
     return res.status(400).json({ ok: false, error: result.error });

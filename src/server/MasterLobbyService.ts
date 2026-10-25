@@ -154,6 +154,16 @@ export class MasterLobbyService {
     return total;
   }
 
+  getLobbyPlayerCount(): number {
+    let total = 0;
+    for (const lobbies of this.workerLobbies.values()) {
+      for (const lobby of lobbies) {
+        total += lobby.numClients || 0;
+      }
+    }
+    return total;
+  }
+
   isHealthy(): boolean {
     // We consider the lobby service healthy if at least half of the workers are ready.
     // This allows for some leeway if a worker crashes.

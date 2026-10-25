@@ -23,6 +23,7 @@ interface AdminPlayer {
   hasCustomSkinUnlocked: boolean;
   hasBattlePass: boolean;
   ownedFlaresCount: number;
+  isOnline?: boolean;
 }
 
 interface PurchaseItem {
@@ -86,10 +87,27 @@ export class AdminModal extends BaseModal {
   @state() private broadcastText = "";
   @state() private broadcastLevel: "info" | "warning" | "alert" = "alert";
   @state() private broadcastDuration = 60;
+  @state() private filterOnlineOnly = false;
+  private pollInterval: number | null = null;
 
   override connectedCallback() {
     super.connectedCallback();
     this.refreshAllData();
+    if (typeof window !== "undefined") {
+      this.pollInterval = window.setInterval(() => {
+        if (this.isOpen()) {
+          this.refreshAllData(true);
+        }
+      }, 10_000);
+    }
+  }
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
   }
 
   protected override onOpen() {
@@ -105,9 +123,9 @@ export class AdminModal extends BaseModal {
     };
   }
 
-  public async refreshAllData() {
+  public async refreshAllData(silent = false) {
     if (!commanderStore.isAdmin()) return;
-    this.isLoading = true;
+    if (!silent) this.isLoading = true;
     this.errorMsg = null;
     const headers = this.getAuthHeaders();
 
@@ -284,10 +302,18 @@ export class AdminModal extends BaseModal {
 
     const filteredPlayers = this.players.filter((p) => {
       const q = this.playerSearch.toLowerCase();
-      return (
-        p.username.toLowerCase().includes(q) || p.email.toLowerCase().includes(q)
-      );
+      const matchesQuery =
+        p.username.toLowerCase().includes(q) ||
+        p.email.toLowerCase().includes(q);
+      if (!matchesQuery) return false;
+      if (this.filterOnlineOnly) {
+        return Boolean(p.isOnline);
+      }
+      return true;
     });
+
+    const liveTotal = this.overview?.livePlayers?.totalOnline ?? 1;
+    const onlineRegisteredCount = this.players.filter((p) => p.isOnline).length;
 
     return html`
       <div class="p-4 sm:p-6 space-y-5 text-slate-100 max-w-7xl mx-auto">
@@ -304,6 +330,10 @@ export class AdminModal extends BaseModal {
                 </h1>
                 <span class="bg-red-500/30 text-red-300 border border-red-400/50 text-[10px] font-black px-2 py-0.5 rounded uppercase">
                   ROOT ADMIN
+                </span>
+                <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[10px] font-black px-2.5 py-0.5 rounded uppercase flex items-center gap-1.5 shadow-[0_0_12px_rgba(34,197,94,0.4)]">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span>${liveTotal} JOUEUR(S) EN DIRECT</span>
                 </span>
               </div>
               <p class="text-xs text-slate-400">
@@ -355,6 +385,9 @@ export class AdminModal extends BaseModal {
               : "bg-slate-900/80 text-slate-300 hover:bg-slate-800 border border-slate-700"}"
           >
             👥 JOUEURS INSCRITS (${this.players.length})
+            ${onlineRegisteredCount > 0
+              ? html`<span class="ml-1.5 px-1.5 py-0.2 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400 text-[10px]">🟢 ${onlineRegisteredCount}</span>`
+              : nothing}
           </button>
           <button
             type="button"
@@ -380,6 +413,104 @@ export class AdminModal extends BaseModal {
         ${this.currentTab === "overview"
           ? html`
               <div class="space-y-5">
+                <!-- LIVE PLAYERS RADAR SPOTLIGHT -->
+                <div class="rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-950/40 via-slate-900/90 to-emerald-950/40 p-5 shadow-[0_0_30px_rgba(16,185,129,0.2)] space-y-4">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                      <span class="relative flex h-4 w-4">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span>
+                      </span>
+                      <div>
+                        <h3 class="text-base font-black font-mono uppercase text-emerald-300 tracking-wider flex items-center gap-2">
+                          <span>RADAR TACTIQUE : JOUEURS EN DIRECT</span>
+                          <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-black">
+                            LIVE MONITOR
+                          </span>
+                        </h3>
+                        <p class="text-xs text-slate-400">
+                          Activité en direct des commandants actuellement connectés sur BorderConflict
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <div class="px-5 py-2.5 rounded-2xl bg-slate-950 border-2 border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                        <div class="text-3xl font-black text-emerald-400 font-mono flex items-center gap-2.5">
+                          <span class="text-base">🟢</span>
+                          <span>${liveTotal}</span>
+                          <span class="text-xs font-normal text-slate-300 uppercase tracking-widest">Connecté(s)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- LIVE STATS BREAKDOWN -->
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="p-3.5 rounded-xl bg-slate-950/80 border border-emerald-500/30 flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <span class="text-xl">🎮</span>
+                        <div>
+                          <span class="text-xs font-mono font-bold text-slate-200 block">En Partie / Lobbies</span>
+                          <span class="text-[10px] text-slate-400">Dans les salons de jeu</span>
+                        </div>
+                      </div>
+                      <span class="text-xl font-mono font-black text-emerald-400">
+                        ${this.overview?.livePlayers?.inLobbies ?? 0}
+                      </span>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/80 border border-emerald-500/30 flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <span class="text-xl">🏠</span>
+                        <div>
+                          <span class="text-xs font-mono font-bold text-slate-200 block">Menus & Quartier Général</span>
+                          <span class="text-[10px] text-slate-400">Navigation, boutique, profil</span>
+                        </div>
+                      </div>
+                      <span class="text-xl font-mono font-black text-cyan-400">
+                        ${this.overview?.livePlayers?.inMenus ?? 1}
+                      </span>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/80 border border-emerald-500/30 flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <span class="text-xl">⚔️</span>
+                        <div>
+                          <span class="text-xs font-mono font-bold text-slate-200 block">Matchs en Cours</span>
+                          <span class="text-[10px] text-slate-400">Parties actives sur serveurs</span>
+                        </div>
+                      </div>
+                      <span class="text-xl font-mono font-black text-amber-400">
+                        ${this.overview?.livePlayers?.liveGames ?? 0}
+                      </span>
+                    </div>
+                  </div>
+
+                  ${(this.overview?.livePlayers?.sessions || []).length > 0
+                    ? html`
+                        <div class="pt-3 border-t border-emerald-500/20">
+                          <span class="text-[11px] font-mono font-bold text-emerald-400 uppercase tracking-wider block mb-2 flex items-center gap-2">
+                            <span>📡 SESSIONS ACTIVES DÉTECTÉES (${(this.overview.livePlayers.sessions as any[]).length}) :</span>
+                          </span>
+                          <div class="flex flex-wrap gap-2 max-h-36 overflow-y-auto pr-1">
+                            ${(this.overview.livePlayers.sessions as any[]).map(
+                              (sess) => html`
+                                <div class="px-3 py-1.5 rounded-lg bg-slate-950/90 border border-emerald-500/40 text-xs font-mono flex items-center gap-2 shadow">
+                                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                  <span class="font-bold text-white">${sess.username}</span>
+                                  <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-300">
+                                    ${sess.state === "in_game" ? "En combat" : sess.currentPage || "QG"}
+                                  </span>
+                                  <span class="text-[9px] text-emerald-400/80 font-mono">il y a ${sess.lastSeenAgoSeconds}s</span>
+                                </div>
+                              `,
+                            )}
+                          </div>
+                        </div>
+                      `
+                    : nothing}
+                </div>
+
                 <!-- KPI CARDS -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-700 shadow flex flex-col justify-between">
@@ -586,17 +717,38 @@ export class AdminModal extends BaseModal {
         ${this.currentTab === "players"
           ? html`
               <div class="space-y-4">
-                <!-- SEARCH BAR -->
-                <div class="flex items-center gap-3">
+                <!-- SEARCH & FILTER BAR -->
+                <div class="flex flex-wrap items-center gap-3">
                   <input
                     type="text"
                     .value=${this.playerSearch}
                     @input=${(e: any) => (this.playerSearch = e.target.value)}
                     placeholder="🔍 Rechercher un joueur par pseudo ou adresse email..."
-                    class="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm font-mono text-white focus:outline-none focus:border-red-500"
+                    class="flex-1 min-w-[240px] px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm font-mono text-white focus:outline-none focus:border-red-500"
                   />
+                  <div class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      @click=${() => (this.filterOnlineOnly = false)}
+                      class="px-3 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer transition-all ${!this.filterOnlineOnly
+                        ? "bg-slate-700 text-white border border-slate-500"
+                        : "bg-slate-900/80 text-slate-400 border border-slate-800 hover:text-white"}"
+                    >
+                      Tous (${this.players.length})
+                    </button>
+                    <button
+                      type="button"
+                      @click=${() => (this.filterOnlineOnly = true)}
+                      class="px-3 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer transition-all flex items-center gap-1.5 ${this.filterOnlineOnly
+                        ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 ring-2 ring-emerald-400"
+                        : "bg-emerald-950/40 text-emerald-400 border border-emerald-700/50 hover:bg-emerald-950/80"}"
+                    >
+                      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                      <span>En Ligne (${onlineRegisteredCount})</span>
+                    </button>
+                  </div>
                   <span class="text-xs font-mono text-slate-400">
-                    ${filteredPlayers.length} résultat(s)
+                    ${filteredPlayers.length} affiché(s)
                   </span>
                 </div>
 
@@ -606,6 +758,7 @@ export class AdminModal extends BaseModal {
                     <thead>
                       <tr class="bg-slate-950 border-b border-slate-800 text-slate-400 uppercase text-[11px]">
                         <th class="p-3">Joueur / Email</th>
+                        <th class="p-3">Présence</th>
                         <th class="p-3">Rôle</th>
                         <th class="p-3">Niveau & XP</th>
                         <th class="p-3">Plutonium ☢️</th>
@@ -622,6 +775,14 @@ export class AdminModal extends BaseModal {
                             <td class="p-3">
                               <div class="font-bold text-white text-sm">${p.username}</div>
                               <div class="text-[10px] text-slate-400">${p.email}</div>
+                            </td>
+                            <td class="p-3">
+                              ${p.isOnline
+                                ? html`<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/50 text-[10px] font-bold shadow-[0_0_10px_rgba(34,197,94,0.35)]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                    <span>EN DIRECT</span>
+                                  </span>`
+                                : html`<span class="text-slate-500 text-[10px]">Hors-ligne</span>`}
                             </td>
                             <td class="p-3">
                               <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase ${p.role === "admin"
