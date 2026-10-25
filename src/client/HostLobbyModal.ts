@@ -736,25 +736,6 @@ export class HostLobbyModal extends BaseModal {
                 <span>🔗</span>
                 <span>COPIER LIEN</span>
               </button>
-              <a
-                href="https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  `Rejoins mon salon sur BorderConflict pour un duel stratégique : ${
-                    this.duelShareUrl ||
-                    (this.lobbyId
-                      ? `${window.location.origin}${ClientEnv.gamePath(
-                          this.lobbyId,
-                        )}`
-                      : window.location.href)
-                  }`,
-                )}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="retro-metal-btn flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-retro text-[10px] sm:text-xs font-bold text-emerald-300 hover:text-white uppercase tracking-wider cursor-pointer border border-emerald-500/50 bg-emerald-950/40 whitespace-nowrap"
-                title="Inviter directement via WhatsApp"
-              >
-                <span>💬</span>
-                <span>WHATSAPP</span>
-              </a>
             </div>
           </div>
 
