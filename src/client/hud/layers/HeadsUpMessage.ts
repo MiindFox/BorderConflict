@@ -254,29 +254,29 @@ export class HeadsUpMessage extends LitElement implements Controller {
               >
                 <div
                   data-game-toast-content
-                  class="px-6 py-4 rounded-xl animate-fade-in-out"
-                  style="min-width: 200px; text-align: center;
+                  class="px-5 py-3 rounded-md animate-fade-in-out font-mono uppercase tracking-wider text-xs sm:text-sm border-2 shadow-[0_0_30px_rgba(0,0,0,0.9)] backdrop-blur-md"
+                  style="min-width: 220px; text-align: center;
                   transform: translate3d(${this.toastDragOffset.x}px, ${this
                     .toastDragOffset.y}px, 0);
                   transition: ${this.toastPointerId === null
                     ? "transform 180ms cubic-bezier(0.4, 0, 0.2, 1)"
                     : "none"};
                   background: ${this.toastColor === "red"
-                    ? "rgba(239,68,68,0.1)"
-                    : "rgba(34,197,94,0.1)"};
-                  border: 1px solid ${this.toastColor === "red"
-                    ? "rgba(239,68,68,0.5)"
-                    : "rgba(34,197,94,0.5)"};
-                  color: white;
-                  box-shadow: 0 0 30px 0 ${this.toastColor === "red"
-                    ? "rgba(239,68,68,0.3)"
-                    : "rgba(34,197,94,0.3)"};
-                  backdrop-filter: blur(12px);"
+                    ? "rgba(25, 12, 12, 0.95)"
+                    : "rgba(12, 25, 16, 0.95)"};
+                  border-color: ${this.toastColor === "red"
+                    ? "rgba(239, 68, 68, 0.8)"
+                    : "rgba(34, 197, 94, 0.8)"};
+                  color: ${this.toastColor === "red" ? "#fca5a5" : "#86efac"};
+                  box-shadow: 0 0 25px 0 ${this.toastColor === "red"
+                    ? "rgba(239, 68, 68, 0.4)"
+                    : "rgba(34, 197, 94, 0.4)"}, inset 0 1px 0 rgba(255, 255, 255, 0.1);"
                 >
                   ${typeof this.toastMessage === "string"
-                    ? html`<span class="font-medium"
-                        >${this.toastMessage}</span
-                      >`
+                    ? html`<span class="font-bold flex items-center justify-center gap-2">
+                        <span>${this.toastColor === "red" ? "⚠️" : "🎖️"}</span>
+                        <span>${this.toastMessage}</span>
+                      </span>`
                     : this.toastMessage}
                 </div>
               </div>

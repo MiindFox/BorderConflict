@@ -659,9 +659,11 @@ export class EventsDisplay extends LitElement implements Controller {
 
   private renderEventRow(event: GameEvent) {
     return html`
-      <tr>
+      <tr
+        class="border-b border-[#1b281d]/50 last:border-b-0 hover:bg-[#18261b]/50 transition-colors"
+      >
         <td
-          class="lg:px-2 lg:py-1 p-1 text-left ${getMessageTypeClasses(
+          class="px-2.5 py-1.5 text-left font-mono tracking-wide ${getMessageTypeClasses(
             event.type,
           )}"
         >
@@ -671,7 +673,7 @@ export class EventsDisplay extends LitElement implements Controller {
                 onClick: () => {
                   if (event.focusID) this.emitGoToPlayerEvent(event.focusID);
                 },
-                className: "text-left",
+                className: "text-left hover:underline cursor-pointer",
               })
             : event.unitView
               ? this.renderButton({
@@ -679,7 +681,7 @@ export class EventsDisplay extends LitElement implements Controller {
                   onClick: () => {
                     if (event.unitView) this.emitGoToUnitEvent(event.unitView);
                   },
-                  className: "text-left",
+                  className: "text-left hover:underline cursor-pointer",
                 })
               : this.getEventDescription(event)}
         </td>
@@ -719,14 +721,24 @@ export class EventsDisplay extends LitElement implements Controller {
     }
 
     return html`
-      <div class="flex flex-col gap-1 w-full min-[1200px]:w-96">
+      <div
+        class="flex flex-col gap-1.5 w-full min-[1200px]:w-96 select-none font-mono"
+      >
         ${tier2Events.length > 0
           ? html`
               <div
-                class="bg-gray-800/92 backdrop-blur-sm max-h-[12vh] lg:max-h-[22vh] overflow-y-auto rounded-lg opacity-90 events-container"
+                class="bg-[#0c140e]/95 backdrop-blur-md max-h-[12vh] lg:max-h-[22vh] overflow-y-auto rounded-md border-2 border-[#233526] shadow-[0_4px_16px_rgba(0,0,0,0.85)] opacity-95 events-container"
               >
+                <div
+                  class="px-2 py-0.5 bg-[#142016] border-b border-[#233526] text-[9px] font-pixel text-[#8fa382] uppercase tracking-wider flex items-center justify-between"
+                >
+                  <span>JOURNAL TACTIQUE</span>
+                  <span
+                    class="size-1.5 rounded-full bg-emerald-500 animate-pulse"
+                  ></span>
+                </div>
                 <table
-                  class="w-full border-collapse text-white text-xs lg:text-sm pointer-events-auto"
+                  class="w-full border-collapse text-xs pointer-events-auto"
                 >
                   <tbody>
                     ${tier2Events.map((event) => this.renderEventRow(event))}
@@ -738,17 +750,32 @@ export class EventsDisplay extends LitElement implements Controller {
         ${tier1Events.length > 0 || showBetrayalTimer
           ? html`
               <div
-                class="bg-gray-800 backdrop-blur-sm max-h-[30vh] lg:max-h-[40vh] overflow-y-auto rounded-lg shadow-lg border-l-4 border-red-500 important-events-container"
+                class="bg-gradient-to-r from-[#0e1711]/98 via-[#09110b]/98 to-[#0e1711]/98 backdrop-blur-md max-h-[30vh] lg:max-h-[40vh] overflow-y-auto rounded-md border-2 border-[#314534] shadow-[0_6px_25px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.06)] border-l-4 border-l-red-500 important-events-container"
               >
+                <div
+                  class="px-2.5 py-1 bg-[#131f15] border-b border-[#263728] text-[10px] font-pixel text-amber-400 uppercase tracking-wider flex items-center justify-between"
+                >
+                  <span class="flex items-center gap-1.5">
+                    <span class="text-xs">📡</span>
+                    <span>ALERTE COMBAT</span>
+                  </span>
+                  <span
+                    class="text-[9px] font-mono text-red-400 font-black tracking-widest animate-pulse"
+                  >
+                    DIRECT
+                  </span>
+                </div>
                 <table
-                  class="w-full border-collapse text-white text-base lg:text-lg font-medium pointer-events-auto"
+                  class="w-full border-collapse text-xs sm:text-[13px] font-medium pointer-events-auto"
                 >
                   <tbody>
                     ${tier1Events.map((event) => this.renderEventRow(event))}
                     ${showBetrayalTimer
                       ? html`
-                          <tr>
-                            <td class="lg:px-2 lg:py-1 p-1 text-left">
+                          <tr
+                            class="border-b border-[#1b281d]/50 last:border-b-0 hover:bg-[#18261b]/50 transition-colors"
+                          >
+                            <td class="px-2.5 py-1.5 text-left font-mono">
                               ${this.renderBetrayalDebuffTimer()}
                             </td>
                           </tr>

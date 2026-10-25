@@ -646,12 +646,13 @@ export function getTranslatedPlayerTeamLabel(
 }
 
 export const severityColors: Record<string, string> = {
-  fail: "text-red-400",
-  warn: "text-yellow-400",
-  success: "text-green-400",
-  info: "text-gray-200",
-  blue: "text-blue-400",
-  white: "text-white",
+  fail: "text-red-400 drop-shadow-[0_0_4px_rgba(239,68,68,0.5)] font-mono",
+  warn: "text-amber-400 drop-shadow-[0_0_4px_rgba(245,158,11,0.5)] font-mono",
+  success:
+    "text-emerald-400 drop-shadow-[0_0_4px_rgba(52,211,153,0.5)] font-mono",
+  info: "text-emerald-100/90 font-mono",
+  blue: "text-cyan-400 drop-shadow-[0_0_4px_rgba(34,211,238,0.5)] font-mono",
+  white: "text-amber-100 font-mono",
 };
 
 /**

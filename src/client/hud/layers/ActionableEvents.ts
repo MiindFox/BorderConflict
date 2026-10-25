@@ -318,31 +318,44 @@ export class ActionableEvents extends LitElement implements Controller {
 
     return html`
       <div
-        class="flex flex-col gap-2 w-full min-[1200px]:w-96 pointer-events-auto mt-2"
+        class="flex flex-col gap-2 w-full min-[1200px]:w-96 pointer-events-auto mt-2 select-none font-mono"
       >
         ${sorted.map(
           (event) => html`
             <div
-              class="bg-gray-800/92 backdrop-blur-sm rounded-lg shadow-lg border-l-4 border-yellow-400 p-3 lg:p-4 text-white"
+              class="bg-gradient-to-r from-[#172216]/98 via-[#0e160e]/98 to-[#172216]/98 backdrop-blur-md rounded-md border-2 border-[#3b543f] shadow-[0_6px_25px_rgba(0,0,0,0.95)] border-l-4 border-l-amber-400 p-3 lg:p-3.5 text-white"
             >
+              <div
+                class="flex items-center justify-between pb-1.5 mb-2 border-b border-[#253628]"
+              >
+                <span
+                  class="text-[9px] font-pixel text-amber-400 tracking-wider uppercase flex items-center gap-1.5"
+                >
+                  <span class="text-xs">📨</span>
+                  <span>COMMUNICATION DIPLOMATIQUE</span>
+                </span>
+                <span
+                  class="size-2 rounded-full bg-amber-400 animate-ping"
+                ></span>
+              </div>
               <button
-                class="text-left text-sm lg:text-base font-semibold w-full cursor-pointer ${getMessageTypeClasses(
+                class="text-left text-xs sm:text-sm font-bold w-full cursor-pointer hover:underline ${getMessageTypeClasses(
                   event.type,
                 )}"
                 @click=${() => this.emitGoToPlayerEvent(event.focusID)}
               >
                 ${event.description}
               </button>
-              <div class="flex flex-wrap gap-1.5 mt-2">
+              <div class="flex flex-wrap gap-2 mt-2.5">
                 ${event.buttons.map(
                   (btn) => html`
                     <button
-                      class="inline-block px-3 py-1 text-white rounded-sm text-xs lg:text-sm cursor-pointer transition-colors duration-300
+                      class="retro-metal-btn inline-block px-3 py-1.5 rounded text-xs font-mono font-bold uppercase tracking-wider cursor-pointer transition-all
                         ${btn.className.includes("btn-info")
-                        ? "bg-blue-500 hover:bg-blue-600"
+                        ? "text-cyan-300 border-cyan-500/50 bg-cyan-950/40"
                         : btn.className.includes("btn-gray")
-                          ? "bg-gray-500 hover:bg-gray-600"
-                          : "bg-green-600 hover:bg-green-700"}"
+                          ? "text-slate-300 border-slate-600/50 bg-slate-900/60"
+                          : "text-emerald-300 border-emerald-500/50 bg-emerald-950/40"}"
                       @click=${() => {
                         btn.action();
                         if (!btn.preventClose) {
