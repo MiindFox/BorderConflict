@@ -247,11 +247,11 @@ const ALL_PALETTE_REFS = PALETTE_DEFS.map((p) => ({
 }));
 
 const RARITY_PRICING: Record<Rarity, { hard: number; soft: number }> = {
-  common: { hard: 120, soft: 1000 },
-  uncommon: { hard: 180, soft: 1500 },
-  rare: { hard: 280, soft: 2400 },
-  epic: { hard: 420, soft: 3600 },
-  legendary: { hard: 650, soft: 5800 },
+  common: { hard: 79, soft: 800 },
+  uncommon: { hard: 149, soft: 1400 },
+  rare: { hard: 249, soft: 2400 },
+  epic: { hard: 399, soft: 3800 },
+  legendary: { hard: 599, soft: 5900 },
 };
 
 interface PatternSpec {
@@ -3184,6 +3184,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
 
   function addEffect(label: string, effect: Effect): void {
     registerLabel("effects", effect.name, label);
+    const standardPricing = RARITY_PRICING[effect.rarity as Rarity];
+    if (standardPricing) {
+      effect.priceHard = standardPricing.hard;
+      effect.priceSoft = standardPricing.soft;
+    }
     effects[effect.effectType][effect.name] = effect;
   }
 
@@ -4142,7 +4147,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "🎃 Pack Nécropole Maudite (Événement Halloween)",
       description:
         "Édition Spéciale Halloween : Cornes Démoniaques, Toile Nécromantique, Étendard Faucheuse d'Âmes, Sillage Ectoplasme et Déflagration Toxique Mort-Vivante.",
-      priceHard: 450,
+      priceHard: 399,
       rarity: "legendary",
       items: [
         {
@@ -4161,7 +4166,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "🔥 Pack Citrouille Infernale (Édition Limitée)",
       description:
         "Édition Limitée Halloween : Couronne Roi Citrouille, Lanterne d'Effroi, Blason Samhain, Coque Citrouille Infernale et Traînée d'Âmes Enflammées.",
-      priceHard: 490,
+      priceHard: 449,
       rarity: "legendary",
       items: [
         {
@@ -4180,7 +4185,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Recrue Tactique",
       description:
         "Pack d'initiation comprenant Rayures d'Assaut, Chenilles de Char, Cercle de Fer, Sillage Émeraude et Voie Ferrée Impériale.",
-      priceHard: 240,
+      priceHard: 199,
       rarity: "common",
       items: [
         {
@@ -4203,7 +4208,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Ingénieur de Forteresse",
       description:
         "Fortifiez vos frontières : Maillage Bunker, Rouages Industriels, Couronne Crénelée, Structures Émeraude et Train Cargo.",
-      priceHard: 380,
+      priceHard: 299,
       rarity: "uncommon",
       items: [
         {
@@ -4226,7 +4231,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Division Polaire Arctique",
       description:
         "Domination glaciale : Cristaux Cryogéniques, Couronne de Givre, Directoire Arctique, Brise-Glace et Bombe H Blizzard.",
-      priceHard: 620,
+      priceHard: 499,
       rarity: "rare",
       items: [
         {
@@ -4245,7 +4250,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Amiral Cybernétique",
       description:
         "Dominez les océans : Grille Hexagonale Cyber-Néon, Couronne du Commandeur, Cuirassé Fantôme, Sillage Plasma et Train Hyperloop.",
-      priceHard: 650,
+      priceHard: 549,
       rarity: "rare",
       items: [
         { type: "pattern", name: "hex_grid", colorPalette: "cyber_neon" },
@@ -4260,7 +4265,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Syndicat Rad-Toxique",
       description:
         "Guerre chimique et atomique : Sceau Bio-Danger, Trèfle Radioactif, Couronne Rad-Overlord, Hélice Uranium et Tempête Bio-Rad.",
-      priceHard: 820,
+      priceHard: 699,
       rarity: "rare",
       items: [
         { type: "pattern", name: "biohazard_seal", colorPalette: "toxic_rad" },
@@ -4280,7 +4285,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Phalange Impériale",
       description:
         "Tradition martiale : Lambda Spartiate, Bouclier des Ordres, Laurier Impérial, Légion Écarlate et Nova Écarlate.",
-      priceHard: 750,
+      priceHard: 649,
       rarity: "rare",
       items: [
         {
@@ -4303,7 +4308,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Shogunat Sakura",
       description:
         "Esthétique cyber-féodale : Mon de Shogun, Entrelacs Sakura, Ailes de Valkyrie Plasma, Drapeau Shogunat et Fusée Synthwave.",
-      priceHard: 980,
+      priceHard: 799,
       rarity: "epic",
       items: [
         { type: "pattern", name: "shogun_crest", colorPalette: "sakura_ronin" },
@@ -4322,7 +4327,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Division Holographique",
       description:
         "Technologie de pointe : Circuits Cybernétiques, Réseau de Qubits, Structures Hologrammes, Rails Énergétiques et Bombe A Étincelles.",
-      priceHard: 1100,
+      priceHard: 899,
       rarity: "epic",
       items: [
         { type: "pattern", name: "cyber_circuit", colorPalette: "cyber_neon" },
@@ -4342,7 +4347,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Hégémonie Écarlate",
       description:
         "Puissance de feu totale : Ondes Radar Écarlates, Couronne Lune de Sang, Hélice Apocalypse, Flotte Écarlate et Cataclysme Bombe H.",
-      priceHard: 1280,
+      priceHard: 999,
       rarity: "epic",
       items: [
         {
@@ -4366,7 +4371,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Dynastie Solaire",
       description:
         "Rayonnement ardent : Sceau des Pharaons, Rayonnement Céleste, Némès Solaire, Impérium Solaire et Éruption Bombe H.",
-      priceHard: 1450,
+      priceHard: 1199,
       rarity: "epic",
       items: [
         { type: "pattern", name: "pharaoh_ankh", colorPalette: "solar_flare" },
@@ -4386,7 +4391,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Archonte du Néant",
       description:
         "Mystères dimensionnels : Vortex Trou Noir, Tesseract 4D, Diadème d'Archonte, Dreadnought du Néant et Implosion Bombe A.",
-      priceHard: 1680,
+      priceHard: 1399,
       rarity: "legendary",
       items: [
         {
@@ -4410,7 +4415,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Empereur Dragon Mythique",
       description:
         "Rage ancestrale : Écailles de Dragon, Ascension du Phénix, Cornes du Dragon Souverain, Forge Magmatique et Pluie d'Or MIRV.",
-      priceHard: 1900,
+      priceHard: 1599,
       rarity: "legendary",
       items: [
         {
@@ -4433,7 +4438,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Souverain Doré",
       description:
         "Prestige impérial absolu : Étoile Supernova Or, Dédale du Souverain, Halo Séraphique, Structures Impériales et Armada Dorée.",
-      priceHard: 2100,
+      priceHard: 1799,
       rarity: "legendary",
       items: [
         {
@@ -4458,7 +4463,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Oméga Singularity",
       description:
         "Collection Légendaire : Labyrinthe Quantique, Spirale Galactique, Spirale Nucléaire 3D, Supernova Bombe H, Singularité MIRV et Couronne Quantique.",
-      priceHard: 2450,
+      priceHard: 1999,
       rarity: "legendary",
       items: [
         {
@@ -4478,7 +4483,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       displayName: "Pack Suprême Apothéose BorderConflict",
       description:
         "Le trésor ultime du Haut Commandement : Apothéose BorderConflict, Mandala Cosmique, Couronne Suprême, Léviathan Astral, Architecture Oméga et Triple Hélice.",
-      priceHard: 2900,
+      priceHard: 2499,
       rarity: "legendary",
       items: [
         {

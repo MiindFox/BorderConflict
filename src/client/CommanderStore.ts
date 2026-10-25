@@ -797,10 +797,10 @@ class CommanderStore {
   } {
     const cost =
       tier === "standard"
-        ? { method: "soft" as const, amount: 2500, count: 2 }
+        ? { method: "soft" as const, amount: 2400, count: 2 }
         : tier === "elite"
-          ? { method: "hard" as const, amount: 450, count: 3 }
-          : { method: "hard" as const, amount: 900, count: 4 };
+          ? { method: "hard" as const, amount: 399, count: 3 }
+          : { method: "hard" as const, amount: 799, count: 4 };
 
     if (cost.method === "hard" && this.profile.plutonium < cost.amount) {
       return {

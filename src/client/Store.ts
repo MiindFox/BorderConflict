@@ -748,7 +748,7 @@ export class StoreModal extends BaseModal {
           </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- 250 PLUTONIUM -->
           <div
             class="rounded-2xl border border-slate-700 bg-slate-900/90 p-4 flex flex-col justify-between shadow-md hover:border-emerald-400/50 transition-all"
@@ -766,8 +766,7 @@ export class StoreModal extends BaseModal {
                 250 Plutonium
               </h4>
               <p class="text-[11px] text-slate-300 mt-1">
-                Réserve rapide pour ouvrir 1 coffre ou personnaliser votre
-                profil.
+                Débloque directement 1 cosmétique Rare (249 ☢️) ou personnalise votre profil.
               </p>
             </div>
             <button
@@ -801,7 +800,7 @@ export class StoreModal extends BaseModal {
                 600 Plutonium
               </h4>
               <p class="text-[11px] text-slate-300 mt-1">
-                Idéal pour coffre Cyber-Élite + cosmétiques de navires.
+                Débloque 1 skin Légendaire (599 ☢️), 1 Coffre Cyber-Élite ou 1 Pack Spécial.
               </p>
             </div>
             <button
@@ -813,7 +812,41 @@ export class StoreModal extends BaseModal {
             </button>
           </div>
 
-          <!-- 1700 PLUTONIUM -->
+          <!-- 1350 PLUTONIUM -->
+          <div
+            class="rounded-2xl border border-cyan-500/50 bg-slate-900/95 p-4 flex flex-col justify-between shadow-lg relative overflow-hidden hover:border-cyan-400 transition-all"
+          >
+            <div
+              class="absolute -right-8 top-3 rotate-45 bg-cyan-600 text-[9px] font-black uppercase px-8 text-white"
+            >
+              POPULAIRE
+            </div>
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">☢️✨</span>
+                <span
+                  class="rounded bg-cyan-500/20 px-2 py-0.5 text-xs font-bold text-cyan-300"
+                >
+                  4,99 €
+                </span>
+              </div>
+              <h4 class="mt-2 text-base font-black text-cyan-300">
+                1 350 Plutonium
+              </h4>
+              <p class="text-[11px] text-slate-300 mt-1">
+                1 200 + 150 Plutonium OFFERTS. Idéal pour les Coffres Suprêmes et Packs Thématiques.
+              </p>
+            </div>
+            <button
+              type="button"
+              @click=${() => this.handleBuyStripeBundle("plutonium_1350")}
+              class="mt-4 w-full cursor-pointer rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 py-2.5 text-xs font-black uppercase text-white shadow"
+            >
+              Acheter · 4,99 €
+            </button>
+          </div>
+
+          <!-- 3000 PLUTONIUM -->
           <div
             class="rounded-2xl border border-amber-400/50 bg-slate-900/95 p-4 flex flex-col justify-between shadow-lg hover:border-amber-300 transition-all"
           >
@@ -823,23 +856,22 @@ export class StoreModal extends BaseModal {
                 <span
                   class="rounded bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-300"
                 >
-                  6,99 €
+                  9,99 €
                 </span>
               </div>
               <h4 class="mt-2 text-base font-black text-amber-300">
-                1 700 Plutonium
+                3 000 Plutonium
               </h4>
               <p class="text-[11px] text-slate-300 mt-1">
-                1 500 + 200 Plutonium OFFERTS. Le plein pour les coffres
-                Suprêmes.
+                2 500 + 500 Plutonium OFFERTS. Permet d'acquérir le Pack Suprême Apothéose.
               </p>
             </div>
             <button
               type="button"
-              @click=${() => this.handleBuyStripeBundle("plutonium_1700")}
+              @click=${() => this.handleBuyStripeBundle("plutonium_3000")}
               class="mt-4 w-full cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 py-2.5 text-xs font-black uppercase text-slate-950 shadow"
             >
-              Acheter · 6,99 €
+              Acheter · 9,99 €
             </button>
           </div>
         </div>
@@ -872,7 +904,7 @@ export class StoreModal extends BaseModal {
               @click=${() => this.handleOpenCrate("standard")}
               class="mt-4 w-full cursor-pointer rounded-xl bg-emerald-600 hover:bg-emerald-500 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white transition-all shadow-md flex items-center justify-center gap-1.5"
             >
-              <span>Ouvrir · 2 500</span>
+              <span>Ouvrir · 2 400</span>
               <cap-icon .size=${16}></cap-icon>
               <span>Caps</span>
             </button>
@@ -904,7 +936,7 @@ export class StoreModal extends BaseModal {
               @click=${() => this.handleOpenCrate("elite")}
               class="mt-4 w-full cursor-pointer rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white transition-all shadow-md flex items-center justify-center gap-1.5"
             >
-              <span>Ouvrir · 450</span>
+              <span>Ouvrir · 399</span>
               <plutonium-icon .size=${16}></plutonium-icon>
               <span>Plutonium</span>
             </button>
@@ -937,7 +969,7 @@ export class StoreModal extends BaseModal {
               @click=${() => this.handleOpenCrate("supreme")}
               class="mt-4 w-full cursor-pointer rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 py-2.5 text-xs font-extrabold uppercase tracking-wider text-slate-950 transition-all shadow-md flex items-center justify-center gap-1.5"
             >
-              <span>Ouvrir · 900</span>
+              <span>Ouvrir · 799</span>
               <plutonium-icon .size=${16}></plutonium-icon>
               <span>Plutonium</span>
             </button>

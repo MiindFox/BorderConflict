@@ -199,19 +199,19 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
     // 3 Starter Bundles
     bundle_recrue: {
       name: "Kit de Recrue Stratégique",
-      description: "120 Plutonium + 1 500 Caps + Couronne Vanguard d'Argent",
+      description: "150 Plutonium + 2 000 Caps + Couronne Vanguard d'Argent",
       priceCents: 99, // 0.99 EUR
     },
     bundle_officier: {
       name: "Pack Officier de Terrain",
       description:
-        "450 Plutonium + 6 000 Caps + Couronne Animée Plasma Pulsar + Sillage Plasma",
+        "500 Plutonium + 7 000 Caps + Couronne Animée Plasma Pulsar + Sillage Plasma",
       priceCents: 299, // 2.99 EUR
     },
     bundle_supreme: {
       name: "Édition Suprême Commandant",
       description:
-        "950 Plutonium + 15 000 Caps + Couronne Animée Supernova Royale + Impact MIRV",
+        "1 100 Plutonium + 18 000 Caps + Couronne Animée Supernova Royale + Impact MIRV",
       priceCents: 499, // 4.99 EUR
     },
 
@@ -242,10 +242,25 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
       description: "600 Plutonium pour la boutique et les caisses",
       priceCents: 299, // 2.99 EUR
     },
+    plutonium_1350: {
+      name: "Stock Tactique de 1 350 Plutonium (1 200 + 150 Offerts)",
+      description: "1 350 Plutonium pour la boutique et les caisses",
+      priceCents: 499, // 4.99 EUR
+    },
     plutonium_1700: {
-      name: "Stock Stratégique de 1 700 Plutonium (1500 + 200 Offerts)",
+      name: "Stock Stratégique de 1 700 Plutonium (1 500 + 200 Offerts)",
       description: "1 700 Plutonium pour la boutique et les caisses",
       priceCents: 699, // 6.99 EUR
+    },
+    plutonium_3000: {
+      name: "Réserve Suprême de 3 000 Plutonium (2 500 + 500 Offerts)",
+      description: "3 000 Plutonium pour la boutique et les caisses",
+      priceCents: 999, // 9.99 EUR
+    },
+    plutonium_7500: {
+      name: "Dépôt d'Arsenal de 7 500 Plutonium (6 000 + 1 500 Offerts)",
+      description: "7 500 Plutonium pour la boutique et les caisses",
+      priceCents: 2299, // 22.99 EUR
     },
 
     // Module Forge de Skin de Territoire Personnalisé

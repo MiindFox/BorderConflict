@@ -421,22 +421,22 @@ class AccountDatabase {
         "effect:halloween_soul_trail",
       );
     } else if (bundleId === "bundle_recrue") {
-      addPlutonium = 120;
-      addCaps = 1500;
+      addPlutonium = 150;
+      addCaps = 2000;
       addFlares.push("crown:vanguard_silver");
     } else if (bundleId === "bundle_officier") {
-      addPlutonium = 450;
-      addCaps = 6000;
+      addPlutonium = 500;
+      addCaps = 7000;
       addFlares.push("crown:plasma_pulsar", "boat_trail:electric_plasma");
     } else if (bundleId === "bundle_supreme") {
-      addPlutonium = 950;
-      addCaps = 15000;
+      addPlutonium = 1100;
+      addCaps = 18000;
       addFlares.push("crown:supernova_royale", "nuke_impact:mirv_custom");
     } else if (bundleId === "battle_pass_s1") {
       current.hasBattlePass = true;
       current.battlePassSeason = 1;
-      addPlutonium = 250;
-      addCaps = 5000;
+      addPlutonium = 300;
+      addCaps = 6000;
       addFlares.push(
         "crown:atomic_conqueror",
         "pattern:nuclear_hazard:rad_active",
@@ -454,8 +454,14 @@ class AccountDatabase {
       addPlutonium = 250;
     } else if (bundleId === "plutonium_600") {
       addPlutonium = 600;
+    } else if (bundleId === "plutonium_1350") {
+      addPlutonium = 1350;
     } else if (bundleId === "plutonium_1700") {
       addPlutonium = 1700;
+    } else if (bundleId === "plutonium_3000") {
+      addPlutonium = 3000;
+    } else if (bundleId === "plutonium_7500") {
+      addPlutonium = 7500;
     } else if (bundleId === "custom_skin_pass") {
       current.hasCustomSkinUnlocked = true;
       addPlutonium = 100;
