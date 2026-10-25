@@ -471,18 +471,24 @@
         </div>
       </div>
 
-      <!-- events+chat: <sm between attacks and control (order-2), sm+ positioned above console on bottom-right -->
+      <!-- Chat: <sm between attacks and control (order-2), sm+ positioned above console on bottom-right -->
       <div
         class="flex flex-col pointer-events-none items-end order-2 sm:order-none sm:fixed sm:right-3 sm:bottom-[78px] lg:bottom-[74px] sm:max-w-[360px] z-20"
       >
         <chat-display
           class="w-full sm:w-auto pointer-events-auto"
         ></chat-display>
+      </div>
+
+      <!-- Mini Radio Tactique (Events & Transmissions): <sm between attacks and control (order-2), sm+ positioned on the LEFT side under statistics -->
+      <div
+        class="flex flex-col pointer-events-none items-start order-2 sm:order-none sm:fixed sm:left-3 sm:bottom-[82px] lg:bottom-[80px] sm:w-[350px] min-[1400px]:w-[380px] z-20"
+      >
         <events-display
-          class="w-full sm:w-auto pointer-events-auto"
+          class="w-full pointer-events-auto"
         ></events-display>
         <actionable-events
-          class="w-full sm:w-auto pointer-events-auto"
+          class="w-full pointer-events-auto"
         ></actionable-events>
       </div>
     </div>

@@ -722,70 +722,148 @@ export class EventsDisplay extends LitElement implements Controller {
 
     return html`
       <div
-        class="flex flex-col gap-1.5 w-full min-[1200px]:w-96 select-none font-mono"
+        class="w-full min-[1200px]:w-96 select-none font-mono bg-[#111a13]/95 border-2 border-[#334636] rounded-lg shadow-[0_8px_30px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.08)] overflow-hidden flex flex-col"
       >
-        ${tier2Events.length > 0
-          ? html`
-              <div
-                class="bg-[#0c140e]/95 backdrop-blur-md max-h-[12vh] lg:max-h-[22vh] overflow-y-auto rounded-md border-2 border-[#233526] shadow-[0_4px_16px_rgba(0,0,0,0.85)] opacity-95 events-container"
-              >
-                <div
-                  class="px-2 py-0.5 bg-[#142016] border-b border-[#233526] text-[9px] font-pixel text-[#8fa382] uppercase tracking-wider flex items-center justify-between"
+        <!-- En-tête Châssis Mini Radio Militaire -->
+        <div
+          class="bg-gradient-to-r from-[#1a261c] via-[#243527] to-[#1a261c] border-b-2 border-[#121c13] px-2.5 py-1.5 flex items-center justify-between"
+        >
+          <!-- Gauche: Icône Radio & Fréquence -->
+          <div class="flex items-center gap-2">
+            <div
+              class="size-6 rounded bg-[#0d140e] border border-[#3b543f] flex items-center justify-center text-xs shadow-inner"
+            >
+              📻
+            </div>
+            <div class="flex flex-col">
+              <div class="flex items-center gap-1.5">
+                <span
+                  class="text-[9px] font-pixel text-amber-400 uppercase tracking-wider"
                 >
-                  <span>JOURNAL TACTIQUE</span>
-                  <span
-                    class="size-1.5 rounded-full bg-emerald-500 animate-pulse"
-                  ></span>
-                </div>
-                <table
-                  class="w-full border-collapse text-xs pointer-events-auto"
+                  RADIO TACTIQUE
+                </span>
+                <span
+                  class="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[7.5px] font-bold"
                 >
-                  <tbody>
-                    ${tier2Events.map((event) => this.renderEventRow(event))}
-                  </tbody>
-                </table>
+                  142.8 MHz
+                </span>
               </div>
-            `
-          : ""}
-        ${tier1Events.length > 0 || showBetrayalTimer
-          ? html`
               <div
-                class="bg-gradient-to-r from-[#0e1711]/98 via-[#09110b]/98 to-[#0e1711]/98 backdrop-blur-md max-h-[30vh] lg:max-h-[40vh] overflow-y-auto rounded-md border-2 border-[#314534] shadow-[0_6px_25px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.06)] border-l-4 border-l-red-500 important-events-container"
+                class="flex items-center gap-1.5 text-[8.5px] text-[#8fa382] font-mono leading-none mt-0.5"
               >
+                <span
+                  class="size-1.5 rounded-full bg-emerald-400 animate-pulse"
+                ></span>
+                <span>ÉCOUTE RÉSEAU ACTIF</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Droite: Signal VU-meter & Potentiomètre rotatif -->
+          <div class="flex items-center gap-1.5">
+            <div
+              class="flex items-end gap-0.5 h-3 px-1.5 py-0.5 rounded bg-black/60 border border-[#2b3c2e]"
+              title="Signal radio optimal"
+            >
+              <div class="w-1 h-1 bg-emerald-500 rounded-xs"></div>
+              <div class="w-1 h-1.5 bg-emerald-500 rounded-xs"></div>
+              <div class="w-1 h-2 bg-emerald-500 rounded-xs"></div>
+              <div
+                class="w-1 h-2.5 bg-emerald-400 rounded-xs animate-pulse"
+              ></div>
+            </div>
+            <div
+              class="size-4 rounded-full bg-gradient-to-b from-[#64748b] to-[#334155] border border-black shadow relative flex items-center justify-center"
+              title="Squelch / Volume"
+            >
+              <div
+                class="w-0.5 h-1.5 bg-amber-400 rounded-xs absolute top-0.5"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grille Haut-Parleur Tactique stylisée -->
+        <div
+          class="bg-[#0f1711] px-2 py-0.5 border-b border-[#253628] flex items-center justify-center opacity-60"
+        >
+          <div
+            class="w-full h-1 bg-[repeating-linear-gradient(90deg,#243527_0px,#243527_2px,transparent_2px,transparent_4px)]"
+          ></div>
+        </div>
+
+        <!-- Écran Récepteur CRT (Contenu des transmissions) -->
+        <div
+          class="bg-gradient-to-b from-[#0a110b] via-[#050805] to-[#0a110b] p-1.5 flex flex-col gap-1 max-h-[35vh] lg:max-h-[42vh] overflow-y-auto custom-scrollbar relative"
+        >
+          <!-- Scanline overlay -->
+          <div
+            class="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.7)_50%)] bg-[length:100%_4px] z-10"
+          ></div>
+
+          ${tier1Events.length > 0 || showBetrayalTimer
+            ? html`
                 <div
-                  class="px-2.5 py-1 bg-[#131f15] border-b border-[#263728] text-[10px] font-pixel text-amber-400 uppercase tracking-wider flex items-center justify-between"
+                  class="bg-[#0d160f]/90 rounded border border-red-500/40 border-l-4 border-l-red-500 shadow-md important-events-container overflow-hidden"
                 >
-                  <span class="flex items-center gap-1.5">
-                    <span class="text-xs">📡</span>
-                    <span>ALERTE COMBAT</span>
-                  </span>
-                  <span
-                    class="text-[9px] font-mono text-red-400 font-black tracking-widest animate-pulse"
+                  <div
+                    class="px-2 py-0.5 bg-red-950/40 border-b border-red-500/30 text-[9px] font-pixel text-red-300 uppercase tracking-wider flex items-center justify-between"
                   >
-                    DIRECT
-                  </span>
+                    <span class="flex items-center gap-1">
+                      <span>⚡</span>
+                      <span>ALERTE COMBAT DIRECT</span>
+                    </span>
+                    <span
+                      class="text-[8px] font-mono text-red-400 font-black animate-pulse"
+                    >
+                      PRIORITÉ 1
+                    </span>
+                  </div>
+                  <table
+                    class="w-full border-collapse text-xs sm:text-[13px] font-medium pointer-events-auto"
+                  >
+                    <tbody>
+                      ${tier1Events.map((event) => this.renderEventRow(event))}
+                      ${showBetrayalTimer
+                        ? html`
+                            <tr
+                              class="border-b border-[#1b281d]/50 last:border-b-0 hover:bg-[#18261b]/50 transition-colors"
+                            >
+                              <td class="px-2 py-1 text-left font-mono">
+                                ${this.renderBetrayalDebuffTimer()}
+                              </td>
+                            </tr>
+                          `
+                        : ""}
+                    </tbody>
+                  </table>
                 </div>
-                <table
-                  class="w-full border-collapse text-xs sm:text-[13px] font-medium pointer-events-auto"
+              `
+            : ""}
+          ${tier2Events.length > 0
+            ? html`
+                <div
+                  class="bg-[#0b120c]/90 rounded border border-[#233526] shadow-sm events-container overflow-hidden"
                 >
-                  <tbody>
-                    ${tier1Events.map((event) => this.renderEventRow(event))}
-                    ${showBetrayalTimer
-                      ? html`
-                          <tr
-                            class="border-b border-[#1b281d]/50 last:border-b-0 hover:bg-[#18261b]/50 transition-colors"
-                          >
-                            <td class="px-2.5 py-1.5 text-left font-mono">
-                              ${this.renderBetrayalDebuffTimer()}
-                            </td>
-                          </tr>
-                        `
-                      : ""}
-                  </tbody>
-                </table>
-              </div>
-            `
-          : ""}
+                  <div
+                    class="px-2 py-0.5 bg-[#121c14] border-b border-[#233526] text-[8.5px] font-pixel text-[#8fa382] uppercase tracking-wider flex items-center justify-between"
+                  >
+                    <span>JOURNAL DE BORD</span>
+                    <span
+                      class="size-1 rounded-full bg-emerald-500 animate-pulse"
+                    ></span>
+                  </div>
+                  <table
+                    class="w-full border-collapse text-[11px] pointer-events-auto"
+                  >
+                    <tbody>
+                      ${tier2Events.map((event) => this.renderEventRow(event))}
+                    </tbody>
+                  </table>
+                </div>
+              `
+            : ""}
+        </div>
       </div>
     `;
   }
