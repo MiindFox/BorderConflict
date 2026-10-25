@@ -236,7 +236,7 @@ export default defineConfig(({ mode }) => {
       cdnBase,
     ),
     backgroundImageUrl: buildAssetUrl(
-      "images/background.webp",
+      "images/retro-military-map.jpg",
       assetManifest,
       cdnBase,
     ),

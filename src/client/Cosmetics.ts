@@ -110,7 +110,9 @@ export function getLocalSelectedSkin(): { name: string; url: string } | null {
     const customUrl = commanderStore.getCustomSkinUrl();
     return {
       name: skinName,
-      url: customUrl || `/static/skins/custom/${skinName.replace("custom_", "skin_")}.png`,
+      url:
+        customUrl ||
+        `/static/skins/custom/${skinName.replace("custom_", "skin_")}.png`,
     };
   }
   const skin = __cosmeticsCache?.skins?.[skinName];
@@ -683,7 +685,11 @@ export async function purchaseCosmetic(
       : `${cosmeticType}:${c.name}`;
   const success = commanderStore.purchaseLocalCosmetic([flare], price, method);
   if (success) {
-    showToast(`✨ Cosmétique débloqué : ${c.name.replace(/_/g, " ")} !`, "green", 3000);
+    showToast(
+      `✨ Cosmétique débloqué : ${c.name.replace(/_/g, " ")} !`,
+      "green",
+      3000,
+    );
     invalidateUserMe();
   } else {
     showToast(`Solde insuffisant pour débloquer ce cosmétique.`, "red");
@@ -725,9 +731,17 @@ async function purchasePack(
   }
 
   const flares = pack.items.map(packItemFlare);
-  const success = commanderStore.purchaseLocalCosmetic(flares, pack.priceHard, "hard");
+  const success = commanderStore.purchaseLocalCosmetic(
+    flares,
+    pack.priceHard,
+    "hard",
+  );
   if (success) {
-    showToast(`🎁 Pack débloqué : ${pack.displayName} (${flares.length} objets) !`, "green", 3500);
+    showToast(
+      `🎁 Pack débloqué : ${pack.displayName} (${flares.length} objets) !`,
+      "green",
+      3500,
+    );
     invalidateUserMe();
   } else {
     showToast(`Plutonium insuffisant pour débloquer ce pack.`, "red");
@@ -1592,7 +1606,9 @@ export async function getPlayerCosmetics(
       const customUrl = commanderStore.getCustomSkinUrl();
       result.skin = {
         name: refs.skinName,
-        url: customUrl || `/static/skins/custom/${refs.skinName.replace("custom_", "skin_")}.png`,
+        url:
+          customUrl ||
+          `/static/skins/custom/${refs.skinName.replace("custom_", "skin_")}.png`,
       };
     } else if (cosmetics) {
       const skin = cosmetics.skins?.[refs.skinName];

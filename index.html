@@ -9,12 +9,23 @@
     <title data-i18n="main.title">BorderConflict</title>
     <meta name="theme-color" content="#111827" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="apple-mobile-web-app-title" content="BorderConflict" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="<%- manifestHref %>" />
     <link rel="icon" type="image/svg+xml" href="<%- faviconHref %>" />
     <link rel="apple-touch-icon" href="<%- faviconHref %>" />
+
+    <!-- Retro Military Pixel Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=VT323&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Preload styles -->
     <style>
@@ -147,7 +158,10 @@
     />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="BorderConflict - Tactical Territory Strategy" />
+    <meta
+      property="og:title"
+      content="BorderConflict - Tactical Territory Strategy"
+    />
     <meta
       property="og:description"
       content="Conquer the world in BorderConflict! Expand your territory, forge alliances, and dominate the tactical map in this fast-paced real-time strategy game."
@@ -223,21 +237,12 @@
   </head>
 
   <body
-    class="select-none font-sans min-h-screen bg-[#070b14] transition-opacity duration-300 ease-in-out flex flex-row flex-wrap content-start"
+    class="select-none font-sans min-h-screen bg-[#0b0f0c] transition-opacity duration-300 ease-in-out flex flex-col overflow-x-hidden"
   >
-    <div id="hex-grid" class="fixed inset-0 -z-50 pointer-events-none">
-      <div
-        id="background-layer"
-        class="absolute inset-x-0 top-0 -bottom-[4cm] bg-cover opacity-25 [filter:brightness(0.85)_saturate(1.15)_hue-rotate(195deg)]"
-        style="
-          background-image: var(--background-image-url);
-          background-position: center top;
-        "
-      ></div>
-      <div
-        class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.12),transparent_65%),radial-gradient(ellipse_at_bottom_right,rgba(79,70,229,0.12),transparent_60%)]"
-      ></div>
-    </div>
+    <div
+      id="hex-grid"
+      class="fixed inset-0 -z-50 pointer-events-none hidden"
+    ></div>
 
     <!-- LEFT SIDEBAR MENU -->
 
@@ -250,134 +255,172 @@
 
     <mobile-nav-bar
       id="sidebar-menu"
-      class="peer [.in-game_&]:hidden z-[40001] fixed left-0 top-0 h-full flex flex-col justify-start overflow-visible bg-black/70 backdrop-blur-xl border-r border-white/10 transition-transform duration-500 ease-out transform -translate-x-full w-[70%] [&.open]:translate-x-0 lg:hidden"
+      class="peer [.in-game_&]:hidden z-[40001] fixed left-0 top-0 h-full flex flex-col justify-start overflow-visible bg-[#101712]/95 backdrop-blur-xl border-r-2 border-[#2b3a2a] transition-transform duration-500 ease-out transform -translate-x-full w-[80%] max-w-[320px] [&.open]:translate-x-0 lg:hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]"
       role="dialog"
       data-i18n-aria-label="main.menu"
     ></mobile-nav-bar>
 
     <!-- MAIN CONTENT AREA -->
     <div
-      class="in-[.in-game]:hidden flex-1 basis-full min-w-0 min-h-dvh in-[.page-open]:min-h-0 in-[.page-open]:overflow-hidden relative pt-[var(--top-ad-pad,0px)] in-[.page-open]:pt-[var(--top-ad-height,0px)] transition-[margin] duration-500 ease-out will-change-[margin-left] flex flex-col"
+      class="in-[.in-game]:hidden flex-1 basis-full min-w-0 h-dvh min-h-dvh in-[.page-open]:min-h-0 in-[.page-open]:overflow-hidden relative pt-[var(--top-ad-pad,0px)] in-[.page-open]:pt-[var(--top-ad-height,0px)] transition-[margin] duration-500 ease-out will-change-[margin-left] flex flex-col p-1 sm:p-2 overflow-hidden"
     >
-      <!-- Desktop Top Bar (sticky so it stays visible while the page scrolls,
-           offset below the header ad when one is showing; static while an
-           inline page is open, when the content area is padded below the ad
-           instead and nothing scrolls) -->
-      <desktop-nav-bar
-        class="sticky top-[var(--top-ad-height,0px)] z-[60] in-[.page-open]:static"
-      ></desktop-nav-bar>
-
+      <!-- Retro Military CRT Monitor Chassis Wrapper -->
       <div
-        id="turnstile-container"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-99999"
-      ></div>
+        class="crt-chassis relative flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden"
+      >
+        <!-- 4 Corner Screws -->
+        <div class="crt-screw crt-screw-tl hidden sm:block"></div>
+        <div class="crt-screw crt-screw-tr hidden sm:block"></div>
+        <div class="crt-screw crt-screw-bl hidden sm:block"></div>
+        <div class="crt-screw crt-screw-br hidden sm:block"></div>
 
-      <banned-modal></banned-modal>
+        <!-- Inner Curved CRT Screen Container -->
+        <div
+          class="crt-screen-container relative flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden"
+        >
+          <!-- Direct CRT Silo Hangar Screen Layer with Surveillance Camera Breathing -->
+          <div
+            class="hangar-bg-live absolute inset-0 bg-cover bg-center pointer-events-none z-0"
+            style="
+              background-image: var(--background-image-url);
+              filter: brightness(0.92) contrast(1.15);
+            "
+          ></div>
+          <!-- Silo Arc-Welding Sparks Overlay -->
+          <div class="hangar-welding-glow pointer-events-none"></div>
+          <!-- Silo Safety Beacon Pulse Overlay -->
+          <div class="hangar-siren-beacon pointer-events-none"></div>
+          <!-- Silo Industrial Steam Mist Overlay -->
+          <div class="hangar-steam-mist pointer-events-none"></div>
+          <!-- CRT Scanlines Overlay -->
+          <div
+            class="absolute inset-0 crt-scanlines opacity-40 pointer-events-none z-10"
+          ></div>
+          <!-- CRT Glass Vignette & Phosphor Glow -->
+          <div
+            class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(0,0,0,0.85)_100%)] pointer-events-none z-10"
+          ></div>
 
-      <!-- Main container with responsive padding -->
-      <main-layout class="contents">
-        <play-page class="contents"></play-page>
-        <matchmaking-modal
-          id="page-matchmaking"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></matchmaking-modal>
-        <news-modal
-          id="page-news"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></news-modal>
-        <single-player-modal
-          id="page-single-player"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></single-player-modal>
-        <host-lobby-modal
-          id="page-host-lobby"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></host-lobby-modal>
-        <join-lobby-modal
-          id="page-join-lobby"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></join-lobby-modal>
-        <store-modal
-          id="page-item-store"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></store-modal>
-        <user-setting
-          id="page-settings"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></user-setting>
-        <leaderboard-modal
-          id="page-leaderboard"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></leaderboard-modal>
-        <troubleshooting-modal
-          id="page-troubleshooting"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></troubleshooting-modal>
+          <!-- Desktop Top Bar -->
+          <desktop-nav-bar
+            class="sticky top-[var(--top-ad-height,0px)] z-[60] shrink-0 in-[.page-open]:static"
+          ></desktop-nav-bar>
 
-        <clan-modal
-          id="page-clan"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></clan-modal>
-        <account-modal
-          id="page-account"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></account-modal>
-        <game-stats-modal
-          id="page-stats"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></game-stats-modal>
-        <player-profile-modal
-          id="page-profile"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></player-profile-modal>
-        <help-modal
-          id="page-help"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></help-modal>
-        <language-modal
-          id="page-language"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></language-modal>
-        <inventory-modal
-          id="page-inventory"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></inventory-modal>
-        <ranked-modal
-          id="page-ranked"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></ranked-modal>
-        <detailed-view-modal
-          id="page-detailed-view"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></detailed-view-modal>
-        <doctrines-modal
-          id="page-doctrines"
-          inline
-          class="hidden w-full h-full page-content relative z-50"
-        ></doctrines-modal>
-      </main-layout>
+          <div
+            id="turnstile-container"
+            class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-99999"
+          ></div>
 
-      <div class="[.in-game_&]:hidden mt-auto flex flex-col shrink-0">
-        <page-footer></page-footer>
+          <banned-modal></banned-modal>
+
+          <!-- Main container with responsive padding -->
+          <main-layout class="contents">
+            <play-page class="contents"></play-page>
+            <matchmaking-modal
+              id="page-matchmaking"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></matchmaking-modal>
+            <news-modal
+              id="page-news"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></news-modal>
+            <single-player-modal
+              id="page-single-player"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></single-player-modal>
+            <host-lobby-modal
+              id="page-host-lobby"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></host-lobby-modal>
+            <join-lobby-modal
+              id="page-join-lobby"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></join-lobby-modal>
+            <store-modal
+              id="page-item-store"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></store-modal>
+            <user-setting
+              id="page-settings"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></user-setting>
+            <leaderboard-modal
+              id="page-leaderboard"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></leaderboard-modal>
+            <troubleshooting-modal
+              id="page-troubleshooting"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></troubleshooting-modal>
+
+            <clan-modal
+              id="page-clan"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></clan-modal>
+            <account-modal
+              id="page-account"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></account-modal>
+            <game-stats-modal
+              id="page-stats"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></game-stats-modal>
+            <player-profile-modal
+              id="page-profile"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></player-profile-modal>
+            <help-modal
+              id="page-help"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></help-modal>
+            <language-modal
+              id="page-language"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></language-modal>
+            <inventory-modal
+              id="page-inventory"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></inventory-modal>
+            <ranked-modal
+              id="page-ranked"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></ranked-modal>
+            <detailed-view-modal
+              id="page-detailed-view"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></detailed-view-modal>
+            <doctrines-modal
+              id="page-doctrines"
+              inline
+              class="hidden w-full h-full page-content relative z-50"
+            ></doctrines-modal>
+          </main-layout>
+
+          <div class="[.in-game_&]:hidden mt-auto flex flex-col shrink-0">
+            <page-footer></page-footer>
+          </div>
+        </div>
+        <!-- End crt-screen-container -->
       </div>
+      <!-- End crt-chassis -->
 
       <!-- Global Modals -->
       <steam-link-modal></steam-link-modal>
@@ -391,36 +434,41 @@
     <!-- Game components -->
     <div id="app"></div>
 
-    <!-- Bottom HUD: <sm=column, sm..lg=2col (HUD left | events right), lg+=3col grid centered -->
+    <!-- Bottom HUD: <sm=column, sm..lg=tablet dock, lg+=wide widescreen retro command dock -->
     <div
-      class="fixed bottom-0 left-0 w-full z-[200] flex flex-col pointer-events-none sm:flex-row sm:items-end lg:grid lg:grid-cols-[1fr_500px_1fr] lg:items-end min-[1200px]:px-4"
+      class="fixed bottom-0 left-0 w-full z-[200] flex flex-col pointer-events-none sm:items-end lg:items-center px-0 lg:px-2"
       style="
         padding-bottom: env(safe-area-inset-bottom);
         padding-left: env(safe-area-inset-left);
         padding-right: env(safe-area-inset-right);
       "
     >
-      <!-- HUD: <sm contents (children join outer flex), sm+ flex-col 460px, lg+ col-2 -->
+      <!-- HUD container: spans wide on desktop across window width with minimal height -->
       <div
-        class="contents sm:flex sm:flex-col sm:pointer-events-none w-full sm:w-[500px] lg:col-start-2 sm:z-10"
+        class="contents sm:flex sm:flex-col sm:pointer-events-none w-full sm:w-[580px] lg:w-[calc(100%-1rem)] min-[1400px]:w-[calc(100%-1.5rem)] lg:max-w-[1780px] sm:z-10 relative"
       >
         <attacks-display
-          class="w-full pointer-events-auto order-1 sm:order-none"
+          class="w-full sm:max-w-[620px] pointer-events-auto order-1 sm:order-none mb-1"
         ></attacks-display>
         <tutorial-panel
           class="hidden w-full order-3 sm:order-none"
         ></tutorial-panel>
         <div
-          class="pointer-events-auto bg-slate-950/90 backdrop-blur-xl border border-cyan-500/25 sm:rounded-tr-xl lg:rounded-t-xl min-[1200px]:rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.75),0_0_24px_rgba(6,182,212,0.1)] order-3 sm:order-none"
+          class="pointer-events-auto bg-[#121813]/95 border-2 border-[#2b3a2d] shadow-[0_12px_40px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] sm:rounded-tr-xl lg:rounded-t-xl order-3 sm:order-none relative overflow-hidden"
         >
+          <!-- Corner tactical screws for retro military console bezel -->
+          <div class="crt-screw crt-screw-tl hidden sm:block"></div>
+          <div class="crt-screw crt-screw-tr hidden sm:block"></div>
+          <div class="crt-screw crt-screw-bl hidden sm:block"></div>
+          <div class="crt-screw crt-screw-br hidden sm:block"></div>
           <control-panel class="w-full"></control-panel>
           <unit-display class="hidden lg:block w-full"></unit-display>
         </div>
       </div>
 
-      <!-- events+chat: <sm between attacks and control (order-2), sm+ right side, lg+ col-3 -->
+      <!-- events+chat: <sm between attacks and control (order-2), sm+ positioned above console on bottom-right -->
       <div
-        class="flex flex-col pointer-events-none items-end order-2 sm:order-none sm:flex-1 lg:col-start-3 lg:self-end lg:justify-end"
+        class="flex flex-col pointer-events-none items-end order-2 sm:order-none sm:fixed sm:right-3 sm:bottom-[78px] lg:bottom-[74px] sm:max-w-[360px] z-20"
       >
         <chat-display
           class="w-full sm:w-auto pointer-events-auto"
@@ -440,7 +488,9 @@
     <win-modal></win-modal>
     <new-lobby-prompt></new-lobby-prompt>
     <game-starting-modal></game-starting-modal>
-    <div class="flex flex-col items-end fixed top-0 right-0 z-1000 gap-2 pointer-events-none">
+    <div
+      class="flex flex-col items-end fixed top-0 right-0 z-1000 gap-2 pointer-events-none"
+    >
       <game-right-sidebar class="pointer-events-auto"></game-right-sidebar>
       <replay-panel class="pointer-events-auto"></replay-panel>
       <world-events-banner class="pointer-events-auto"></world-events-banner>
@@ -556,10 +606,10 @@
 
     <script type="module" src="/src/client/Main.ts"></script>
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch((err) => {
-            console.warn('SW registration skipped:', err);
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js").catch((err) => {
+            console.warn("SW registration skipped:", err);
           });
         });
       }

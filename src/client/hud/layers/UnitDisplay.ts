@@ -142,11 +142,21 @@ export class UnitDisplay extends LitElement implements Controller {
     }
 
     return html`
-      <div class="border-t border-cyan-500/20 px-2 py-1.5 w-full bg-slate-950/60 backdrop-blur-md">
-        <div class="flex items-center justify-center gap-1.5 sm:gap-2.5 flex-wrap max-w-full overflow-x-auto py-0.5">
+      <div
+        class="border-t border-[#222e24] px-1.5 py-0.5 w-full bg-[#0c120d]/90 font-mono"
+      >
+        <div
+          class="flex items-center justify-center gap-1.5 min-[1200px]:gap-2 flex-nowrap max-w-full overflow-x-auto py-0.5"
+        >
           <!-- Groupe Économie -->
-          <div class="flex items-center gap-1 bg-slate-900/70 px-1.5 py-1 rounded-xl border border-cyan-500/20 shadow-inner">
-            <span class="text-[10px] select-none text-cyan-300/80 font-bold px-0.5 hidden min-[480px]:inline" title="Économie">🏙️</span>
+          <div
+            class="flex items-center gap-1 bg-[#121813] px-1.5 py-0.5 rounded-lg border border-[#2b3a2d] shadow-inner shrink-0"
+          >
+            <span
+              class="text-xs select-none text-emerald-400 font-bold px-0.5 hidden min-[1300px]:inline"
+              title="Économie"
+              >🏙️</span
+            >
             ${this.renderUnitItem(
               cityIcon,
               this._cities,
@@ -170,11 +180,19 @@ export class UnitDisplay extends LitElement implements Controller {
             )}
           </div>
 
-          <div class="hidden sm:block w-[1px] h-6 bg-cyan-500/25"></div>
+          <div
+            class="hidden sm:block w-[1.5px] h-6 bg-[#2b3a2d] shrink-0"
+          ></div>
 
           <!-- Groupe Défense -->
-          <div class="flex items-center gap-1 bg-slate-900/70 px-1.5 py-1 rounded-xl border border-cyan-500/20 shadow-inner">
-            <span class="text-[10px] select-none text-cyan-300/80 font-bold px-0.5 hidden min-[480px]:inline" title="Défense">🛡️</span>
+          <div
+            class="flex items-center gap-1 bg-[#121813] px-1.5 py-0.5 rounded-lg border border-[#2b3a2d] shadow-inner shrink-0"
+          >
+            <span
+              class="text-xs select-none text-emerald-400 font-bold px-0.5 hidden min-[1300px]:inline"
+              title="Défense"
+              >🛡️</span
+            >
             ${this.renderUnitItem(
               defensePostIcon,
               this._defensePost,
@@ -198,11 +216,19 @@ export class UnitDisplay extends LitElement implements Controller {
             )}
           </div>
 
-          <div class="hidden sm:block w-[1px] h-6 bg-cyan-500/25"></div>
+          <div
+            class="hidden sm:block w-[1.5px] h-6 bg-[#2b3a2d] shrink-0"
+          ></div>
 
           <!-- Groupe Stratégique -->
-          <div class="flex items-center gap-1 bg-slate-900/70 px-1.5 py-1 rounded-xl border border-cyan-500/20 shadow-inner">
-            <span class="text-[10px] select-none text-cyan-300/80 font-bold px-0.5 hidden min-[480px]:inline" title="Stratégique">🚀</span>
+          <div
+            class="flex items-center gap-1 bg-[#121813] px-1.5 py-0.5 rounded-lg border border-[#2b3a2d] shadow-inner shrink-0"
+          >
+            <span
+              class="text-xs select-none text-amber-400 font-bold px-0.5 hidden min-[1300px]:inline"
+              title="Stratégique"
+              >🚀</span
+            >
             ${this.renderUnitItem(
               missileSiloIcon,
               this._missileSilo,
@@ -271,9 +297,9 @@ export class UnitDisplay extends LitElement implements Controller {
         ${hovered
           ? html`
               <div
-                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 text-slate-100 text-center w-max max-w-[260px] text-xs bg-slate-950/95 backdrop-blur-xl border border-cyan-500/35 rounded-xl p-2.5 z-[100] shadow-[0_12px_32px_rgba(0,0,0,0.8)] pointer-events-none"
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 text-slate-100 text-center w-max max-w-[280px] text-xs bg-[#121813]/98 border-2 border-[#2b3a2d] rounded-xl p-3 z-[100] shadow-[0_12px_32px_rgba(0,0,0,0.9)] pointer-events-none font-mono"
               >
-                <div class="font-extrabold text-sm text-cyan-300 mb-1">
+                <div class="font-bold text-sm text-emerald-300 mb-1">
                   ${translateText(
                     "unit_type." + structureKey,
                   )}${` [${displayHotkey}]`}
@@ -283,16 +309,16 @@ export class UnitDisplay extends LitElement implements Controller {
                 </div>
                 ${unitType === UnitType.Warship
                   ? html`<div
-                      class="mt-1 px-2 py-1 text-[10px] text-cyan-300 border-t border-white/10"
+                      class="mt-1 px-2 py-1 text-[10px] text-emerald-300 border-t border-[#2b3a2d]"
                     >
                       ⇧ ${translateText("build_menu.warship_shift_hint")}
                     </div>`
                   : null}
-                <div class="flex items-center justify-center gap-1 mt-1 pt-1 border-t border-white/10 font-bold">
-                  <img src=${goldCoinIcon} width="13" height="13" />
-                  <span class="text-amber-300 tabular-nums"
-                    >${renderNumber(itemCost)}</span
-                  >
+                <div
+                  class="flex items-center justify-center gap-1 mt-1.5 pt-1.5 border-t border-[#2b3a2d] font-bold text-amber-300"
+                >
+                  <img src=${goldCoinIcon} width="14" height="14" />
+                  <span class="tabular-nums">${renderNumber(itemCost)}</span>
                 </div>
               </div>
             `
@@ -300,10 +326,10 @@ export class UnitDisplay extends LitElement implements Controller {
         <div
           class="${this.canBuild(unitType)
             ? ""
-            : "opacity-40"} border rounded-lg px-2 py-1 flex items-center gap-1.5 cursor-pointer transition-all duration-150
+            : "opacity-40"} border rounded-md px-1.5 py-0.5 flex items-center gap-1.5 cursor-pointer transition-all duration-150 shadow-sm h-7
              ${selected
-            ? "border-cyan-400 bg-cyan-500/25 shadow-[0_0_14px_rgba(34,211,238,0.4)] -translate-y-0.5 text-white"
-            : "border-white/15 bg-slate-900/80 hover:bg-slate-800/95 hover:border-cyan-400/50 text-slate-100"}
+            ? "border-green-400 bg-[#1e3825] shadow-[0_0_10px_rgba(34,197,94,0.6)] -translate-y-0.5 text-white"
+            : "border-[#2b3a2d] bg-[#18231a] hover:bg-[#202e22] hover:border-amber-400/60 text-slate-100"}
              ${this.tutorialHighlight === unitType ? "tutorial-highlight" : ""}"
           @click=${() => {
             if (selected) {
@@ -335,17 +361,27 @@ export class UnitDisplay extends LitElement implements Controller {
             this.eventBus?.emit(new ToggleStructureEvent(null))}
         >
           <div
-            class="px-1 py-0.2 text-[9px] font-mono font-bold rounded bg-slate-950/80 text-cyan-300 border border-cyan-500/25"
+            class="px-1 py-0.2 text-[9px] font-mono font-bold rounded bg-[#0a0f0c] text-emerald-300 border border-[#2b3a2d]"
           >
             ${displayHotkey}
           </div>
           <div class="flex items-center gap-1">
-            <img src=${icon} alt=${structureKey} class="align-middle size-5 shrink-0" />
+            <img
+              src=${icon}
+              alt=${structureKey}
+              class="align-middle size-4 shrink-0"
+            />
             ${number !== null
-              ? html`<span class="text-xs font-extrabold tabular-nums">${renderNumber(number)}</span>`
+              ? html`<span class="text-xs font-mono font-bold tabular-nums"
+                  >${renderNumber(number)}</span
+                >`
               : null}
           </div>
-          <div class="flex items-center gap-0.5 text-[10px] font-bold tabular-nums ${canAfford ? "text-amber-300" : "text-slate-500"}">
+          <div
+            class="flex items-center gap-0.5 text-[10px] font-mono font-bold tabular-nums ${canAfford
+              ? "text-amber-300"
+              : "text-slate-500"}"
+          >
             <img src=${goldCoinIcon} width="11" height="11" class="shrink-0" />
             <span>${renderNumber(itemCost)}</span>
           </div>

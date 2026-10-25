@@ -300,9 +300,9 @@ export class MapPicker extends LitElement {
       type="button"
       role="tab"
       aria-selected=${isActive}
-      class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${isActive
-        ? "bg-malibu-blue/20 text-white shadow-[var(--shadow-malibu-blue-soft)]"
-        : "text-white/60 hover:text-white"}"
+      class="retro-metal-btn px-2 sm:px-2.5 py-1.5 rounded text-[10px] font-retro font-bold uppercase tracking-tight whitespace-nowrap transition-all cursor-pointer ${isActive
+        ? "ring-2 ring-amber-400 text-amber-200 brightness-110 shadow-[0_0_8px_rgba(245,158,11,0.4)]"
+        : "text-[#8fa382] hover:text-white"}"
       @click=${() => (this.activeTab = tab)}
     >
       ${label}
@@ -312,14 +312,14 @@ export class MapPicker extends LitElement {
   render() {
     const isSearching = this.searchQuery.trim().length > 0;
     return html`
-      <div class="space-y-8">
+      <div class="space-y-6">
         <div class="w-full flex items-center gap-2">
           ${isSearching
             ? null
             : html`<div
                   role="tablist"
                   aria-label="${translateText("map.map")}"
-                  class="flex-1 grid grid-cols-3 gap-2 rounded-xl border border-white/10 bg-black/20 p-1"
+                  class="flex-1 grid grid-cols-3 gap-1.5 rounded-lg border border-[#2b3a2d] bg-[#0c120e] p-1"
                 >
                   ${this.renderTabButton(
                     "featured",
@@ -340,17 +340,17 @@ export class MapPicker extends LitElement {
             : ""}"
         >
           ${this.renderSectionHeading(translateText("map_categories.special"))}
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             <button
               type="button"
-              class="w-full h-full p-3 flex flex-col items-center justify-between rounded-xl border cursor-pointer transition-all duration-200 active:scale-95 gap-3 group ${this
+              class="w-full h-full p-2.5 flex flex-col items-center justify-between rounded-xl border-2 cursor-pointer transition-all duration-150 active:scale-95 gap-2 group ${this
                 .useRandomMap
-                ? "bg-malibu-blue/20 border-malibu-blue/50 shadow-[var(--shadow-malibu-blue-strong)]"
-                : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:-translate-y-1"}"
+                ? "bg-[#243326] border-amber-400 text-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.4)]"
+                : "bg-[#111712] border-[#2b3a2d] hover:bg-[#182219] hover:border-[#3c4f3e] text-[#8fa382]"}"
               @click=${this.handleSelectRandomMap}
             >
               <div
-                class="w-full aspect-[2/1] relative overflow-hidden rounded-lg bg-black/20"
+                class="w-full aspect-[2/1] relative overflow-hidden rounded-lg bg-black/40 border border-[#2b3a2d]"
               >
                 <img
                   src=${randomMap}
@@ -363,7 +363,10 @@ export class MapPicker extends LitElement {
                 />
               </div>
               <div
-                class="text-xs font-bold text-white uppercase tracking-wider text-center leading-tight break-words hyphens-auto"
+                class="text-[9.5px] font-pixel font-bold uppercase tracking-wider text-center leading-tight break-words hyphens-auto ${this
+                  .useRandomMap
+                  ? "text-amber-200"
+                  : "text-[#8fa382]"}"
               >
                 ${translateText("map.random")}
               </div>

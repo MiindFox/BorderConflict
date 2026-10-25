@@ -1,5 +1,4 @@
 import { UnitType } from "@openfront/engine-api/game/GameTypes";
-import { renderNumber } from "@openfront/engine-lib/Format";
 import {
   getActiveMegastructures,
   getDirectiveAtTick,
@@ -11,6 +10,7 @@ import {
   getWorldEventStateAtTick,
   WorldEventState,
 } from "@openfront/engine-lib/configuration/HexaFrontSystems";
+import { renderNumber } from "@openfront/engine-lib/Format";
 import { html, LitElement, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { commanderStore, getCommanderRankTitle } from "../../CommanderStore";
@@ -155,15 +155,15 @@ export class WorldEventsBanner extends LitElement implements Controller {
     if (s.phase === "calm") {
       return html`
         <div
-          class="cursor-pointer select-none w-fit max-w-[300px] flex flex-col gap-1 rounded-l-xl border-l-4 border-cyan-400 bg-slate-950/90 backdrop-blur-xl px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs text-slate-200 shadow-lg hover:bg-slate-900/95 transition-all"
+          class="cursor-pointer select-none w-fit max-w-[320px] flex flex-col gap-1 rounded-l-xl border-l-4 border-2 border-l-emerald-400 border-[#2b3a2d] bg-[#121813]/95 px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-mono text-slate-200 shadow-[0_8px_25px_rgba(0,0,0,0.85)] hover:bg-[#1a251c] transition-all"
         >
           <div class="flex items-center justify-between gap-3">
             <span
               @click=${() => (this.expanded = !this.expanded)}
-              class="flex items-center gap-1.5 font-extrabold text-cyan-400 hover:text-cyan-300"
+              class="flex items-center gap-1.5 font-bold font-mono text-emerald-400 hover:text-emerald-300"
             >
               <span
-                class="h-2 w-2 rounded-full bg-cyan-400 animate-pulse"
+                class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.8)]"
               ></span>
               RADAR MONDIAL
             </span>
@@ -177,8 +177,10 @@ export class WorldEventsBanner extends LitElement implements Controller {
                   e.stopPropagation();
                   this.isMinimized = !this.isMinimized;
                 }}
-                class="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] text-slate-300 font-mono transition-colors"
-                title="${this.isMinimized ? "Agrandir le radar" : "Réduire le radar"}"
+                class="px-1.5 py-0.5 rounded bg-[#18231a] hover:bg-[#223024] border border-[#2b3a2d] text-[10px] text-amber-200 font-mono transition-colors"
+                title="${this.isMinimized
+                  ? "Agrandir le radar"
+                  : "Réduire le radar"}"
               >
                 ${this.isMinimized ? "➕" : "➖"}
               </button>
@@ -188,11 +190,12 @@ export class WorldEventsBanner extends LitElement implements Controller {
             ? html`
                 <div
                   @click=${() => (this.expanded = !this.expanded)}
-                  class="flex items-center justify-between gap-2 text-[11px] text-slate-400"
+                  class="flex items-center justify-between gap-2 text-[11px] font-mono text-[#8fa382]"
                 >
                   <span>Prochaine anomalie</span>
-                  <span class="text-cyan-300 font-semibold">
-                    ${rankInfo.badge} Niv.${profile.level} (${spentDoctrine} pts)
+                  <span class="text-amber-300 font-semibold">
+                    ${rankInfo.badge} Niv.${profile.level} (${spentDoctrine}
+                    pts)
                   </span>
                 </div>
               `
@@ -205,7 +208,7 @@ export class WorldEventsBanner extends LitElement implements Controller {
       return html`
         <div
           @click=${() => (this.expanded = !this.expanded)}
-          class="cursor-pointer select-none w-[280px] sm:w-[320px] rounded-l-xl border-l-4 border-amber-400 bg-slate-950/92 backdrop-blur-xl px-3.5 py-2.5 shadow-[0_0_20px_rgba(245,158,11,0.25)] transition-all"
+          class="cursor-pointer select-none w-[280px] sm:w-[320px] rounded-l-xl border-l-4 border-2 border-l-amber-400 border-[#2b3a2d] bg-[#121813]/95 px-3.5 py-2.5 font-mono shadow-[0_0_20px_rgba(245,158,11,0.25)] transition-all"
         >
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
@@ -375,18 +378,26 @@ export class WorldEventsBanner extends LitElement implements Controller {
       return html`
         <div
           class="select-none w-fit max-w-[280px] rounded-l-xl border-l-4 ${done
-            ? "border-emerald-400 bg-slate-950/92"
-            : "border-indigo-400 bg-slate-950/90"} backdrop-blur-xl px-2.5 py-1 text-xs text-slate-200 shadow-lg flex items-center justify-between gap-2"
+            ? "border-emerald-400 bg-[#121813]/98"
+            : "border-amber-400/80 bg-[#121813]/98"} border-y border-r border-[#2b3a2d] px-2.5 py-1 text-xs text-slate-200 shadow-lg flex items-center justify-between gap-2 font-mono"
         >
-          <span class="flex items-center gap-1.5 text-[10px] font-black uppercase text-indigo-300">
+          <span
+            class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase ${done
+              ? "text-emerald-400"
+              : "text-amber-300"}"
+          >
             <span>${done ? "✅" : "🎯"}</span>
             <span class="truncate max-w-[140px]">${d.title}</span>
           </span>
-          <span class="font-mono text-[10px] text-cyan-300 font-bold">${renderNumber(this.directiveCurrentVal)}/${renderNumber(d.targetValue)}</span>
+          <span class="font-mono text-[10px] text-emerald-400 font-bold"
+            >${renderNumber(this.directiveCurrentVal)}/${renderNumber(
+              d.targetValue,
+            )}</span
+          >
           <button
             type="button"
             @click=${() => (this.directiveMinimized = false)}
-            class="px-1 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[9px] text-slate-300"
+            class="retro-metal-btn px-1 py-0.5 rounded bg-[#18231a] border border-[#2b3a2d] text-[9px] text-slate-300 hover:text-white font-mono"
             title="Agrandir la directive"
           >
             ➕
@@ -398,26 +409,26 @@ export class WorldEventsBanner extends LitElement implements Controller {
     return html`
       <div
         class="select-none w-[270px] sm:w-[310px] rounded-l-xl border-l-4 ${done
-          ? "border-emerald-400 bg-slate-950/92 shadow-[0_4px_20px_rgba(16,185,129,0.25)]"
-          : "border-indigo-400 bg-slate-950/90 shadow-lg"} backdrop-blur-xl px-3 py-2 text-xs text-slate-200 transition-all"
+          ? "border-emerald-400 bg-[#121813]/98 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+          : "border-amber-400/80 bg-[#121813]/98 shadow-[0_12px_32px_rgba(0,0,0,0.9)]"} border-y-2 border-r-2 border-[#2b3a2d] backdrop-blur-xl px-3 py-2 text-xs text-slate-200 transition-all font-mono"
       >
         <div class="flex items-center justify-between gap-2">
           <span
-            class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider ${done
+            class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider ${done
               ? "text-emerald-400"
-              : "text-indigo-300"}"
+              : "text-amber-300"}"
           >
             <span>${done ? "✅" : "🎯"}</span>
             <span>${done ? "DIRECTIVE ACCOMPLIE" : "DIRECTIVE DU QG"}</span>
           </span>
           <div class="flex items-center gap-1.5">
-            <span class="font-mono text-[11px] font-bold text-slate-300">
+            <span class="font-mono text-[11px] font-bold text-emerald-400">
               ${d.secondsRemaining}s
             </span>
             <button
               type="button"
               @click=${() => (this.directiveMinimized = true)}
-              class="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] text-slate-300 font-mono transition-colors"
+              class="retro-metal-btn px-1.5 py-0.5 rounded bg-[#18231a] border border-[#2b3a2d] text-[10px] text-slate-300 hover:text-white font-mono transition-colors"
               title="Réduire la directive"
             >
               ➖
@@ -426,39 +437,42 @@ export class WorldEventsBanner extends LitElement implements Controller {
         </div>
 
         <div class="mt-0.5 flex items-center justify-between gap-2">
-          <span class="font-extrabold text-white text-xs truncate">
+          <span class="font-mono font-bold text-white text-xs truncate">
             ${d.icon} ${d.title}
           </span>
           <span
-            class="font-mono text-[11px] font-extrabold ${done
+            class="font-mono text-[11px] font-bold ${done
               ? "text-emerald-400"
-              : "text-cyan-300"}"
+              : "text-amber-300"}"
           >
             ${renderNumber(this.directiveCurrentVal)} /
             ${renderNumber(d.targetValue)}
           </span>
         </div>
 
-        <div class="text-[11px] text-slate-300 mt-0.5">${d.description}</div>
+        <div class="text-[11px] text-slate-300 mt-0.5 font-mono">
+          ${d.description}
+        </div>
 
-        <div class="mt-1.5 h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
+        <div
+          class="mt-1.5 h-2 w-full rounded-md bg-[#0a0e0b] border border-[#2b3a2d] overflow-hidden"
+        >
           <div
             class="h-full transition-all duration-300 ${done
-              ? "bg-emerald-400"
-              : "bg-gradient-to-r from-indigo-500 to-cyan-400"}"
+              ? "bg-gradient-to-r from-emerald-600 to-green-400"
+              : "bg-gradient-to-r from-[#183520] via-[#22c55e] to-[#4ade80]"}"
             style="width: ${done ? 100 : pct}%"
           ></div>
         </div>
 
         <div
-          class="mt-1.5 flex items-center justify-between text-[10px] font-bold"
+          class="mt-1.5 flex items-center justify-between text-[10px] font-mono font-bold"
         >
           <span class="text-amber-300">
-            🎁 +${renderNumber(d.rewardGold)} Or · +${renderNumber(
-              d.rewardTroops,
-            )} Troupes
+            🎁 +${renderNumber(d.rewardGold)} Or ·
+            +${renderNumber(d.rewardTroops)} Troupes
           </span>
-          <span class="text-cyan-300">+${d.rewardXp} XP</span>
+          <span class="text-emerald-400">+${d.rewardXp} XP</span>
         </div>
       </div>
     `;
@@ -471,18 +485,21 @@ export class WorldEventsBanner extends LitElement implements Controller {
     if (this.megasMinimized) {
       return html`
         <div
-          class="select-none w-fit max-w-[280px] rounded-l-xl border-l-4 ${activeCount > 0
-            ? "border-amber-400 bg-slate-950/92"
-            : "border-slate-600 bg-slate-950/85"} backdrop-blur-xl px-2.5 py-1 text-xs text-slate-200 shadow-lg flex items-center justify-between gap-2"
+          class="select-none w-fit max-w-[280px] rounded-l-xl border-l-4 border-2 ${activeCount >
+          0
+            ? "border-l-amber-400 border-[#2b3a2d] bg-[#121813]/95"
+            : "border-l-[#2b3a2d] border-[#2b3a2d] bg-[#121813]/90"} px-2.5 py-1 text-xs font-mono text-slate-200 shadow-lg flex items-center justify-between gap-2"
         >
-          <span class="flex items-center gap-1.5 text-[10px] font-black uppercase text-amber-300">
+          <span
+            class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase text-amber-300"
+          >
             <span>🏛️</span>
             <span>MÉGAS (${activeCount}/5)</span>
           </span>
           <button
             type="button"
             @click=${() => (this.megasMinimized = false)}
-            class="px-1 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[9px] text-slate-300 transition-colors"
+            class="px-1.5 py-0.5 rounded bg-[#18231a] hover:bg-[#223024] border border-[#2b3a2d] text-[9px] text-amber-200 font-mono transition-colors"
             title="Agrandir les mégastructures"
           >
             ➕
@@ -493,15 +510,15 @@ export class WorldEventsBanner extends LitElement implements Controller {
 
     return html`
       <div
-        class="cursor-pointer select-none w-fit max-w-[310px] rounded-l-xl border-l-4 ${activeCount >
+        class="cursor-pointer select-none w-fit max-w-[310px] rounded-l-xl border-l-4 border-2 ${activeCount >
         0
-          ? "border-amber-400 bg-slate-950/92 shadow-[0_4px_18px_rgba(245,158,11,0.2)]"
-          : "border-slate-600 bg-slate-950/85"} backdrop-blur-xl px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs text-slate-200 transition-all hover:bg-slate-900/95"
+          ? "border-l-amber-400 border-[#2b3a2d] bg-[#121813]/95 shadow-[0_4px_18px_rgba(245,158,11,0.2)]"
+          : "border-l-[#2b3a2d] border-[#2b3a2d] bg-[#121813]/90"} px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-mono text-slate-200 transition-all hover:bg-[#1a251c]"
       >
         <div class="flex items-center justify-between gap-3">
           <span
             @click=${() => (this.megasExpanded = !this.megasExpanded)}
-            class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider ${activeCount >
+            class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider ${activeCount >
             0
               ? "text-amber-300"
               : "text-slate-400"}"
@@ -540,7 +557,6 @@ export class WorldEventsBanner extends LitElement implements Controller {
               </div>
             `
           : nothing}
-
         ${this.megasExpanded
           ? html`
               <div
@@ -564,8 +580,14 @@ export class WorldEventsBanner extends LitElement implements Controller {
                         ? "border-amber-400/50 bg-amber-500/10"
                         : "border-white/10 bg-slate-900/70 opacity-75"}"
                     >
-                      <div class="flex items-center justify-between text-[11px] font-bold">
-                        <span class="${isActive ? "text-amber-300" : "text-slate-200"}">
+                      <div
+                        class="flex items-center justify-between text-[11px] font-bold"
+                      >
+                        <span
+                          class="${isActive
+                            ? "text-amber-300"
+                            : "text-slate-200"}"
+                        >
                           ${m.icon} ${m.name}
                         </span>
                         <span
@@ -596,8 +618,7 @@ export class WorldEventsBanner extends LitElement implements Controller {
     }
 
     return html`
-      ${this.renderWorldEventCard()}
-      ${this.renderDirectiveCard()}
+      ${this.renderWorldEventCard()} ${this.renderDirectiveCard()}
       ${this.renderMegastructuresCard()}
     `;
   }

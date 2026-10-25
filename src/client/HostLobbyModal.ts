@@ -30,21 +30,21 @@ import {
 } from "../client/Utils";
 import { createLobby, getUserMe, queueLobby, setLobbyListed } from "./Api";
 import "./components/baseComponents/Modal";
-import { BaseModal } from "./components/BaseModal";
+import { commanderStore } from "./CommanderStore";
 import "./components/ConfirmDialog";
-import { CopyButton } from "./components/CopyButton";
+import { BaseModal } from "./components/BaseModal";
 import "./components/GameConfigSettings";
 import "./components/InputCard";
 import "./components/InsufficientCurrencyDialog";
 import "./components/ListLobbyDialog";
-import { ListLobbyOptions } from "./components/ListLobbyDialog";
+import { CopyButton } from "./components/CopyButton";
 import "./components/LobbyPlayerView";
 import "./components/PlutoniumIcon";
 import "./components/ToggleInputCard";
+import { ListLobbyOptions } from "./components/ListLobbyDialog";
 import { inviteFriendsButton } from "./components/ui/InviteFriendsButton";
 import { modalHeader } from "./components/ui/ModalHeader";
 import { fetchCosmetics, InsufficientCurrency } from "./Cosmetics";
-import { commanderStore } from "./CommanderStore";
 import { gamePortal } from "./GamePortal";
 import { JoinLobbyEvent } from "./Main";
 import { terrainMapFileLoader } from "./TerrainMapFileLoader";
@@ -627,7 +627,7 @@ export class HostLobbyModal extends BaseModal {
     return html`
       <div class="flex flex-col h-full">
         <div
-          class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6 mr-1 mx-auto w-full max-w-5xl"
+          class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-3 pb-6 mx-auto w-full max-w-4xl"
         >
           ${this.publiclyListed
             ? html`<div
@@ -786,17 +786,21 @@ export class HostLobbyModal extends BaseModal {
         </div>
 
         <!-- Player List / footer -->
-        <div class="p-6 pt-4 border-t border-white/10 bg-black/20 shrink-0">
-          <o-button
-            variant=${secondsRemaining !== null ? "warning" : "primary"}
-            width="block"
-            size="lg"
-            .title=${statusLabel}
-            .uppercase=${secondsRemaining === null}
-            ?disable=${this.queued ||
-            (this.lobbyStartAt === null && this.clients.length < 2)}
-            @click=${this.toggleGameStartTimer}
-          ></o-button>
+        <div
+          class="p-3 sm:p-4 border-t-2 border-[#2b3a2d] bg-[#121813] shrink-0"
+        >
+          <div class="max-w-md mx-auto w-full">
+            <o-button
+              variant=${secondsRemaining !== null ? "warning" : "primary"}
+              width="block"
+              size="md"
+              .title=${statusLabel}
+              .uppercase=${secondsRemaining === null}
+              ?disable=${this.queued ||
+              (this.lobbyStartAt === null && this.clients.length < 2)}
+              @click=${this.toggleGameStartTimer}
+            ></o-button>
+          </div>
         </div>
 
         ${this.showListLobbyDialog

@@ -94,7 +94,12 @@ export class SoundEffectController implements Controller {
     for (const c of updates[GameUpdateType.ConquestEvent] ?? []) {
       // Check if conquered player had an active tactical bounty
       try {
-        tacticalInteractions.checkConquest(c.conquerorId, c.conqueredId, this.game, this.eventBus);
+        tacticalInteractions.checkConquest(
+          c.conquerorId,
+          c.conqueredId,
+          this.game,
+          this.eventBus,
+        );
       } catch (err) {
         console.warn("Bounty check error:", err);
       }

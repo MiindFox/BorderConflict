@@ -144,13 +144,15 @@ export class EngineConfig extends Config {
   }
 
   defensePostDefenseBonus(defenderType: PlayerType = PlayerType.Human): number {
-    const we = this.worldEventState().effectiveModifiers.defensePostStrengthMult;
+    const we =
+      this.worldEventState().effectiveModifiers.defensePostStrengthMult;
     const doc = this.doctrineModifiers(defenderType).defensePostStrengthMult;
     return 5 * we * doc;
   }
 
   defensePostSpeedBonus(defenderType: PlayerType = PlayerType.Human): number {
-    const we = this.worldEventState().effectiveModifiers.defensePostStrengthMult;
+    const we =
+      this.worldEventState().effectiveModifiers.defensePostStrengthMult;
     const doc = this.doctrineModifiers(defenderType).defensePostStrengthMult;
     return 3 * we * doc;
   }
@@ -729,7 +731,8 @@ export class EngineConfig extends Config {
     return this.hasInfiniteTroopsForInfo(playerInfo)
       ? 1_000_000
       : Math.floor(
-          25_000 * this.doctrineModifiers(playerInfo.playerType).startManpowerMult,
+          25_000 *
+            this.doctrineModifiers(playerInfo.playerType).startManpowerMult,
         );
   }
 
@@ -743,9 +746,7 @@ export class EngineConfig extends Config {
     } else {
       baseRate = 100n;
     }
-    return BigInt(
-      Math.floor(Number(baseRate) * multiplier * weMult * docMult),
-    );
+    return BigInt(Math.floor(Number(baseRate) * multiplier * weMult * docMult));
   }
 
   nukeSpeed(unitType: UnitType): number {

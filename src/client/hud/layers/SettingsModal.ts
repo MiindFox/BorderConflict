@@ -313,10 +313,15 @@ export class SettingsModal extends LitElement implements Controller {
         @contextmenu=${(e: Event) => e.preventDefault()}
       >
         <div
-          class="bg-slate-800 border border-slate-600 rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto"
+          class="bg-[#121813]/98 border-2 border-[#2b3a2d] rounded-2xl max-w-md w-full max-h-[85vh] overflow-y-auto shadow-[0_20px_60px_rgba(0,0,0,0.95)] font-mono relative overflow-hidden"
         >
+          <div class="crt-screw crt-screw-tl hidden sm:block"></div>
+          <div class="crt-screw crt-screw-tr hidden sm:block"></div>
+          <div class="crt-screw crt-screw-bl hidden sm:block"></div>
+          <div class="crt-screw crt-screw-br hidden sm:block"></div>
+
           <div
-            class="flex items-center justify-between p-4 border-b border-slate-600"
+            class="flex items-center justify-between p-4 bg-[#1a251c] border-b-2 border-[#2b3a2d]"
           >
             <div class="flex items-center gap-2">
               <img
@@ -324,17 +329,19 @@ export class SettingsModal extends LitElement implements Controller {
                 alt=""
                 width="24"
                 height="24"
-                class="align-middle"
+                class="align-middle brightness-110"
               />
-              <h2 class="text-xl font-semibold text-white">
+              <h2
+                class="text-xl font-mono font-bold text-amber-200 tracking-wide"
+              >
                 ${translateText("user_setting.game_menu_title")}
               </h2>
             </div>
             <button
-              class="text-slate-400 hover:text-white text-2xl font-bold leading-none"
+              class="retro-metal-btn flex h-7 w-7 items-center justify-center rounded-lg bg-[#18231a] text-slate-300 border border-[#2b3a2d] hover:text-red-400 hover:border-red-500 font-mono font-bold transition-colors"
               @click=${this.closeModal}
             >
-              ×
+              ✕
             </button>
           </div>
 
@@ -342,35 +349,52 @@ export class SettingsModal extends LitElement implements Controller {
             ${this.renderSaveRow()}
 
             <button
-              class="flex gap-3 items-center w-full text-left p-3 hover:bg-slate-700 rounded-sm text-white transition-colors"
+              class="flex gap-3 items-center w-full text-left p-3 bg-[#18231a] border border-[#2b3a2d] hover:bg-[#202e22] hover:border-amber-400/60 rounded-xl text-white transition-all shadow-inner"
               data-open-settings
               @click="${this.onOpenSettingsButtonClick}"
             >
-              <img src=${settingsIcon} alt="" width="20" height="20" />
+              <img
+                src=${settingsIcon}
+                alt=""
+                width="20"
+                height="20"
+                class="brightness-110"
+              />
               <div class="flex-1">
-                <div class="font-medium">
+                <div class="font-mono font-bold text-emerald-300">
                   ${translateText("user_setting.open_settings_label")}
                 </div>
-                <div class="text-sm text-slate-400">
+                <div class="text-xs text-slate-400 font-mono">
                   ${translateText("user_setting.open_settings_desc")}
                 </div>
               </div>
             </button>
 
             <button
-              class="flex gap-3 items-center w-full text-left p-3 hover:bg-slate-700 rounded-sm text-white transition-colors"
+              class="flex gap-3 items-center w-full text-left p-3 bg-[#18231a] border border-[#2b3a2d] hover:bg-[#202e22] hover:border-amber-400/60 rounded-xl text-white transition-all shadow-inner"
               @click="${this.onTerrainButtonClick}"
             >
-              <img src=${treeIcon} alt="" width="20" height="20" />
+              <img
+                src=${treeIcon}
+                alt=""
+                width="20"
+                height="20"
+                class="brightness-110"
+              />
               <div class="flex-1">
-                <div class="font-medium">
+                <div class="font-mono font-bold text-emerald-300">
                   ${translateText("user_setting.toggle_terrain")}
                 </div>
-                <div class="text-sm text-slate-400">
+                <div class="text-xs text-slate-400 font-mono">
                   ${translateText("user_setting.toggle_view_desc")}
                 </div>
               </div>
-              <div class="text-sm text-slate-400">
+              <div
+                class="px-2 py-0.5 rounded bg-[#0e1410] border border-[#2b3a2d] text-xs font-mono font-bold ${this
+                  .alternateView
+                  ? "text-emerald-400"
+                  : "text-slate-400"}"
+              >
                 ${this.alternateView
                   ? translateText("user_setting.on")
                   : translateText("user_setting.off")}
@@ -379,40 +403,52 @@ export class SettingsModal extends LitElement implements Controller {
 
             ${this.renderModifiers()}
 
-            <div class="border-t border-slate-600 pt-3 mt-4">
+            <div class="border-t-2 border-[#2b3a2d] pt-3 mt-4">
               <div
-                class="px-3 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider"
+                class="px-3 py-1 text-xs font-mono font-bold text-amber-400/80 uppercase tracking-wider"
               >
                 ${translateText("user_setting.development_only")}
               </div>
 
               <button
-                class="flex gap-3 items-center w-full text-left p-3 hover:bg-slate-700 rounded-sm text-white transition-colors"
+                class="flex gap-3 items-center w-full text-left p-3 bg-[#18231a] border border-[#2b3a2d] hover:bg-[#202e22] hover:border-amber-400/60 rounded-xl text-white transition-all shadow-inner"
                 @click="${this.onRenderDebugGuiButtonClick}"
               >
-                <img src=${settingsIcon} alt="" width="20" height="20" />
+                <img
+                  src=${settingsIcon}
+                  alt=""
+                  width="20"
+                  height="20"
+                  class="brightness-110"
+                />
                 <div class="flex-1">
-                  <div class="font-medium">
+                  <div class="font-mono font-bold text-emerald-300">
                     ${translateText("user_setting.render_debug_gui")}
                   </div>
-                  <div class="text-sm text-slate-400">
+                  <div class="text-xs text-slate-400 font-mono">
                     ${translateText("user_setting.render_debug_gui_desc")}
                   </div>
                 </div>
               </button>
             </div>
 
-            <div class="border-t border-slate-600 pt-3 mt-4">
+            <div class="border-t-2 border-[#2b3a2d] pt-3 mt-4">
               <button
-                class="flex gap-3 items-center w-full text-left p-3 hover:bg-red-600/20 rounded-sm text-red-400 transition-colors"
+                class="flex gap-3 items-center w-full text-left p-3 bg-[#2a1315]/80 border-2 border-red-900/60 hover:bg-[#3a181b] hover:border-red-500 rounded-xl text-red-300 transition-all font-mono shadow-inner"
                 @click="${this.onExitButtonClick}"
               >
-                <img src=${exitIcon} alt="" width="20" height="20" />
+                <img
+                  src=${exitIcon}
+                  alt=""
+                  width="20"
+                  height="20"
+                  class="brightness-110"
+                />
                 <div class="flex-1">
-                  <div class="font-medium">
+                  <div class="font-mono font-bold text-red-400">
                     ${translateText("user_setting.exit_game_label")}
                   </div>
-                  <div class="text-sm text-slate-400">
+                  <div class="text-xs text-slate-400 font-mono">
                     ${translateText("user_setting.exit_game_info")}
                   </div>
                 </div>

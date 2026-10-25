@@ -321,9 +321,9 @@ export abstract class BaseModal extends LitElement {
 }
 
 const spinnerColorClasses: Record<string, string> = {
-  blue: "border-blue-500/30 border-t-blue-500",
+  blue: "border-green-500/30 border-t-green-400",
   green: "border-green-500/30 border-t-green-500",
-  yellow: "border-yellow-500/30 border-t-yellow-500",
+  yellow: "border-amber-500/30 border-t-amber-400",
   white: "border-white/20 border-t-white",
 };
 

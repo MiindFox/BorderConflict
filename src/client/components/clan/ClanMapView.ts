@@ -353,9 +353,9 @@ export class ClanMapView extends LitElement {
               type="button"
               @click=${() => (this.selectedClanFilter = "ALL")}
               class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all border ${filter ===
-              'ALL'
-                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.3)]'
-                : 'bg-slate-900/80 text-slate-400 border-white/10 hover:text-white'}"
+              "ALL"
+                ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.3)]"
+                : "bg-slate-900/80 text-slate-400 border-white/10 hover:text-white"}"
             >
               Tous les Secteurs (${this.mapData.sectors.length})
             </button>
@@ -366,11 +366,11 @@ export class ClanMapView extends LitElement {
                   @click=${() => (this.selectedClanFilter = c.tag)}
                   style="border-color: ${filter === c.tag
                     ? c.color
-                    : 'rgba(255,255,255,0.1)'}; color: ${c.color};"
+                    : "rgba(255,255,255,0.1)"}; color: ${c.color};"
                   class="px-2.5 py-1 rounded-lg text-xs font-black tracking-wider transition-all border flex items-center gap-1.5 ${filter ===
                   c.tag
-                    ? 'bg-white/10 shadow-lg scale-105'
-                    : 'bg-slate-900/80 hover:bg-white/5 opacity-80'}"
+                    ? "bg-white/10 shadow-lg scale-105"
+                    : "bg-slate-900/80 hover:bg-white/5 opacity-80"}"
                 >
                   <span
                     class="w-2 h-2 rounded-full"
@@ -454,11 +454,7 @@ export class ClanMapView extends LitElement {
                       stop-color="#06b6d4"
                       stop-opacity="0.05"
                     />
-                    <stop
-                      offset="100%"
-                      stop-color="#06b6d4"
-                      stop-opacity="0"
-                    />
+                    <stop offset="100%" stop-color="#06b6d4" stop-opacity="0" />
                   </radialGradient>
                   <filter
                     id="glow"
@@ -468,7 +464,11 @@ export class ClanMapView extends LitElement {
                     height="140%"
                   >
                     <feGaussianBlur stdDeviation="6" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    <feComposite
+                      in="SourceGraphic"
+                      in2="blur"
+                      operator="over"
+                    />
                   </filter>
                 </defs>
 
@@ -682,11 +682,11 @@ export class ClanMapView extends LitElement {
                   </span>
                   <span
                     class="rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${sector.status ===
-                    'secure'
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                      : sector.status === 'fortified'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}"
+                    "secure"
+                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                      : sector.status === "fortified"
+                        ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                        : "bg-rose-500/20 text-rose-400 border border-rose-500/30"}"
                   >
                     ${sector.statusLabel}
                   </span>
@@ -804,8 +804,8 @@ export class ClanMapView extends LitElement {
                         <span
                           class="w-3.5 h-1.5 rounded-sm ${lvl <=
                           sector.defenseLevel
-                            ? 'bg-cyan-400 shadow-[0_0_6px_#22d3ee]'
-                            : 'bg-slate-800'}"
+                            ? "bg-cyan-400 shadow-[0_0_6px_#22d3ee]"
+                            : "bg-slate-800"}"
                         ></span>
                       `,
                     )}

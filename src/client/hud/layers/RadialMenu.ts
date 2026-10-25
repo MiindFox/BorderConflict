@@ -90,7 +90,7 @@ export class RadialMenu implements Controller {
   private backButtonHoverTimeout: number | null = null;
   private navigationInProgress: boolean = false;
   private originalCenterButtonIcon: string = "";
-  private readonly defaultCenterButtonColor = "#0f2744";
+  private readonly defaultCenterButtonColor = "#121813";
   private centerButtonColor: string;
   private centerButtonIconSize: number;
 
@@ -108,7 +108,7 @@ export class RadialMenu implements Controller {
       centerButtonSize: config.centerButtonSize ?? 30,
       iconSize: config.iconSize ?? 32,
       centerIconSize: config.centerIconSize ?? 48,
-      disabledColor: config.disabledColor ?? d3.rgb(128, 128, 128).toString(),
+      disabledColor: config.disabledColor ?? "#222e24",
       menuTransitionDuration: config.menuTransitionDuration ?? 300,
       mainMenuInnerRadius: config.mainMenuInnerRadius ?? 40,
       centerButtonIcon: config.centerButtonIcon ?? "",
@@ -211,6 +211,8 @@ export class RadialMenu implements Controller {
       .attr("class", "center-button-visible")
       .attr("r", this.config.centerButtonSize)
       .attr("fill", this.centerButtonColor)
+      .attr("stroke", "#2b3a2d")
+      .attr("stroke-width", "2.5")
       .style("pointer-events", "none");
 
     centerButton
@@ -229,10 +231,13 @@ export class RadialMenu implements Controller {
     this.tooltipElement.className = "radial-tooltip";
     this.tooltipElement.style.position = "absolute";
     this.tooltipElement.style.pointerEvents = "none";
-    this.tooltipElement.style.background = "rgba(12, 35, 64, 0.88)";
-    this.tooltipElement.style.color = "white";
+    this.tooltipElement.style.background = "rgba(18, 24, 19, 0.98)";
+    this.tooltipElement.style.border = "2px solid #2b3a2d";
+    this.tooltipElement.style.color = "#f1f5f9";
+    this.tooltipElement.style.fontFamily = "'Share Tech Mono', monospace";
+    this.tooltipElement.style.boxShadow = "0 8px 24px rgba(0,0,0,0.85)";
     this.tooltipElement.style.padding = "6px 10px";
-    this.tooltipElement.style.borderRadius = "6px";
+    this.tooltipElement.style.borderRadius = "8px";
     this.tooltipElement.style.fontSize = "12px";
     this.tooltipElement.style.zIndex = "10000";
     this.tooltipElement.style.maxWidth = "250px";
@@ -334,8 +339,8 @@ export class RadialMenu implements Controller {
         const disabled = this.params === null || d.data.disabled(this.params);
         const color = disabled
           ? this.config.disabledColor
-          : (resolveColor(d.data, this.params) ?? "#1e3a5f");
-        const opacity = disabled ? 0.4 : 0.82;
+          : (resolveColor(d.data, this.params) ?? "#18231a");
+        const opacity = disabled ? 0.45 : 0.92;
 
         if (d.data.id === this.selectedItemId && this.currentLevel > level) {
           return color;
@@ -343,7 +348,8 @@ export class RadialMenu implements Controller {
 
         return d3.color(color)?.copy({ opacity: opacity })?.toString() ?? color;
       })
-      .attr("stroke", "none")
+      .attr("stroke", "#2b3a2d")
+      .attr("stroke-width", "2")
       .style("cursor", (d) =>
         this.params === null || d.data.disabled(this.params)
           ? "not-allowed"
@@ -365,8 +371,8 @@ export class RadialMenu implements Controller {
         const disabled = this.params === null || d.data.disabled(this.params);
         const baseColor = disabled
           ? this.config.disabledColor
-          : (resolveColor(d.data, this.params) ?? "#1e3a5f");
-        const opacity = disabled ? 0.4 : 0.82;
+          : (resolveColor(d.data, this.params) ?? "#18231a");
+        const opacity = disabled ? 0.45 : 0.92;
 
         const normalColor =
           d3.color(baseColor)?.copy({ opacity: opacity })?.toString() ??
@@ -991,7 +997,9 @@ export class RadialMenu implements Controller {
       state === "back" ? this.defaultCenterButtonColor : this.centerButtonColor;
     centerButton
       .select(".center-button-visible")
-      .attr("fill", enabled ? buttonColor : "#999999");
+      .attr("fill", enabled ? buttonColor : "#1a251c")
+      .attr("stroke", "#2b3a2d")
+      .attr("stroke-width", "2.5");
 
     centerButton
       .select(".center-button-icon")

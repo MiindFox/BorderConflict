@@ -29,6 +29,7 @@ import {
 import { ClientEnv } from "../client/ClientEnv";
 import { reloadForUpdate, translateText } from "../client/Utils";
 import { MapLayerController } from "./controllers/MapLayerController";
+import { getPlayerCosmetics } from "./Cosmetics";
 import { isDesktopShell } from "./DesktopShell";
 import { GameMetrics } from "./GameMetrics";
 import { createRenderer, GameRenderer } from "./hud/GameRenderer";
@@ -97,7 +98,6 @@ import {
   USER_SETTINGS_CHANGED_EVENT,
   UserSettings,
 } from "./UserSettings";
-import { getPlayerCosmetics } from "./Cosmetics";
 import { createCanvas } from "./Utils";
 import { GameView, PlayerView } from "./view";
 import { WebGLFrameBuilder } from "./WebGLFrameBuilder";

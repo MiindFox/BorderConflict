@@ -23,6 +23,7 @@ import {
   TouchEvent,
 } from "../../InputHandler";
 import { Platform } from "../../Platform";
+import { tacticalInteractions } from "../../TacticalInteractionManager";
 import { themeProvider } from "../../theme/ThemeProvider";
 import { TransformHandler } from "../../TransformHandler";
 import { UserSettings } from "../../UserSettings";
@@ -39,7 +40,6 @@ import {
   getPlayerIcons,
   IMAGE_ICON_KIND,
 } from "../PlayerIcons";
-import { tacticalInteractions } from "../../TacticalInteractionManager";
 import { ShowPlayerChatEvent } from "./ChatModal";
 import { ShowPlayerEmojiMenuEvent } from "./EmojiTable";
 import { ImmunityBarVisibleEvent } from "./ImmunityTimer";
@@ -351,14 +351,14 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
   private displayUnitCount(player: PlayerView, type: UnitType, icon: string) {
     return !this.game.config().isUnitDisabled(type)
       ? html`<div
-          class="flex items-center justify-center gap-0.5 lg:gap-1 p-0.5 lg:p-1 border rounded-md border-gray-500 text-[10px] lg:text-xs w-9 lg:w-12 h-6 lg:h-7"
+          class="flex items-center justify-center gap-0.5 lg:gap-1 p-0.5 lg:p-1 border border-[#2b3a2d] rounded bg-[#151f17] text-[10px] lg:text-xs w-9 lg:w-12 h-6 lg:h-7 shadow-inner font-mono font-bold text-emerald-300"
           translate="no"
         >
           <img
             src=${icon}
-            class="w-3 h-3 lg:w-4 lg:h-4 object-contain shrink-0"
+            class="w-3 h-3 lg:w-4 lg:h-4 object-contain shrink-0 brightness-110"
           />
-          <span>${player.totalUnitLevels(type)}</span>
+          <span class="tabular-nums">${player.totalUnitLevels(type)}</span>
         </div>`
       : "";
   }
@@ -499,9 +499,9 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
     onClick: () => void,
   ) {
     const key = keybind ? formatKeyForDisplay(keybind) : "";
-    // Icon only, with the key as a corner badge, to keep the panel narrow.
+    // Tactical retro metal button with corner keybind badge
     return html`<button
-      class="relative flex items-center justify-center size-6.5 border rounded-md border-gray-500 hover:bg-white/10 cursor-pointer"
+      class="retro-metal-btn relative flex items-center justify-center size-6.5 border border-[#2b3a2d] rounded bg-[#18231a] hover:bg-[#202e22] hover:border-amber-400/60 cursor-pointer shadow-sm transition-all"
       title=${title}
       @click=${(e: MouseEvent) => {
         e.stopPropagation();
@@ -509,10 +509,10 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
         this.hide();
       }}
     >
-      <img src=${icon} alt="" class="size-5 object-contain" />
+      <img src=${icon} alt="" class="size-4 object-contain brightness-110" />
       ${key
         ? html`<span
-            class="pointer-events-none absolute -bottom-1 -right-1 px-0.5 rounded-sm bg-gray-800 text-[9px] leading-tight font-mono text-gray-300"
+            class="pointer-events-none absolute -bottom-1 -right-1 px-1 rounded-xs bg-[#0a0f0c] text-[9px] leading-tight font-mono font-bold text-emerald-300 border border-[#2b3a2d]"
             translate="no"
             >${key}</span
           >`
@@ -660,16 +660,18 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
         <div class="flex flex-col gap-1 shrink-0 w-28 md:w-36">
           <div class="flex items-center gap-1">
             <div
-              class="flex items-center justify-center px-1 py-0.5 border rounded-md border-yellow-400 font-bold text-yellow-400 text-sm lg:gap-1"
+              class="flex items-center justify-center px-1.5 py-0.5 border-2 rounded-lg border-amber-500/50 bg-[#0e1410] font-bold text-amber-300 text-sm font-mono shadow-inner lg:gap-1"
               translate="no"
             >
               <img src=${goldCoinIcon} width="13" height="13" />
-              <span class="px-0.5">${renderNumber(player.gold())}</span>
+              <span class="px-0.5 tabular-nums"
+                >${renderNumber(player.gold())}</span
+              >
             </div>
             <div
-              class="flex flex-1 flex-col items-center justify-center text-xs font-bold ${attackingTroops >
+              class="flex flex-1 flex-col items-center justify-center text-xs font-mono font-bold ${attackingTroops >
               0
-                ? "text-aquarius"
+                ? "text-emerald-400"
                 : "text-white/40"} drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]"
               translate="no"
             >
@@ -843,27 +845,31 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
 
     return html`
       <div
-        class="w-full h-5 lg:h-6 border border-gray-600 rounded-md bg-gray-900/60 overflow-hidden relative"
+        class="w-full h-5 lg:h-6 border-2 border-[#2b3a2d] rounded-lg bg-[#0a0e0b] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] overflow-hidden relative"
       >
         <div class="relative h-full">
           <div
-            class="absolute inset-y-0 left-0 w-full origin-left bg-sky-700 transition-transform duration-200 ease-out"
+            class="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-[#183520] via-[#22c55e] to-[#4ade80] transition-transform duration-200 ease-out"
             style="transform: scaleX(${greenPercent / 100});"
           ></div>
           <div
-            class="absolute inset-y-0 left-0 w-full origin-left bg-malibu-blue transition-transform duration-200 ease-out"
+            class="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-amber-600 to-amber-400 transition-transform duration-200 ease-out"
             style="transform: translateX(${greenPercent}%) scaleX(${orangePercent /
             100});"
           ></div>
         </div>
+        <!-- Scanlines layer -->
         <div
-          class="absolute inset-0 flex items-center justify-between px-1.5 text-sm font-bold leading-none pointer-events-none"
+          class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:100%_2px] pointer-events-none"
+        ></div>
+        <div
+          class="absolute inset-0 flex items-center justify-between px-1.5 text-xs font-mono font-bold leading-none pointer-events-none"
           translate="no"
         >
           <span class="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]"
             >${renderTroops(totalTroops)}</span
           >
-          <span class="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]"
+          <span class="text-emerald-100 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]"
             >${renderTroops(maxTroops)}</span
           >
         </div>
@@ -871,8 +877,8 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
           src=${soldierIcon}
           alt=""
           aria-hidden="true"
-          width="14"
-          height="14"
+          width="12"
+          height="12"
           class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 brightness-0 invert drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)] pointer-events-none"
         />
       </div>
@@ -924,12 +930,15 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
         @contextmenu=${(e: MouseEvent) => e.preventDefault()}
       >
         <div
-          class="bg-gray-800/92 backdrop-blur-sm shadow-xs min-[1200px]:rounded-lg sm:rounded-b-lg shadow-lg text-white text-lg lg:text-base w-full ${this.showShortcutButtons()
+          class="bg-[#121813]/95 border-2 border-[#2b3a2d] shadow-[0_12px_40px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md min-[1200px]:rounded-xl sm:rounded-b-xl text-white text-lg lg:text-base w-full ${this.showShortcutButtons()
             ? "sm:w-[598px]"
-            : "sm:w-[500px]"} overflow-hidden ${containerClasses}"
+            : "sm:w-[500px]"} overflow-hidden ${containerClasses} relative font-mono"
           @mouseenter=${this.onPanelEnter}
           @mouseleave=${this.onPanelLeave}
         >
+          <!-- Corner tactical screws -->
+          <div class="crt-screw crt-screw-tl hidden sm:block"></div>
+          <div class="crt-screw crt-screw-tr hidden sm:block"></div>
           ${this.player ? this.renderPlayerInfo(this.player) : ""}
           ${this.unit ? this.renderUnitInfo(this.unit) : ""}
         </div>

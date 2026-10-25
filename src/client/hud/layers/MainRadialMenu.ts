@@ -55,12 +55,21 @@ export class MainRadialMenu implements Controller {
     const menuConfig: RadialMenuConfig = {
       centerButtonIcon: swordIcon,
       tooltipStyle: `
+        .radial-tooltip {
+          background: rgba(18, 24, 19, 0.98) !important;
+          border: 2px solid #2b3a2d !important;
+          border-radius: 8px !important;
+          color: #f1f5f9 !important;
+          font-family: 'Share Tech Mono', monospace !important;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.85) !important;
+        }
         .radial-tooltip .cost {
           margin-top: 4px;
-          color: ${COLORS.tooltip.cost};
+          color: ${COLORS.tooltip.cost} !important;
+          font-weight: bold;
         }
         .radial-tooltip .count {
-          color: ${COLORS.tooltip.count};
+          color: ${COLORS.tooltip.count} !important;
         }
       `,
     };

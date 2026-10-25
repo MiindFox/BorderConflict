@@ -445,54 +445,58 @@ export class ControlPanel extends LitElement implements Controller {
     const isNearCap = greenPercent >= 90;
     return html`
       <div
-        class="w-full h-7 border rounded-lg bg-slate-900/90 shadow-inner overflow-hidden relative transition-all duration-300 ${isNearCap
+        class="w-full h-7 border-2 rounded-lg bg-[#0a0e0b] shadow-[inset_0_2px_6px_rgba(0,0,0,0.9)] overflow-hidden relative transition-all duration-300 border-[#2b3a2d] ${isNearCap
           ? "border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.6)]"
-          : "border-cyan-500/35"}"
+          : ""}"
       >
         <div class="relative h-full">
           <div
-            class="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-cyan-500 to-indigo-600 transition-transform duration-200 ease-out"
+            class="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-emerald-600 via-green-500 to-[#4ade80] transition-transform duration-200 ease-out"
             style="transform: scaleX(${greenPercent / 100});"
           ></div>
           <div
-            class="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-amber-500 to-orange-500 transition-transform duration-200 ease-out"
+            class="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-amber-600 to-amber-400 transition-transform duration-200 ease-out"
             style="transform: translateX(${greenPercent}%) scaleX(${orangePercent /
             100});"
           ></div>
         </div>
+        <!-- Scanlines layer -->
         <div
-          class="absolute inset-0 flex items-center text-base font-extrabold leading-none pointer-events-none px-2"
+          class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:100%_2.5px] pointer-events-none"
+        ></div>
+        <div
+          class="absolute inset-0 flex items-center text-xs font-mono font-bold leading-none pointer-events-none px-2"
           translate="no"
         >
           <span class="flex-1 flex justify-end h-full items-center pr-1">
-            <span class="text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+            <span class="text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
               >${renderTroops(this._troops)}</span
             >
           </span>
           <span
-            class="h-full flex items-center px-0.5 text-cyan-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+            class="h-full flex items-center px-0.5 text-emerald-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
             >/</span
           >
           <span
             class="flex-1 flex justify-start h-full items-center pl-1 gap-1"
           >
             <span
-              class="text-cyan-100 tabular-nums w-[3.5rem] drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+              class="text-emerald-100 tabular-nums w-[3.2rem] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
               >${renderTroops(this._maxTroops)}</span
             >
             <img
               src=${soldierIcon}
               alt=""
               aria-hidden="true"
-              width="20"
-              height="20"
-              class="shrink-0 brightness-0 invert drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ml-1"
+              width="14"
+              height="14"
+              class="shrink-0 brightness-0 invert drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] ml-0.5"
             />
           </span>
           <span
-            class="ml-auto text-[11px] font-mono px-1.5 py-0.5 rounded bg-slate-950/70 border ${isNearCap
-              ? "text-amber-300 border-amber-400/50 animate-pulse"
-              : "text-cyan-200 border-cyan-500/30"}"
+            class="ml-auto text-[11px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#0e1410]/90 border ${isNearCap
+              ? "text-amber-300 border-amber-400/60 animate-pulse"
+              : "text-emerald-300 border-[#2b3a2d]"}"
           >
             ${Math.round(greenPercent)}%
           </span>
@@ -523,115 +527,130 @@ export class ControlPanel extends LitElement implements Controller {
   private renderDesktop() {
     return html`
       ${this.renderNotification()}
-      <!-- Row 1: troop rate | troop bar | gold -->
-      <div class="flex gap-1.5 items-center mb-1.5">
-        <!-- Troop rate -->
+      <!-- Ultra-low-profile widescreen command telemetry bar -->
+      <div
+        class="flex items-center justify-between gap-2.5 w-full flex-wrap min-[1180px]:flex-nowrap px-1 py-0.5"
+      >
+        <!-- Telemetry & Troops group -->
         <div
-          class="flex items-center justify-center gap-1 shrink-0 bg-slate-900/90 border rounded-lg font-extrabold text-sm h-7 px-2 min-w-[5.75rem] shadow-inner ${this.tutorialHighlightClass(
-            "troop_rate",
-          )} ${this._troopRateIsIncreasing
-            ? "border-emerald-500/45"
-            : "border-amber-500/45"}"
-          translate="no"
+          class="flex items-center gap-2 flex-1 min-w-[320px] max-w-full min-[1180px]:max-w-[55%]"
         >
-          <img
-            src=${soldierIcon}
-            alt=""
-            aria-hidden="true"
-            width="13"
-            height="13"
-            class="shrink-0"
-            style="filter: ${this._troopRateIsIncreasing
-              ? "brightness(0) saturate(100%) invert(74%) sepia(44%) saturate(500%) hue-rotate(83deg) brightness(103%)"
-              : "brightness(0) saturate(100%) invert(65%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(105%)"}"
-          />
-          <span
-            class="text-sm font-extrabold tabular-nums ${this._troopRateIsIncreasing
-              ? "text-emerald-400"
-              : "text-amber-400"}"
-            >+${renderTroops(this.troopRate)}/s</span
+          <!-- Troop rate -->
+          <div
+            class="flex items-center justify-center gap-1.5 shrink-0 bg-[#0e1410] border-2 rounded-lg font-mono font-bold text-xs h-7 px-2 shadow-inner ${this.tutorialHighlightClass(
+              "troop_rate",
+            )} ${this._troopRateIsIncreasing
+              ? "border-[#22c55e]/50 text-emerald-400"
+              : "border-amber-500/50 text-amber-400"}"
+            translate="no"
           >
+            <img
+              src=${soldierIcon}
+              alt=""
+              aria-hidden="true"
+              width="12"
+              height="12"
+              class="shrink-0"
+              style="filter: ${this._troopRateIsIncreasing
+                ? "brightness(0) saturate(100%) invert(74%) sepia(44%) saturate(500%) hue-rotate(83deg) brightness(103%)"
+                : "brightness(0) saturate(100%) invert(65%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(105%)"}"
+            />
+            <span
+              class="text-xs font-mono font-bold tabular-nums ${this
+                ._troopRateIsIncreasing
+                ? "text-emerald-400"
+                : "text-amber-400"}"
+              >+${renderTroops(this.troopRate)}/s</span
+            >
+          </div>
+          <!-- Troop bar -->
+          <div class="flex-1 ${this.tutorialHighlightClass("troops")}">
+            ${this.renderDesktopTroopBar()}
+          </div>
+          <!-- Gold -->
+          <div
+            class="flex items-center justify-center gap-1.5 shrink-0 bg-[#0e1410] border-2 rounded-lg border-amber-500/40 font-mono font-bold text-amber-300 text-xs h-7 px-2.5 relative shadow-inner ${this.tutorialHighlightClass(
+              "gold",
+            )}"
+            translate="no"
+          >
+            ${this._goldGain !== null
+              ? keyed(
+                  this._goldGainPulseId,
+                  html`<span
+                    class="gold-gain-pop absolute -top-5 right-[5px] text-emerald-400 text-xs font-mono font-extrabold tabular-nums whitespace-nowrap pointer-events-none drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]"
+                    >+${renderNumber(this._goldGain)}</span
+                  >`,
+                )
+              : ""}
+            <img src=${goldCoinIcon} width="14" height="14" class="shrink-0" />
+            <span class="tabular-nums font-mono text-xs"
+              >${renderNumber(this._gold)}</span
+            >
+          </div>
         </div>
-        <!-- Troop bar -->
-        <div class="flex-1 ${this.tutorialHighlightClass("troops")}">
-          ${this.renderDesktopTroopBar()}
-        </div>
-        <!-- Gold -->
+
         <div
-          class="flex items-center justify-center gap-1.5 shrink-0 bg-slate-900/90 border rounded-lg border-amber-400/45 font-extrabold text-amber-300 text-sm h-7 px-2.5 min-w-[4.75rem] relative shadow-inner ${this.tutorialHighlightClass(
-            "gold",
+          class="hidden min-[1180px]:block w-[1.5px] h-6 bg-[#2b3a2d] shrink-0"
+        ></div>
+
+        <!-- Attack ratio & Presets group -->
+        <div
+          class="flex items-center gap-2 px-2 py-0.5 rounded-lg bg-[#0e1410]/80 border border-[#232f25] shrink-0 flex-1 min-[1180px]:flex-initial justify-between ${this.tutorialHighlightClass(
+            "attack_ratio",
           )}"
           translate="no"
         >
-          ${this._goldGain !== null
-            ? keyed(
-                this._goldGainPulseId,
-                html`<span
-                  class="gold-gain-pop absolute -top-5 right-[5px] min-[1015px]:right-[9px] text-emerald-400 text-sm font-extrabold tabular-nums whitespace-nowrap pointer-events-none drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]"
-                  >+${renderNumber(this._goldGain)}</span
-                >`,
-              )
-            : ""}
-          <img src=${goldCoinIcon} width="14" height="14" class="shrink-0" />
-          <span class="tabular-nums">${renderNumber(this._gold)}</span>
-        </div>
-      </div>
-      <!-- Row 2: attack ratio | slider -->
-      <div
-        class="flex items-center gap-2 ${this.tutorialHighlightClass(
-          "attack_ratio",
-        )}"
-        translate="no"
-      >
-        <div
-          class="flex items-center justify-center gap-1.5 shrink-0 bg-slate-900/90 border border-cyan-500/25 rounded-lg px-2 py-0.5 text-sm font-extrabold text-cyan-100 cursor-pointer w-[8.5rem] shadow-inner"
-        >
-          <img
-            src=${swordIcon}
-            alt=""
-            aria-hidden="true"
-            width="12"
-            height="12"
-            style="filter: brightness(0) invert(1);"
-          />
-          <span class="tabular-nums"
-            >${(this.attackRatio * 100).toFixed(0)}%
-            (${renderTroops(
-              (this.game?.myPlayer()?.troops() ?? 0) * this.attackRatio,
-            )})</span
+          <div
+            class="flex items-center justify-center gap-1.5 shrink-0 bg-[#151f17] border border-[#2b3a2d] rounded px-2 py-0.5 text-xs font-mono font-bold text-emerald-200 cursor-pointer w-[8.2rem] shadow-inner"
           >
-        </div>
-        <input
-          type="range"
-          min="1"
-          max="100"
-          .value=${String(Math.round(this.attackRatio * 100))}
-          @input=${(e: Event) => this.handleRatioSliderInput(e)}
-          @pointerup=${(e: Event) => this.handleRatioSliderPointerUp(e)}
-          class="flex-1 h-2 accent-cyan-400 cursor-pointer"
-        />
-        <!-- Quick Attack Presets -->
-        <div class="flex items-center gap-1 shrink-0">
-          ${[
-            { label: "20%", val: 0.2 },
-            { label: "50%", val: 0.5 },
-            { label: "75%", val: 0.75 },
-            { label: "MAX", val: 1.0 },
-          ].map(
-            (preset) => html`
-              <button
-                type="button"
-                @click=${() => this.setRatioPreset(preset.val)}
-                class="px-2 py-0.5 rounded text-[11px] font-black transition-all ${Math.abs(
-                  this.attackRatio - preset.val,
-                ) < 0.03
-                  ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_8px_rgba(6,182,212,0.6)] border border-cyan-300 scale-105"
-                  : "bg-slate-900/90 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60"}"
-              >
-                ${preset.label}
-              </button>
-            `,
-          )}
+            <img
+              src=${swordIcon}
+              alt=""
+              aria-hidden="true"
+              width="11"
+              height="11"
+              style="filter: brightness(0) invert(1);"
+            />
+            <span class="tabular-nums font-mono text-xs"
+              >${(this.attackRatio * 100).toFixed(0)}%
+              (${renderTroops(
+                (this.game?.myPlayer()?.troops() ?? 0) * this.attackRatio,
+              )})</span
+            >
+          </div>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            .value=${String(Math.round(this.attackRatio * 100))}
+            @input=${(e: Event) => this.handleRatioSliderInput(e)}
+            @pointerup=${(e: Event) => this.handleRatioSliderPointerUp(e)}
+            class="w-28 sm:w-36 lg:w-44 h-1.5 accent-[#22c55e] cursor-pointer"
+          />
+          <!-- Quick Attack Presets -->
+          <div class="flex items-center gap-1 shrink-0">
+            ${[
+              { label: "20%", val: 0.2 },
+              { label: "50%", val: 0.5 },
+              { label: "75%", val: 0.75 },
+              { label: "MAX", val: 1.0 },
+            ].map(
+              (preset) => html`
+                <button
+                  type="button"
+                  @click=${() => this.setRatioPreset(preset.val)}
+                  class="retro-metal-btn px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase transition-all h-6 ${Math.abs(
+                    this.attackRatio - preset.val,
+                  ) < 0.03
+                    ? "ring-2 ring-amber-400 text-amber-200 brightness-110 shadow-[0_0_8px_rgba(245,158,11,0.5)] scale-105"
+                    : "text-[#8fa382] hover:text-white"}"
+                >
+                  ${preset.label}
+                </button>
+              `,
+            )}
+          </div>
         </div>
       </div>
     `;
@@ -702,7 +721,9 @@ export class ControlPanel extends LitElement implements Controller {
         </div>
         <!-- Attack ratio slider & mobile presets -->
         <div
-          class="flex-1 min-w-0 flex flex-col gap-1 ${this.tutorialHighlightClass("attack_ratio")}"
+          class="flex-1 min-w-0 flex flex-col gap-1 ${this.tutorialHighlightClass(
+            "attack_ratio",
+          )}"
           translate="no"
         >
           <input

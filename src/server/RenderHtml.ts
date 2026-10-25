@@ -109,7 +109,7 @@ export async function renderHtmlContent(
       cdnBase,
     ),
     backgroundImageUrl: buildAssetUrl(
-      "images/background.webp",
+      "images/retro-military-map.jpg",
       assetManifest,
       cdnBase,
     ),

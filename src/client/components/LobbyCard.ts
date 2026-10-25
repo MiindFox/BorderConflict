@@ -234,17 +234,35 @@ export function lobbyCard({
       @click=${onClick}
       ?disabled=${disabled}
       aria-disabled=${blocked}
-      class="group @container relative block w-full ${heightClass} overflow-hidden rounded-2xl bg-slate-950 border border-cyan-500/20 hover:border-cyan-400/60 text-left uppercase text-white transition-all duration-200 shadow-[0_8px_28px_rgba(0,0,0,0.5)] hover:shadow-[var(--shadow-lobby-card-hover)] ${state}"
+      class="group @container relative block w-full ${heightClass} overflow-hidden rounded-xl bg-[#0c120e] border-2 border-[#2b3a2d] hover:border-amber-400/80 text-left uppercase text-white transition-all duration-200 shadow-2xl cursor-pointer ${state}"
     >
       <img
         src=${terrainMapFileLoader.getMapData(mapType).webpPath}
         alt=${mapName ?? mapType}
         draggable="false"
-        class="pointer-events-none absolute inset-0 size-full select-none transition-transform duration-300 ${image}"
+        class="pointer-events-none absolute inset-0 size-full select-none transition-transform duration-300 opacity-90 ${image}"
       />
 
+      <!-- Tactical CRT Scanlines & Reticle Overlay -->
       <div
-        class="absolute inset-x-2.5 top-2.5 flex items-start justify-between gap-2"
+        class="absolute inset-0 crt-scanlines opacity-25 pointer-events-none z-10"
+      ></div>
+      <div
+        class="absolute inset-0 border border-green-500/20 flex items-center justify-center pointer-events-none z-10"
+      >
+        <div class="size-16 rounded-full border border-green-500/30"></div>
+        <div class="absolute w-20 h-px bg-green-500/30"></div>
+        <div class="absolute h-20 w-px bg-green-500/30"></div>
+      </div>
+
+      <!-- Corner Screws in the 4 corners -->
+      <div class="crt-screw crt-screw-tl"></div>
+      <div class="crt-screw crt-screw-tr"></div>
+      <div class="crt-screw crt-screw-bl"></div>
+      <div class="crt-screw crt-screw-br"></div>
+
+      <div
+        class="absolute inset-x-3.5 top-3 flex items-start justify-between gap-2 z-20"
       >
         <div class="flex min-w-0 flex-col items-start gap-1">
           ${custom
@@ -255,15 +273,15 @@ export function lobbyCard({
           ${modifiers.map((label) => html`<span class=${PILL}>${label}</span>`)}
         </div>
         <span
-          class="${PILL} shrink-0 tabular-nums !bg-gradient-to-r !from-cyan-500/90 !to-indigo-600/90 !text-white !border-cyan-300/40 ${timeDisplayUppercase
+          class="${PILL} shrink-0 tabular-nums !bg-[#1c1204] !border-[#d97706]/70 !text-amber-300 font-pixel text-[9px] sm:text-[10px] shadow flex items-center gap-1 ${timeDisplayUppercase
             ? ""
             : "normal-case"}"
-          >${timeDisplay}</span
+          >⏱️ ${timeDisplay}</span
         >
       </div>
 
       <div
-        class="absolute inset-x-0 bottom-0 flex flex-col bg-gradient-to-t from-slate-950/95 via-slate-950/85 to-slate-950/30 border-t border-white/10 px-3.5 py-2.5 ${trustedOnly &&
+        class="absolute inset-x-0 bottom-0 flex flex-col bg-gradient-to-t from-[#0a0f0b] via-[#0a0f0b]/90 to-transparent border-t border-[#2b3a2d] px-3.5 py-2.5 z-20 ${trustedOnly &&
         custom
           ? "pr-20"
           : trustedOnly || custom
@@ -271,30 +289,25 @@ export function lobbyCard({
             : ""}"
       >
         <span
-          class="${BADGE} absolute bottom-full right-2.5 mb-1.5 flex items-center gap-1 px-2 py-0.5 text-xs font-extrabold tabular-nums tracking-widest text-cyan-200"
+          class="${BADGE} absolute bottom-full right-3 mb-1.5 flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-pixel font-bold tabular-nums tracking-wider text-green-300 bg-[#101712] border border-[#2b3a2d] shadow"
         >
-          ${playerCount}
-          <svg
-            class="size-4 text-cyan-400"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
-            />
-          </svg>
+          <span>👥</span>
+          <span>${playerCount}</span>
         </span>
         ${trustedOnly ? trustLockIcon(viewerTrusted) : nothing}
         ${custom ? customInfoIcon(lobby, trustedOnly) : nothing}
         ${title
           ? html`<p
-              class="text-sm font-extrabold leading-tight tracking-wider text-white group-hover:text-cyan-200 transition-colors @[20rem]:text-base"
+              class="text-xs sm:text-sm font-pixel font-black leading-tight tracking-wider text-amber-200 group-hover:text-amber-100 transition-colors glow-amber"
             >
               ${title}
             </p>`
           : nothing}
-        <h3 class="text-xs font-semibold tracking-wider text-cyan-300/80">${subtitleLine}</h3>
+        <h3
+          class="text-[10px] sm:text-[11px] font-terminal text-green-400 font-bold uppercase tracking-wider mt-0.5"
+        >
+          ${subtitleLine}
+        </h3>
       </div>
     </button>
   `;

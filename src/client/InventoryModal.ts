@@ -495,18 +495,29 @@ export class InventoryModal extends BaseModal {
     const equippedKey = this.equippedSkin()?.key;
     return html`
       <!-- Custom Skin Studio Callout -->
-      <div class="mb-3 rounded-2xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 via-slate-900/90 to-purple-950/40 p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div
+        class="mb-3 rounded-2xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 via-slate-900/90 to-purple-950/40 p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3"
+      >
         <div class="flex items-center gap-3">
           <span class="text-2xl">🎨</span>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-black uppercase text-cyan-300">Skin de Territoire Personnalisé</span>
+              <span class="text-xs font-black uppercase text-cyan-300"
+                >Skin de Territoire Personnalisé</span
+              >
               ${commanderStore.hasCustomSkinUnlocked()
-                ? html`<span class="rounded bg-emerald-500/20 border border-emerald-400/40 px-1.5 py-0.2 text-[9px] font-black text-emerald-300 uppercase">Actif</span>`
-                : html`<span class="rounded bg-cyan-400 text-slate-950 px-1.5 py-0.2 text-[9px] font-black uppercase">Nouveau</span>`}
+                ? html`<span
+                    class="rounded bg-emerald-500/20 border border-emerald-400/40 px-1.5 py-0.2 text-[9px] font-black text-emerald-300 uppercase"
+                    >Actif</span
+                  >`
+                : html`<span
+                    class="rounded bg-cyan-400 text-slate-950 px-1.5 py-0.2 text-[9px] font-black uppercase"
+                    >Nouveau</span
+                  >`}
             </div>
             <p class="text-[11px] text-slate-300 mt-0.5">
-              Importez votre propre logo ou image pour l'afficher sur vos territoires en jeu.
+              Importez votre propre logo ou image pour l'afficher sur vos
+              territoires en jeu.
             </p>
           </div>
         </div>

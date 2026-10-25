@@ -1,6 +1,6 @@
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
 
 export interface StoredServerAccount {
   email: string;
@@ -64,7 +64,8 @@ class AccountDatabase {
           FOX: {
             tag: "FOX",
             name: "Fox Vanguard",
-            description: "Clan tactique d'élite de BorderConflict. Stratégie, défense et coordination.",
+            description:
+              "Clan tactique d'élite de BorderConflict. Stratégie, défense et coordination.",
             isOpen: true,
             createdAt: new Date().toISOString(),
             createdBy: "CommanderAlpha",
@@ -82,7 +83,8 @@ class AccountDatabase {
           APEX: {
             tag: "APEX",
             name: "Apex Predators",
-            description: "Assaut total, expansion rapide et domination des mégastructures mondiales.",
+            description:
+              "Assaut total, expansion rapide et domination des mégastructures mondiales.",
             isOpen: true,
             createdAt: new Date().toISOString(),
             createdBy: "ApexGeneral",
@@ -100,7 +102,8 @@ class AccountDatabase {
           IRON: {
             tag: "IRON",
             name: "Iron Fortress",
-            description: "Défense impénétrable de bunkers et missiles nucléaires de représailles.",
+            description:
+              "Défense impénétrable de bunkers et missiles nucléaires de représailles.",
             isOpen: false,
             createdAt: new Date().toISOString(),
             createdBy: "IronWarden",
@@ -143,19 +146,30 @@ class AccountDatabase {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      fs.writeFileSync(CLANS_FILE, JSON.stringify(this.clans, null, 2), "utf-8");
+      fs.writeFileSync(
+        CLANS_FILE,
+        JSON.stringify(this.clans, null, 2),
+        "utf-8",
+      );
     } catch (e) {
       console.error("Failed to save Clans Database:", e);
     }
   }
 
-  public register(emailRaw: string, passwordRaw: string, usernameRaw?: string): { ok: boolean; error?: string; account?: StoredServerAccount } {
+  public register(
+    emailRaw: string,
+    passwordRaw: string,
+    usernameRaw?: string,
+  ): { ok: boolean; error?: string; account?: StoredServerAccount } {
     const email = emailRaw.trim().toLowerCase();
     if (!email || !passwordRaw) {
       return { ok: false, error: "Email et mot de passe requis." };
     }
     if (this.db[email]) {
-      return { ok: false, error: "Un compte existe déjà avec cette adresse email." };
+      return {
+        ok: false,
+        error: "Un compte existe déjà avec cette adresse email.",
+      };
     }
     const salt = crypto.randomBytes(16).toString("hex");
     const passwordHash = hashPassword(passwordRaw, salt);
@@ -182,8 +196,8 @@ class AccountDatabase {
         equippedMedal: null,
         plutonium: 0,
         caps: 0,
-        ownedFlares: []
-      }
+        ownedFlares: [],
+      },
     };
 
     this.db[email] = account;
@@ -191,7 +205,10 @@ class AccountDatabase {
     return { ok: true, account };
   }
 
-  public login(emailRaw: string, passwordRaw: string): { ok: boolean; error?: string; account?: StoredServerAccount } {
+  public login(
+    emailRaw: string,
+    passwordRaw: string,
+  ): { ok: boolean; error?: string; account?: StoredServerAccount } {
     const email = emailRaw.trim().toLowerCase();
     const account = this.db[email];
     if (!account) {
@@ -204,7 +221,10 @@ class AccountDatabase {
     return { ok: true, account };
   }
 
-  public getProfile(emailRaw: string, passwordRaw: string): { ok: boolean; error?: string; profile?: any } {
+  public getProfile(
+    emailRaw: string,
+    passwordRaw: string,
+  ): { ok: boolean; error?: string; profile?: any } {
     const email = emailRaw.trim().toLowerCase();
     const account = this.db[email];
     if (!account) {
@@ -222,7 +242,7 @@ class AccountDatabase {
     passwordRaw: string,
     deltaPlutonium: number,
     deltaCaps: number,
-    reason?: string
+    reason?: string,
   ): { ok: boolean; error?: string; profile?: any } {
     const email = emailRaw.trim().toLowerCase();
     const account = this.db[email];
@@ -235,8 +255,12 @@ class AccountDatabase {
     }
 
     account.profile = account.profile || {};
-    const curPu = typeof account.profile.plutonium === "number" ? account.profile.plutonium : 0;
-    const curCaps = typeof account.profile.caps === "number" ? account.profile.caps : 0;
+    const curPu =
+      typeof account.profile.plutonium === "number"
+        ? account.profile.plutonium
+        : 0;
+    const curCaps =
+      typeof account.profile.caps === "number" ? account.profile.caps : 0;
 
     const newPu = Math.max(0, curPu + (Number(deltaPlutonium) || 0));
     const newCaps = Math.max(0, curCaps + (Number(deltaCaps) || 0));
@@ -247,13 +271,17 @@ class AccountDatabase {
     this.save();
 
     console.log(
-      `[AccountDatabase] Currency mutation for ${email}: Pu ${curPu}->${newPu} (${deltaPlutonium}), Caps ${curCaps}->${newCaps} (${deltaCaps}) [${reason || "mutation"}]`
+      `[AccountDatabase] Currency mutation for ${email}: Pu ${curPu}->${newPu} (${deltaPlutonium}), Caps ${curCaps}->${newCaps} (${deltaCaps}) [${reason || "mutation"}]`,
     );
 
     return { ok: true, profile: account.profile };
   }
 
-  public syncProfile(emailRaw: string, passwordRaw: string, profile: any): { ok: boolean; error?: string; profile?: any } {
+  public syncProfile(
+    emailRaw: string,
+    passwordRaw: string,
+    profile: any,
+  ): { ok: boolean; error?: string; profile?: any } {
     const email = emailRaw.trim().toLowerCase();
     const account = this.db[email];
     if (!account) {
@@ -269,10 +297,14 @@ class AccountDatabase {
     // Cloud Authoritative Balance Protection:
     // The server is the sole source of truth for plutonium and caps.
     // We only mutate currencies if explicit deltas are passed in the sync payload.
-    let updatedPlutonium = typeof current.plutonium === "number" ? current.plutonium : 0;
+    let updatedPlutonium =
+      typeof current.plutonium === "number" ? current.plutonium : 0;
     let updatedCaps = typeof current.caps === "number" ? current.caps : 0;
 
-    if (typeof profile?.deltaPlutonium === "number" && profile.deltaPlutonium !== 0) {
+    if (
+      typeof profile?.deltaPlutonium === "number" &&
+      profile.deltaPlutonium !== 0
+    ) {
       updatedPlutonium = Math.max(0, updatedPlutonium + profile.deltaPlutonium);
     }
     if (typeof profile?.deltaCaps === "number" && profile.deltaCaps !== 0) {
@@ -286,22 +318,52 @@ class AccountDatabase {
       xp: Math.max(current.xp || 0, profile.xp || 0),
       gamesPlayed: Math.max(current.gamesPlayed || 0, profile.gamesPlayed || 0),
       victories: Math.max(current.victories || 0, profile.victories || 0),
-      worldEventsSurvived: Math.max(current.worldEventsSurvived || 0, profile.worldEventsSurvived || 0),
-      directivesCompleted: Math.max(current.directivesCompleted || 0, profile.directivesCompleted || 0),
+      worldEventsSurvived: Math.max(
+        current.worldEventsSurvived || 0,
+        profile.worldEventsSurvived || 0,
+      ),
+      directivesCompleted: Math.max(
+        current.directivesCompleted || 0,
+        profile.directivesCompleted || 0,
+      ),
       plutonium: updatedPlutonium,
       caps: updatedCaps,
-      unlockedMedals: Array.from(new Set([...(current.unlockedMedals || []), ...(profile.unlockedMedals || [])])),
-      ownedFlares: Array.from(new Set([...(current.ownedFlares || []), ...(profile.ownedFlares || [])])),
-      doctrineMask: profile.doctrineMask !== undefined ? profile.doctrineMask : current.doctrineMask,
-      equippedMedal: profile.equippedMedal !== undefined ? profile.equippedMedal : current.equippedMedal,
+      unlockedMedals: Array.from(
+        new Set([
+          ...(current.unlockedMedals || []),
+          ...(profile.unlockedMedals || []),
+        ]),
+      ),
+      ownedFlares: Array.from(
+        new Set([
+          ...(current.ownedFlares || []),
+          ...(profile.ownedFlares || []),
+        ]),
+      ),
+      doctrineMask:
+        profile.doctrineMask !== undefined
+          ? profile.doctrineMask
+          : current.doctrineMask,
+      equippedMedal:
+        profile.equippedMedal !== undefined
+          ? profile.equippedMedal
+          : current.equippedMedal,
       username: profile.username || current.username,
       isVip: current.isVip || profile.isVip || false,
-      vipUntil: Math.max(current.vipUntil || 0, profile.vipUntil || 0) || undefined,
+      vipUntil:
+        Math.max(current.vipUntil || 0, profile.vipUntil || 0) || undefined,
       hasBattlePass: current.hasBattlePass || profile.hasBattlePass || false,
-      battlePassSeason: Math.max(current.battlePassSeason || 0, profile.battlePassSeason || 0) || undefined,
-      hasCustomSkinUnlocked: current.hasCustomSkinUnlocked || profile.hasCustomSkinUnlocked || false,
-      customSkinUrl: profile.customSkinUrl || current.customSkinUrl || undefined,
-      customSkinName: profile.customSkinName || current.customSkinName || undefined,
+      battlePassSeason:
+        Math.max(
+          current.battlePassSeason || 0,
+          profile.battlePassSeason || 0,
+        ) || undefined,
+      hasCustomSkinUnlocked:
+        current.hasCustomSkinUnlocked || profile.hasCustomSkinUnlocked || false,
+      customSkinUrl:
+        profile.customSkinUrl || current.customSkinUrl || undefined,
+      customSkinName:
+        profile.customSkinName || current.customSkinName || undefined,
     };
 
     // Remove temporary deltas from persisted profile object
@@ -323,7 +385,10 @@ class AccountDatabase {
     return this.db[email] || null;
   }
 
-  public creditBundle(emailRaw: string, bundleId: string): { ok: boolean; error?: string; granted?: any } {
+  public creditBundle(
+    emailRaw: string,
+    bundleId: string,
+  ): { ok: boolean; error?: string; granted?: any } {
     const email = emailRaw.trim().toLowerCase();
     const account = this.db[email];
     if (!account) {
@@ -352,11 +417,15 @@ class AccountDatabase {
       current.battlePassSeason = 1;
       addPlutonium = 250;
       addCaps = 5000;
-      addFlares.push("crown:atomic_conqueror", "pattern:nuclear_hazard:rad_active");
+      addFlares.push(
+        "crown:atomic_conqueror",
+        "pattern:nuclear_hazard:rad_active",
+      );
     } else if (bundleId === "vip_status_30d") {
       const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
       const now = Date.now();
-      const currentExpiry = current.vipUntil && current.vipUntil > now ? current.vipUntil : now;
+      const currentExpiry =
+        current.vipUntil && current.vipUntil > now ? current.vipUntil : now;
       current.vipUntil = currentExpiry + thirtyDaysMs;
       current.isVip = true;
       addPlutonium = 150;
@@ -376,7 +445,9 @@ class AccountDatabase {
 
     current.plutonium = (current.plutonium || 0) + addPlutonium;
     current.caps = (current.caps || 0) + addCaps;
-    current.ownedFlares = Array.from(new Set([...(current.ownedFlares || []), ...addFlares]));
+    current.ownedFlares = Array.from(
+      new Set([...(current.ownedFlares || []), ...addFlares]),
+    );
 
     account.profile = current;
     account.updatedAt = Date.now();
@@ -399,8 +470,13 @@ class AccountDatabase {
   public getPublicProfile(publicId: string): any | null {
     const cleanId = publicId.toLowerCase().replace(/^cmd-/, "");
     for (const [email, account] of Object.entries(this.db)) {
-      const emailPrefix = email.split("@")[0].toLowerCase().replace(/[^a-zA-Z0-9_-]/g, "");
-      const usernameClean = (account.username || "").toLowerCase().replace(/[^a-zA-Z0-9_-]/g, "");
+      const emailPrefix = email
+        .split("@")[0]
+        .toLowerCase()
+        .replace(/[^a-zA-Z0-9_-]/g, "");
+      const usernameClean = (account.username || "")
+        .toLowerCase()
+        .replace(/[^a-zA-Z0-9_-]/g, "");
       if (
         cleanId === emailPrefix ||
         cleanId === usernameClean ||
@@ -461,7 +537,10 @@ class AccountDatabase {
     };
   }
 
-  public getClansBrowse(filter: string = "all", sort: string = "memberCount"): any {
+  public getClansBrowse(
+    filter: string = "all",
+    sort: string = "memberCount",
+  ): any {
     const list = Object.values(this.clans).map((c) => ({
       name: c.name,
       tag: c.tag,
@@ -499,7 +578,7 @@ class AccountDatabase {
     const clans = Object.values(this.clans).map((c, idx) => ({
       tag: c.tag,
       name: c.name,
-      score: (c.members.length * 1500) + parseInt(c.softBalance || "0", 10) / 10,
+      score: c.members.length * 1500 + parseInt(c.softBalance || "0", 10) / 10,
       rank: idx + 1,
       membersCount: c.members.length,
       softBalance: c.softBalance,
@@ -540,17 +619,27 @@ class AccountDatabase {
     descriptionRaw: string,
     isOpen: boolean,
     creatorPublicId: string,
-    creatorUsername: string
+    creatorUsername: string,
   ): { ok: boolean; error?: string; clan?: StoredServerClan } {
-    const tag = tagRaw.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const tag = tagRaw
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "");
     const name = nameRaw.trim();
     const description = descriptionRaw.trim();
 
     if (tag.length < 2 || tag.length > 5) {
-      return { ok: false, error: "Le Tag du Clan doit contenir entre 2 et 5 caractères alphanumériques." };
+      return {
+        ok: false,
+        error:
+          "Le Tag du Clan doit contenir entre 2 et 5 caractères alphanumériques.",
+      };
     }
     if (name.length < 3 || name.length > 35) {
-      return { ok: false, error: "Le nom du Clan doit contenir entre 3 et 35 caractères." };
+      return {
+        ok: false,
+        error: "Le nom du Clan doit contenir entre 3 et 35 caractères.",
+      };
     }
     if (this.clans[tag]) {
       return { ok: false, error: "Un Clan existe déjà avec ce Tag." };
@@ -583,7 +672,7 @@ class AccountDatabase {
   public joinClan(
     tagRaw: string,
     publicId: string,
-    username: string
+    username: string,
   ): { ok: boolean; error?: string; clan?: StoredServerClan } {
     const tag = tagRaw.toUpperCase();
     const clan = this.clans[tag];
@@ -604,18 +693,31 @@ class AccountDatabase {
   }
 
   public getConquestMap(): any {
-    const getClanInfo = (tag: string, defaultName: string, defaultColor: string) => {
+    const getClanInfo = (
+      tag: string,
+      defaultName: string,
+      defaultColor: string,
+    ) => {
       const clan = this.clans[tag];
       if (clan) {
         return {
           tag: clan.tag,
           name: clan.name,
-          color: tag === "FOX" ? "#38bdf8" : tag === "APEX" ? "#f59e0b" : "#a855f7",
+          color:
+            tag === "FOX" ? "#38bdf8" : tag === "APEX" ? "#f59e0b" : "#a855f7",
           membersCount: clan.members.length,
-          leader: clan.members.find((m) => m.role === "leader")?.username || "Commandant",
+          leader:
+            clan.members.find((m) => m.role === "leader")?.username ||
+            "Commandant",
         };
       }
-      return { tag, name: defaultName, color: defaultColor, membersCount: 1, leader: "Commandant" };
+      return {
+        tag,
+        name: defaultName,
+        color: defaultColor,
+        membersCount: 1,
+        leader: "Commandant",
+      };
     };
 
     const c1 = getClanInfo("FOX", "Fox Vanguard", "#38bdf8");
@@ -638,7 +740,8 @@ class AccountDatabase {
         defenseLevel: 4,
         garrison: "14 200 Troupes Tactiques",
         lastEvent: `Victoire écrasante de [${c1.tag}] face aux assauts de [${c2.tag}]`,
-        description: "Centre névralgique de commandement européen. Contrôle les carrefours de télécommunications et les usines de blindés.",
+        description:
+          "Centre névralgique de commandement européen. Contrôle les carrefours de télécommunications et les usines de blindés.",
       },
       {
         id: "na_east",
@@ -655,7 +758,8 @@ class AccountDatabase {
         defenseLevel: 5,
         garrison: "19 500 Troupes de Choc",
         lastEvent: `Infiltration repoussée par la garnison d'élite de [${c2.tag}]`,
-        description: "Complexe de lancement balistique et usines lourdes. Assure l'enrichissement en isotopes et la supériorité technologique.",
+        description:
+          "Complexe de lancement balistique et usines lourdes. Assure l'enrichissement en isotopes et la supériorité technologique.",
       },
       {
         id: "asia_east",
@@ -672,7 +776,8 @@ class AccountDatabase {
         defenseLevel: 4,
         garrison: "16 800 Troupes Blindées",
         lastEvent: `Barrage d'artillerie lourde soutenu par [${c3.tag}]`,
-        description: "Bunkers souterrains fortifiés à l'épreuve des frappes orbitales. Déploie des systèmes radar avancés sur tout le continent.",
+        description:
+          "Bunkers souterrains fortifiés à l'épreuve des frappes orbitales. Déploie des systèmes radar avancés sur tout le continent.",
       },
       {
         id: "mea_south",
@@ -689,7 +794,8 @@ class AccountDatabase {
         defenseLevel: 3,
         garrison: "9 400 Combattants",
         lastEvent: `Offensive majeure lancée par [${c3.tag}] pour contester le puits pétrolier`,
-        description: "Bassin de réserves stratégiques et oléoducs clés. Les revenus d'or générés ici permettent des réapprovisionnements militaires continus.",
+        description:
+          "Bassin de réserves stratégiques et oléoducs clés. Les revenus d'or générés ici permettent des réapprovisionnements militaires continus.",
       },
       {
         id: "pac_oceania",
@@ -706,7 +812,8 @@ class AccountDatabase {
         defenseLevel: 5,
         garrison: "23 000 Forces Maritimes",
         lastEvent: `Flotte de débarquement déployée avec succès par [${c2.tag}]`,
-        description: "Réseau insulaire ultra-sécurisé garantissant la mobilité rapide et des attaques côtières foudroyantes sur toutes les côtes.",
+        description:
+          "Réseau insulaire ultra-sécurisé garantissant la mobilité rapide et des attaques côtières foudroyantes sur toutes les côtes.",
       },
       {
         id: "sa_south",
@@ -723,11 +830,15 @@ class AccountDatabase {
         defenseLevel: 3,
         garrison: "8 200 Gardes Frontières",
         lastEvent: `Ermitage tactique : embuscade menée par [${c3.tag}]`,
-        description: "Relais satellitaires dissimulés dans les massifs montagneux et laboratoires de bio-stimulation accélérant les renforts.",
+        description:
+          "Relais satellitaires dissimulés dans les massifs montagneux et laboratoires de bio-stimulation accélérant les renforts.",
       },
     ];
 
-    const dominationMap: Record<string, { tag: string; name: string; color: string; count: number }> = {};
+    const dominationMap: Record<
+      string,
+      { tag: string; name: string; color: string; count: number }
+    > = {};
     sectors.forEach((s) => {
       const tag = s.controllingClan.tag;
       if (!dominationMap[tag]) {
@@ -776,7 +887,9 @@ class AccountDatabase {
       season: "Saison 1 : Tempête Nucléaire",
       cycleEndsIn: "13 jours, 18 heures",
       sectors,
-      dominationSummary: Object.values(dominationMap).sort((a, b) => b.count - a.count),
+      dominationSummary: Object.values(dominationMap).sort(
+        (a, b) => b.count - a.count,
+      ),
       recentActivity,
     };
   }
@@ -784,7 +897,7 @@ class AccountDatabase {
   public saveCustomSkin(
     emailRaw: string,
     imageBase64: string,
-    publicId: string
+    publicId: string,
   ): { ok: boolean; error?: string; skinUrl?: string } {
     const email = emailRaw ? emailRaw.trim().toLowerCase() : "";
     let account = email ? this.db[email] : null;
@@ -799,7 +912,8 @@ class AccountDatabase {
     }
 
     const current = account?.profile || {};
-    const isVip = current.isVip && current.vipUntil && current.vipUntil > Date.now();
+    const isVip =
+      current.isVip && current.vipUntil && current.vipUntil > Date.now();
     const hasUnlocked = current.hasCustomSkinUnlocked || isVip;
 
     if (account && !hasUnlocked) {
@@ -809,7 +923,8 @@ class AccountDatabase {
       } else {
         return {
           ok: false,
-          error: "Débloquez la Forge de Skin (3,99 € ou 750 Plutonium, ou devenez VIP) pour sauvegarder votre skin.",
+          error:
+            "Débloquez la Forge de Skin (3,99 € ou 750 Plutonium, ou devenez VIP) pour sauvegarder votre skin.",
         };
       }
     }
@@ -818,12 +933,20 @@ class AccountDatabase {
       const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
       const buffer = Buffer.from(base64Data, "base64");
 
-      const customSkinsDir = path.join(process.cwd(), "static", "skins", "custom");
+      const customSkinsDir = path.join(
+        process.cwd(),
+        "static",
+        "skins",
+        "custom",
+      );
       if (!fs.existsSync(customSkinsDir)) {
         fs.mkdirSync(customSkinsDir, { recursive: true });
       }
 
-      const safeId = (publicId || account?.username || "commander").replace(/[^a-zA-Z0-9_-]/g, "_");
+      const safeId = (publicId || account?.username || "commander").replace(
+        /[^a-zA-Z0-9_-]/g,
+        "_",
+      );
       const filename = `skin_${safeId}.png`;
       const filePath = path.join(customSkinsDir, filename);
       fs.writeFileSync(filePath, buffer);
@@ -834,7 +957,11 @@ class AccountDatabase {
         current.customSkinName = `custom_${safeId}`;
         current.hasCustomSkinUnlocked = true;
         current.ownedFlares = Array.from(
-          new Set([...(current.ownedFlares || []), "skin:*", `skin:${current.customSkinName}`])
+          new Set([
+            ...(current.ownedFlares || []),
+            "skin:*",
+            `skin:${current.customSkinName}`,
+          ]),
         );
         account.profile = current;
         account.updatedAt = Date.now();

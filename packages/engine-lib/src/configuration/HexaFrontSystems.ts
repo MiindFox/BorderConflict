@@ -4,7 +4,11 @@ import { simpleHash } from "../Util";
 // 1. DOCTRINES TACTIQUES (TALENT TREE & ACCOUNT PROGRESSION)
 // ============================================================================
 
-export type DoctrineBranchId = "assault" | "fortress" | "economy" | "apocalypse";
+export type DoctrineBranchId =
+  | "assault"
+  | "fortress"
+  | "economy"
+  | "apocalypse";
 
 export type TalentId =
   | "assault_pioneer"
@@ -87,7 +91,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     maxRank: 3,
     name: "Éclaireurs de Front",
     icon: "🚩",
-    shortDesc: "Micro-bonus : réduit légèrement les pertes sur terres neutres et augmente les troupes initiales.",
+    shortDesc:
+      "Micro-bonus : réduit légèrement les pertes sur terres neutres et augmente les troupes initiales.",
     rankDescriptions: [
       "-2% pertes (Terres Neutres), +2% troupes au départ",
       "-4% pertes (Terres Neutres), +4% troupes au départ",
@@ -103,7 +108,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     prerequisite: "assault_pioneer",
     name: "Percée Blindée",
     icon: "⚡",
-    shortDesc: "Micro-bonus : accélère légèrement la vitesse de conquête terrestre.",
+    shortDesc:
+      "Micro-bonus : accélère légèrement la vitesse de conquête terrestre.",
     rankDescriptions: [
       "+1.5% vitesse d'avancée terrestre",
       "+3% vitesse d'avancée terrestre",
@@ -119,7 +125,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     prerequisite: "assault_blitz",
     name: "Butin de Conquête",
     icon: "👑",
-    shortDesc: "Micro-bonus : augmente légèrement l'Or pillé et réduit les pertes d'assaut.",
+    shortDesc:
+      "Micro-bonus : augmente légèrement l'Or pillé et réduit les pertes d'assaut.",
     rankDescriptions: [
       "+3% Or de conquête, -1% pertes d'attaque",
       "+6% Or de conquête, -2% pertes d'attaque",
@@ -152,7 +159,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     prerequisite: "fortress_engineer",
     name: "Ligne Bastion",
     icon: "🏰",
-    shortDesc: "Micro-bonus : renforce légèrement l'efficacité des Postes de Défense.",
+    shortDesc:
+      "Micro-bonus : renforce légèrement l'efficacité des Postes de Défense.",
     rankDescriptions: [
       "+2% efficacité des Postes de Défense",
       "+4% efficacité des Postes de Défense",
@@ -168,7 +176,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     prerequisite: "fortress_bastion",
     name: "Bouclier Égide",
     icon: "📡",
-    shortDesc: "Micro-bonus : accélère légèrement le rechargement SAM et la régénération.",
+    shortDesc:
+      "Micro-bonus : accélère légèrement le rechargement SAM et la régénération.",
     rankDescriptions: [
       "-2% recharge SAM, +1.5% régénération de troupes",
       "-4% recharge SAM, +3% régénération de troupes",
@@ -185,7 +194,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     maxRank: 3,
     name: "Routes Commerciales",
     icon: "🚢",
-    shortDesc: "Micro-bonus : augmente légèrement les revenus marchands et l'Or de départ.",
+    shortDesc:
+      "Micro-bonus : augmente légèrement les revenus marchands et l'Or de départ.",
     rankDescriptions: [
       "+2% Or commercial (Navires/Trains), +2 500 Or initial",
       "+4% Or commercial (Navires/Trains), +5 000 Or initial",
@@ -201,7 +211,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     prerequisite: "eco_trade",
     name: "Mégapoles",
     icon: "🏙️",
-    shortDesc: "Micro-bonus : augmente légèrement la capacité de troupes par Ville.",
+    shortDesc:
+      "Micro-bonus : augmente légèrement la capacité de troupes par Ville.",
     rankDescriptions: [
       "+2% capacité de troupes par Ville (+255k/niv)",
       "+4% capacité de troupes par Ville (+260k/niv)",
@@ -217,7 +228,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     prerequisite: "eco_metropolis",
     name: "Complexe Industriel",
     icon: "🏭",
-    shortDesc: "Micro-bonus : réduit légèrement le coût des Villes/Ports/Usines et booste l'Or passif.",
+    shortDesc:
+      "Micro-bonus : réduit légèrement le coût des Villes/Ports/Usines et booste l'Or passif.",
     rankDescriptions: [
       "-1.5% coût (Villes/Ports/Usines), +2% Or passif",
       "-3% coût (Villes/Ports/Usines), +4% Or passif",
@@ -234,7 +246,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     maxRank: 3,
     name: "Amirauté Cuirassée",
     icon: "⚓",
-    shortDesc: "Micro-bonus : réduit légèrement le coût des Navires de Guerre et augmente leur portée.",
+    shortDesc:
+      "Micro-bonus : réduit légèrement le coût des Navires de Guerre et augmente leur portée.",
     rankDescriptions: [
       "-2% coût Navires de Guerre, +1.5% portée navale",
       "-4% coût Navires de Guerre, +3% portée navale",
@@ -250,7 +263,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     prerequisite: "apoc_armada",
     name: "Enrichissement Rapide",
     icon: "🚀",
-    shortDesc: "Micro-bonus : réduit légèrement le coût et le rechargement des Silos/Bombes.",
+    shortDesc:
+      "Micro-bonus : réduit légèrement le coût et le rechargement des Silos/Bombes.",
     rankDescriptions: [
       "-1.5% coût Silos & Bombes A/H, -2% recharge Silo",
       "-3% coût Silos & Bombes A/H, -4% recharge Silo",
@@ -266,7 +280,8 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
     prerequisite: "apoc_silo",
     name: "Divisions Rad-Blindées",
     icon: "☣️",
-    shortDesc: "Micro-bonus : réduit légèrement la pénalité de radiation et accélère les missiles.",
+    shortDesc:
+      "Micro-bonus : réduit légèrement la pénalité de radiation et accélère les missiles.",
     rankDescriptions: [
       "-3% pénalité de radiation, +2% vitesse missiles",
       "-6% pénalité de radiation, +4% vitesse missiles",
@@ -275,7 +290,10 @@ export const TALENT_DEFINITIONS: TalentDefinition[] = [
   },
 ];
 
-export function getTalentRankFromMask(mask: number, talentId: TalentId): number {
+export function getTalentRankFromMask(
+  mask: number,
+  talentId: TalentId,
+): number {
   const def = TALENT_DEFINITIONS.find((t) => t.id === talentId);
   if (!def) return 0;
   return (mask >>> def.bitOffset) & 0b11;
@@ -324,7 +342,9 @@ export interface ComputedDoctrineModifiers {
   nukeSpeedMult: number;
 }
 
-export function computeDoctrineModifiers(mask: number = 0): ComputedDoctrineModifiers {
+export function computeDoctrineModifiers(
+  mask: number = 0,
+): ComputedDoctrineModifiers {
   const rPioneer = getTalentRankFromMask(mask, "assault_pioneer");
   const rBlitz = getTalentRankFromMask(mask, "assault_blitz");
   const rPlunder = getTalentRankFromMask(mask, "assault_plunder");
@@ -496,7 +516,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#f59e0b",
     borderGlow: "rgba(245, 158, 11, 0.45)",
     lore: "L'ouverture des grandes routes maritimes et ferroviaires déclenche une prospérité sans précédent.",
-    strategicTip: "Construisez des Ports et des Usines pour maximiser les dividendes commerciaux.",
+    strategicTip:
+      "Construisez des Ports et des Usines pour maximiser les dividendes commerciaux.",
     modifierBadges: [
       "💰 Commerce & Trains +80%",
       "🏦 Or Passif +60%",
@@ -521,7 +542,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#38bdf8",
     borderGlow: "rgba(56, 189, 248, 0.45)",
     lore: "Une éruption coronale massive aveugle les radars anti-aériens et perturbe les satellites.",
-    strategicTip: "Les batteries SAM sont affaiblies : c'est le moment idéal pour lancer des frappes nucléaires !",
+    strategicTip:
+      "Les batteries SAM sont affaiblies : c'est le moment idéal pour lancer des frappes nucléaires !",
     modifierBadges: [
       "📡 Portée SAM -35%",
       "⏳ Recharge SAM +50%",
@@ -544,7 +566,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#f43f5e",
     borderGlow: "rgba(244, 63, 94, 0.45)",
     lore: "Les états-majors ordonnent une percée mécanique générale sur tous les fronts.",
-    strategicTip: "Lancez des offensives massives : vos armées avancent beaucoup plus vite et subissent moins de pertes.",
+    strategicTip:
+      "Lancez des offensives massives : vos armées avancent beaucoup plus vite et subissent moins de pertes.",
     modifierBadges: [
       "⚡ Vitesse de conquête +40%",
       "🩸 Pertes d'attaque -25%",
@@ -568,13 +591,15 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#a855f7",
     borderGlow: "rgba(168, 85, 247, 0.45)",
     lore: "La découverte de nouveaux filons d'uranium enrichi fait chuter le coût de l'arsenal atomique.",
-    strategicTip: "Érigez des Silos et lancez des Bombes A/H à prix réduit avant la fin de la crise.",
+    strategicTip:
+      "Érigez des Silos et lancez des Bombes A/H à prix réduit avant la fin de la crise.",
     modifierBadges: [
       "☢️ Coût Bombes & Silos -35%",
       "🔄 Recharge Silos -35%",
       "🚀 Vitesse Missiles +15%",
     ],
-    pulseDescription: "Subvention atomique : +25 000 Or par Silo actif toutes les 5s",
+    pulseDescription:
+      "Subvention atomique : +25 000 Or par Silo actif toutes les 5s",
     minEscalationTier: 1,
     modifiers: {
       ...DEFAULT_WORLD_EVENT_MODIFIERS,
@@ -592,7 +617,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#10b981",
     borderGlow: "rgba(16, 185, 129, 0.45)",
     lore: "Un appel patriotique mobilise des millions de réservistes dans toutes les métropoles.",
-    strategicTip: "Vos armées se régénèrent presque deux fois plus vite. Développez vos Villes !",
+    strategicTip:
+      "Vos armées se régénèrent presque deux fois plus vite. Développez vos Villes !",
     modifierBadges: [
       "📈 Régénération Troupes +85%",
       "🏙️ Capacité des Villes +30%",
@@ -616,7 +642,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#06b6d4",
     borderGlow: "rgba(6, 182, 212, 0.45)",
     lore: "Les ingénieurs militaires bétonnent les frontières et déploient des bunkers lourds.",
-    strategicTip: "Fortifiez vos frontières : les Postes de Défense coûtent -40% et sont +50% plus puissants.",
+    strategicTip:
+      "Fortifiez vos frontières : les Postes de Défense coûtent -40% et sont +50% plus puissants.",
     modifierBadges: [
       "🛡️ Puissance Défense +50%",
       "🧱 Coût Postes Défense -40%",
@@ -639,7 +666,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#6366f1",
     borderGlow: "rgba(99, 102, 241, 0.45)",
     lore: "Des cyclones violents balaient les mers, paralysant les flottes mais dopant le rail intérieur.",
-    strategicTip: "Les canons navals ont une portée réduite en mer, tandis que les trains rapportent +75% d'Or.",
+    strategicTip:
+      "Les canons navals ont une portée réduite en mer, tandis que les trains rapportent +75% d'Or.",
     modifierBadges: [
       "🚂 Revenus Ferroviaires +75%",
       "⚓ Portée Navires Guerre -25%",
@@ -662,7 +690,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#eab308",
     borderGlow: "rgba(234, 179, 8, 0.45)",
     lore: "L'inflation freine la construction civile, mais les trésors de guerre capturés doublent de valeur.",
-    strategicTip: "Annexez des nations et des rivaux pour récupérer 200% de leur trésor en Or !",
+    strategicTip:
+      "Annexez des nations et des rivaux pour récupérer 200% de leur trésor en Or !",
     modifierBadges: [
       "👑 Or de Conquête +100% (x2)",
       "⚡ Vitesse d'attaque +20%",
@@ -685,13 +714,15 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#ec4899",
     borderGlow: "rgba(236, 72, 153, 0.45)",
     lore: "Une pluie de météorites riches en métaux rares s'abat sur la planète, dopant toutes les économies.",
-    strategicTip: "Extraction massive d'iridium : l'Or passif double et des gisements tombent toutes les 5s !",
+    strategicTip:
+      "Extraction massive d'iridium : l'Or passif double et des gisements tombent toutes les 5s !",
     modifierBadges: [
       "💎 Or Passif +120%",
       "🏗️ Coût Infrastructures -20%",
       "📈 Régénération Troupes +35%",
     ],
-    pulseDescription: "Météores d'Or : +40 000 Or largués aux empires actifs toutes les 5s",
+    pulseDescription:
+      "Météores d'Or : +40 000 Or largués aux empires actifs toutes les 5s",
     minEscalationTier: 2,
     modifiers: {
       ...DEFAULT_WORLD_EVENT_MODIFIERS,
@@ -709,13 +740,15 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#ef4444",
     borderGlow: "rgba(239, 68, 68, 0.55)",
     lore: "Les superpuissances activent leurs réserves ultimes. Guerre totale sur terre, sur mer et dans les airs.",
-    strategicTip: "Tout est accéléré : frappes nucléaires à moitié prix, offensives éclairs et mobilisation maximale !",
+    strategicTip:
+      "Tout est accéléré : frappes nucléaires à moitié prix, offensives éclairs et mobilisation maximale !",
     modifierBadges: [
       "☢️ Coût Bombes & Silos -45%",
       "⚡ Vitesse d'attaque +35%",
       "📈 Régénération Troupes +60%",
     ],
-    pulseDescription: "Surcharge Globale : +50 000 Or & +5% Troupes toutes les 5s",
+    pulseDescription:
+      "Surcharge Globale : +50 000 Or & +5% Troupes toutes les 5s",
     minEscalationTier: 2,
     modifiers: {
       ...DEFAULT_WORLD_EVENT_MODIFIERS,
@@ -737,7 +770,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#f97316",
     borderGlow: "rgba(249, 115, 22, 0.45)",
     lore: "Une caldeira géante entre en éruption cataclysmique, obscurcissant les cieux de cendres et secouant les failles.",
-    strategicTip: "Les radars SAM et la vitesse de marche sont réduits par la cendre, mais les cendres minérales dopent l'industrie minière !",
+    strategicTip:
+      "Les radars SAM et la vitesse de marche sont réduits par la cendre, mais les cendres minérales dopent l'industrie minière !",
     modifierBadges: [
       "📡 Portée SAM -30%",
       "🏔️ Vitesse d'attaque -15%",
@@ -761,7 +795,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#06b6d4",
     borderGlow: "rgba(6, 182, 212, 0.45)",
     lore: "Le dégel massif transforme les plaines et toundras en bourbiers profonds et libère d'immenses poches de gaz.",
-    strategicTip: "Franchir les terres neutres est harassant pour l'infanterie, mais le trafic ferroviaire explose sur les corridors stabilisés.",
+    strategicTip:
+      "Franchir les terres neutres est harassant pour l'infanterie, mais le trafic ferroviaire explose sur les corridors stabilisés.",
     modifierBadges: [
       "🚩 Pertes Terres Neutres +60%",
       "⚡ Vitesse de conquête -25%",
@@ -784,7 +819,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#e11d48",
     borderGlow: "rgba(225, 29, 72, 0.45)",
     lore: "Des séismes en chaîne fracturent la croûte continentale, éventrant les fortifications de frontière.",
-    strategicTip: "Les Postes de Défense et bunkers sont fragilisés : profitez des brèches tectoniques pour attaquer !",
+    strategicTip:
+      "Les Postes de Défense et bunkers sont fragilisés : profitez des brèches tectoniques pour attaquer !",
     modifierBadges: [
       "🛡️ Puissance Défense -35%",
       "🧱 Coût Postes Défense +40%",
@@ -807,7 +843,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#d97706",
     borderGlow: "rgba(217, 119, 6, 0.45)",
     lore: "Un mur de poussière ocre s'abat sur le continent, aveuglant la DCA et les vigies côtières.",
-    strategicTip: "La visibilité est nulle : lancez des assauts surprises rapides pendant que les radars côtiers et SAM sont aveugles.",
+    strategicTip:
+      "La visibilité est nulle : lancez des assauts surprises rapides pendant que les radars côtiers et SAM sont aveugles.",
     modifierBadges: [
       "📡 Portée SAM -40%",
       "⚓ Portée Navires -30%",
@@ -830,13 +867,15 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#38bdf8",
     borderGlow: "rgba(56, 189, 248, 0.45)",
     lore: "Une vague de froid arctique fige les eaux côtières et durcit le sol, transformant les steppes en autoroutes glacées.",
-    strategicTip: "Les mers sont prises par la banquise, mais les armées motorisées traversent le sol durci à vive allure !",
+    strategicTip:
+      "Les mers sont prises par la banquise, mais les armées motorisées traversent le sol durci à vive allure !",
     modifierBadges: [
       "⚡ Vitesse d'attaque +25%",
       "🚩 Pertes Terres Neutres -30%",
       "⚓ Portée Navires -35%",
     ],
-    pulseDescription: "Ravitaillement grand froid : +6 000 troupes toutes les 5s",
+    pulseDescription:
+      "Ravitaillement grand froid : +6 000 troupes toutes les 5s",
     minEscalationTier: 1,
     modifiers: {
       ...DEFAULT_WORLD_EVENT_MODIFIERS,
@@ -854,13 +893,15 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#0284c7",
     borderGlow: "rgba(2, 132, 199, 0.45)",
     lore: "Des pluies torrentielles submergent les vallées fluviales et inondent les routes de ravitaillement.",
-    strategicTip: "L'infanterie s'enlise dans l'eau boueuse, mais les ports et réseaux d'eau intérieurs connaissent un boom sans précédent.",
+    strategicTip:
+      "L'infanterie s'enlise dans l'eau boueuse, mais les ports et réseaux d'eau intérieurs connaissent un boom sans précédent.",
     modifierBadges: [
       "⚡ Vitesse d'attaque -20%",
       "🩸 Pertes d'attaque +25%",
       "🚢 Commerce Maritime +60%",
     ],
-    pulseDescription: "Irrigation des plaines : +8 000 troupes par Ville toutes les 5s",
+    pulseDescription:
+      "Irrigation des plaines : +8 000 troupes par Ville toutes les 5s",
     minEscalationTier: 1,
     modifiers: {
       ...DEFAULT_WORLD_EVENT_MODIFIERS,
@@ -878,7 +919,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#ea580c",
     borderGlow: "rgba(234, 88, 12, 0.45)",
     lore: "Des mégafeux attisés par des vents chauds consument les forêts et les avant-postes en bordure.",
-    strategicTip: "Les fortifications de bois et béton sont ravagées : les défenseurs perdent leur avantage protecteur !",
+    strategicTip:
+      "Les fortifications de bois et béton sont ravagées : les défenseurs perdent leur avantage protecteur !",
     modifierBadges: [
       "🛡️ Puissance Défense -40%",
       "⚡ Vitesse d'attaque +35%",
@@ -901,7 +943,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#78716c",
     borderGlow: "rgba(120, 113, 108, 0.45)",
     lore: "Le sous-sol calcaire s'effondre en dolines béantes, révélant de vastes cavités minières insoupçonnées.",
-    strategicTip: "Bâtir des usines coûte plus cher en fondations, mais la découverte de filons souterrains rapporte un flot continu d'or.",
+    strategicTip:
+      "Bâtir des usines coûte plus cher en fondations, mais la découverte de filons souterrains rapporte un flot continu d'or.",
     modifierBadges: [
       "🏗️ Coût Infrastructures +35%",
       "🚩 Pertes Terres Neutres +40%",
@@ -924,13 +967,15 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#14b8a6",
     borderGlow: "rgba(20, 184, 166, 0.45)",
     lore: "Des sources hydrothermales et vapeurs volcaniques jaillissent des failles, fournissant une énergie thermique abondante.",
-    strategicTip: "L'énergie géothermique gratuite réduit le coût de l'industrie lourde et booste la croissance économique.",
+    strategicTip:
+      "L'énergie géothermique gratuite réduit le coût de l'industrie lourde et booste la croissance économique.",
     modifierBadges: [
       "🏗️ Coût Infrastructures -25%",
       "💎 Or Passif +70%",
       "📈 Régénération Troupes +20%",
     ],
-    pulseDescription: "Énergie Verte : +18 000 Or par Ville/Usine toutes les 5s",
+    pulseDescription:
+      "Énergie Verte : +18 000 Or par Ville/Usine toutes les 5s",
     minEscalationTier: 1,
     modifiers: {
       ...DEFAULT_WORLD_EVENT_MODIFIERS,
@@ -948,7 +993,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#b45309",
     borderGlow: "rgba(180, 83, 9, 0.45)",
     lore: "Une vague de chaleur écrasante assèche les réservoirs d'eau et transforme les pâturages en étendues craquelées.",
-    strategicTip: "La croissance de vos troupes ralentit, mais le sol durci permet aux trains et aux convois de filer sans encombre.",
+    strategicTip:
+      "La croissance de vos troupes ralentit, mais le sol durci permet aux trains et aux convois de filer sans encombre.",
     modifierBadges: [
       "📈 Régénération Troupes -30%",
       "🚂 Revenus Ferroviaires +60%",
@@ -971,7 +1017,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#94a3b8",
     borderGlow: "rgba(148, 163, 184, 0.45)",
     lore: "Des murs de neige et de rocs dévalent les massifs montagneux, scellant les cols et étouffant les offensives.",
-    strategicTip: "Prendre du terrain neutre en montagne est très meurtrier, mais les bunkers retranchés dans les défilés sont imprenables.",
+    strategicTip:
+      "Prendre du terrain neutre en montagne est très meurtrier, mais les bunkers retranchés dans les défilés sont imprenables.",
     modifierBadges: [
       "🚩 Pertes Terres Neutres +75%",
       "🛡️ Puissance Défense +40%",
@@ -994,7 +1041,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#65a30d",
     borderGlow: "rgba(101, 163, 13, 0.45)",
     lore: "La montée des nappes phréatiques transforme les plaines côtières en sables mouvants et tourbières traîtresses.",
-    strategicTip: "Les attaquants s'enlisent et subissent de lourdes pertes. Restez retranché et consolidez vos frontières.",
+    strategicTip:
+      "Les attaquants s'enlisent et subissent de lourdes pertes. Restez retranché et consolidez vos frontières.",
     modifierBadges: [
       "🩸 Pertes d'attaque +35%",
       "🛡️ Puissance Défense +30%",
@@ -1017,7 +1065,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#84cc16",
     borderGlow: "rgba(132, 204, 22, 0.45)",
     lore: "D'immenses nappes de gaz toxique lourd dégazent des lacs profonds et s'étendent sur les basses plaines.",
-    strategicTip: "La régénération des troupes est paralysée par l'asphyxie, tandis que les bunkers hermétiques résistent admirablement.",
+    strategicTip:
+      "La régénération des troupes est paralysée par l'asphyxie, tandis que les bunkers hermétiques résistent admirablement.",
     modifierBadges: [
       "📈 Régénération Troupes -35%",
       "🛡️ Puissance Défense +35%",
@@ -1040,7 +1089,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#0284c7",
     borderGlow: "rgba(2, 132, 199, 0.55)",
     lore: "Un séisme sous-marin génère un train de vagues titanesques submergeant les rades portuaires et les littoraux.",
-    strategicTip: "Les flottes de guerre sont temporairement paralysées, mais le pillage des épaves échouées rapporte des trésors aux ports survivants.",
+    strategicTip:
+      "Les flottes de guerre sont temporairement paralysées, mais le pillage des épaves échouées rapporte des trésors aux ports survivants.",
     modifierBadges: [
       "⚓ Portée Navires -45%",
       "⛵ Commerce Maritime -40%",
@@ -1064,13 +1114,15 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#e11d48",
     borderGlow: "rgba(225, 29, 72, 0.55)",
     lore: "Un aérolithe de fer nickelé s'écrase sur les terres intérieures, creusant un cratère fumant débordant de métaux rares.",
-    strategicTip: "L'onde de choc déstabilise les lignes de front, mais l'extraction des minerais extraterrestres arrose tous les belligérants d'or !",
+    strategicTip:
+      "L'onde de choc déstabilise les lignes de front, mais l'extraction des minerais extraterrestres arrose tous les belligérants d'or !",
     modifierBadges: [
       "🛡️ Puissance Défense -25%",
       "💎 Or Passif +90%",
       "👑 Or de Conquête +50%",
     ],
-    pulseDescription: "Exploitation Cratère : +50 000 Or à chaque empire toutes les 5s",
+    pulseDescription:
+      "Exploitation Cratère : +50 000 Or à chaque empire toutes les 5s",
     minEscalationTier: 2,
     modifiers: {
       ...DEFAULT_WORLD_EVENT_MODIFIERS,
@@ -1090,7 +1142,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#a855f7",
     borderGlow: "rgba(168, 85, 247, 0.45)",
     lore: "Une brèche dans la haute atmosphère déclenche des aurores boréales électriques illuminant la terre d'une lueur spectrale.",
-    strategicTip: "L'air raréfié et ionisé permet aux missiles balistiques d'atteindre des vitesses hypersoniques exceptionnelles !",
+    strategicTip:
+      "L'air raréfié et ionisé permet aux missiles balistiques d'atteindre des vitesses hypersoniques exceptionnelles !",
     modifierBadges: [
       "🚀 Vitesse Missiles +35%",
       "📡 Portée SAM +25%",
@@ -1113,7 +1166,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#64748b",
     borderGlow: "rgba(100, 116, 139, 0.45)",
     lore: "Un épais rideau de brume impénétrable s'installe au ras du sol, masquant les mouvements des divisions.",
-    strategicTip: "Les postes de garde ennemis ne vous voient pas venir : vos pertes offensives chutent et la vitesse de percée augmente !",
+    strategicTip:
+      "Les postes de garde ennemis ne vous voient pas venir : vos pertes offensives chutent et la vitesse de percée augmente !",
     modifierBadges: [
       "🛡️ Puissance Défense -30%",
       "🩸 Pertes d'attaque -25%",
@@ -1136,7 +1190,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#a3e635",
     borderGlow: "rgba(163, 230, 53, 0.45)",
     lore: "Des condensations industrielles toxiques retombent en pluies corrosives rongeant le ciment et les blindages.",
-    strategicTip: "La maintenance des fortifications et des usines s'envole en coût sous l'acide. Évitez les grands chantiers !",
+    strategicTip:
+      "La maintenance des fortifications et des usines s'envole en coût sous l'acide. Évitez les grands chantiers !",
     modifierBadges: [
       "🏗️ Coût Infrastructures +30%",
       "🧱 Coût Postes Défense +30%",
@@ -1159,7 +1214,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#8b5cf6",
     borderGlow: "rgba(139, 92, 246, 0.45)",
     lore: "Des sphères lumineuses de plasma traversent les lignes électriques et les voies ferrées en crépitant.",
-    strategicTip: "Le réseau ferré et les générateurs urbains absorbent ce survoltage énergétique pour générer une avalanche de profits !",
+    strategicTip:
+      "Le réseau ferré et les générateurs urbains absorbent ce survoltage énergétique pour générer une avalanche de profits !",
     modifierBadges: [
       "🚂 Revenus Ferroviaires +100%",
       "💎 Or Passif +50%",
@@ -1182,7 +1238,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#0ea5e9",
     borderGlow: "rgba(14, 165, 233, 0.45)",
     lore: "Le thermomètre plonge sous les -45°C. Les fluides gèlent et les fantassins doivent s'abriter pour survivre.",
-    strategicTip: "L'offensive à découvert est glaciale. Bâtissez des abris et des lignes défensives à bas coût !",
+    strategicTip:
+      "L'offensive à découvert est glaciale. Bâtissez des abris et des lignes défensives à bas coût !",
     modifierBadges: [
       "📈 Régénération Troupes -40%",
       "🛡️ Puissance Défense +45%",
@@ -1205,7 +1262,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#facc15",
     borderGlow: "rgba(250, 204, 21, 0.45)",
     lore: "Une météo immaculée et des mers calmes s'étendent sur le monde entier, ouvrant une fenêtre idéale pour le commerce.",
-    strategicTip: "Les convois maritimes et les trains fonctionnent à pleine capacité. Récoltez des dividendes records !",
+    strategicTip:
+      "Les convois maritimes et les trains fonctionnent à pleine capacité. Récoltez des dividendes records !",
     modifierBadges: [
       "🚢 Commerce Maritime +80%",
       "🚂 Revenus Ferroviaires +80%",
@@ -1228,7 +1286,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#475569",
     borderGlow: "rgba(71, 85, 105, 0.55)",
     lore: "La lune masque entièrement le disque solaire, plongeant la Terre dans une pénombre glaciale et mystérieuse.",
-    strategicTip: "Les systèmes optiques des SAM perdent leur guidage : profitez de l'obscurité pour lancer des assauts éclairs !",
+    strategicTip:
+      "Les systèmes optiques des SAM perdent leur guidage : profitez de l'obscurité pour lancer des assauts éclairs !",
     modifierBadges: [
       "📡 Portée SAM -50%",
       "⚡ Vitesse d'attaque +30%",
@@ -1251,7 +1310,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#059669",
     borderGlow: "rgba(5, 150, 105, 0.45)",
     lore: "Une fluctuation rapide du noyau externe désoriente les compas et sature les relais de télécommunication.",
-    strategicTip: "La navigation sur terres inconnues est confuse, mais le désordre ambiant permet de piller le double de butin !",
+    strategicTip:
+      "La navigation sur terres inconnues est confuse, mais le désordre ambiant permet de piller le double de butin !",
     modifierBadges: [
       "🚩 Pertes Terres Neutres +40%",
       "⏳ Recharge SAM +40%",
@@ -1276,7 +1336,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#854d0e",
     borderGlow: "rgba(133, 77, 14, 0.45)",
     lore: "Un essaim colossal de milliards de criquets pèlerins dévore toutes les cultures agricoles sur des milliers de kilomètres.",
-    strategicTip: "La disette frappe le ravitaillement des armées. Temporisez vos offensives en attendant que l'essaim se disperse.",
+    strategicTip:
+      "La disette frappe le ravitaillement des armées. Temporisez vos offensives en attendant que l'essaim se disperse.",
     modifierBadges: [
       "📈 Régénération Troupes -35%",
       "🏗️ Coût Infrastructures +25%",
@@ -1299,7 +1360,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#06b6d4",
     borderGlow: "rgba(6, 182, 212, 0.45)",
     lore: "Une prolifération d'algues luminescentes fait luire l'océan d'un éclat bleuté visible depuis l'espace.",
-    strategicTip: "Les voies maritimes illuminées permettent aux convois de naviguer sans risque et étendent la portée des flottes.",
+    strategicTip:
+      "Les voies maritimes illuminées permettent aux convois de naviguer sans risque et étendent la portée des flottes.",
     modifierBadges: [
       "🚢 Commerce Maritime +90%",
       "⚓ Portée Navires +30%",
@@ -1323,7 +1385,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#15803d",
     borderGlow: "rgba(21, 128, 61, 0.45)",
     lore: "Des lianes géantes et une canopée impénétrable reprennent leurs droits sur les routes et frontières territoriales.",
-    strategicTip: "Pénétrer dans la jungle coûte cher en hommes, mais les positions défensives dissimulées sous la canopée sont très solides.",
+    strategicTip:
+      "Pénétrer dans la jungle coûte cher en hommes, mais les positions défensives dissimulées sous la canopée sont très solides.",
     modifierBadges: [
       "🚩 Pertes Terres Neutres +50%",
       "🛡️ Puissance Défense +30%",
@@ -1346,7 +1409,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#a21caf",
     borderGlow: "rgba(162, 28, 175, 0.45)",
     lore: "Des champignons mutants expulsent des nuages de spores toxiques au ras du sol lors de leur floraison saisonnière.",
-    strategicTip: "L'infanterie respire mal dans les tranchées et perd des hommes. Les chantiers industriels en profitent pour extraire des enzymes.",
+    strategicTip:
+      "L'infanterie respire mal dans les tranchées et perd des hommes. Les chantiers industriels en profitent pour extraire des enzymes.",
     modifierBadges: [
       "📈 Régénération Troupes -30%",
       "🩸 Pertes d'attaque +25%",
@@ -1369,7 +1433,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#b45309",
     borderGlow: "rgba(180, 83, 9, 0.45)",
     lore: "D'immenses hardes d'animaux colossaux traversent les vallées et défoncent les barbelés des avant-postes.",
-    strategicTip: "Les lignes de défense statiques sont piétinées : profitez de la panique pour attaquer vos rivaux !",
+    strategicTip:
+      "Les lignes de défense statiques sont piétinées : profitez de la panique pour attaquer vos rivaux !",
     modifierBadges: [
       "🛡️ Puissance Défense -30%",
       "🚩 Pertes Terres Neutres +35%",
@@ -1394,7 +1459,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#64748b",
     borderGlow: "rgba(100, 116, 139, 0.45)",
     lore: "Les armées s'enterrent sous un réseau dense de barbelés, tranchées et casemates, figeant la ligne de contact.",
-    strategicTip: "Attaquer frontalement est un carnage absolu : construisez des défenses imprenables et préparez l'après-crise.",
+    strategicTip:
+      "Attaquer frontalement est un carnage absolu : construisez des défenses imprenables et préparez l'après-crise.",
     modifierBadges: [
       "🛡️ Puissance Défense +70%",
       "⚡ Vitesse d'attaque -40%",
@@ -1417,7 +1483,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#ef4444",
     borderGlow: "rgba(239, 68, 68, 0.45)",
     lore: "Des maquisards et factions rebelles sabotent les arrières et pillent les dépôts militaires adverses.",
-    strategicTip: "Les postes défensifs fixes sont sabotés : pillez et conquérez les bastions ennemis pour empocher un trésor colossal !",
+    strategicTip:
+      "Les postes défensifs fixes sont sabotés : pillez et conquérez les bastions ennemis pour empocher un trésor colossal !",
     modifierBadges: [
       "👑 Or de Conquête +90%",
       "🚩 Pertes Terres Neutres +40%",
@@ -1440,7 +1507,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#1d4ed8",
     borderGlow: "rgba(29, 78, 216, 0.45)",
     lore: "Des escadres de cuirassés et sous-marins ferment hermétiquement tous les détroits et corridors maritimes.",
-    strategicTip: "La portée des navires de guerre est maximale : canonnerez les côtes ennemies pendant que le train compense le commerce.",
+    strategicTip:
+      "La portée des navires de guerre est maximale : canonnerez les côtes ennemies pendant que le train compense le commerce.",
     modifierBadges: [
       "⚓ Portée Navires +40%",
       "⛵ Commerce Maritime -60%",
@@ -1463,7 +1531,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#0284c7",
     borderGlow: "rgba(2, 132, 199, 0.45)",
     lore: "Des escadrilles d'avions de reconnaissance quadrillent les secteurs et transmettent en direct la position des ennemis.",
-    strategicTip: "Vos batteries sol-air ont une détection accrue et vos offensives ciblent parfaitement les points faibles adverses.",
+    strategicTip:
+      "Vos batteries sol-air ont une détection accrue et vos offensives ciblent parfaitement les points faibles adverses.",
     modifierBadges: [
       "📡 Portée SAM +40%",
       "⏳ Recharge SAM -30%",
@@ -1486,7 +1555,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#b91c1c",
     borderGlow: "rgba(185, 28, 28, 0.45)",
     lore: "Les armées en recul dynamitent les ponts, empoisonnent les puits et rasent toutes les villes abandonnées.",
-    strategicTip: "Conquérir des territoires rapporte peu de butin et coûte cher en pionniers, mais défendre ses bastions est aisé.",
+    strategicTip:
+      "Conquérir des territoires rapporte peu de butin et coûte cher en pionniers, mais défendre ses bastions est aisé.",
     modifierBadges: [
       "👑 Or de Conquête -50%",
       "🚩 Pertes Terres Neutres +60%",
@@ -1509,7 +1579,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#dc2626",
     borderGlow: "rgba(220, 38, 38, 0.45)",
     lore: "Des pièces de gros calibre pilonnent méthodiquement toutes les lignes fortifiées ennemies sans discontinuer.",
-    strategicTip: "Les postes défensifs sont pulvérisés par le bombardement : passez à l'attaque avec une résistance minimale !",
+    strategicTip:
+      "Les postes défensifs sont pulvérisés par le bombardement : passez à l'attaque avec une résistance minimale !",
     modifierBadges: [
       "🛡️ Puissance Défense -50%",
       "⚡ Vitesse d'attaque +30%",
@@ -1534,7 +1605,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#fbbf24",
     borderGlow: "rgba(251, 191, 36, 0.45)",
     lore: "Des prospecteurs découvrent de gigantesques veines aurifères dans les massifs montagneux et les plaines fluviales.",
-    strategicTip: "Toutes les économies nagent dans l'or : profitez de ces liquidités pour investir dans vos infrastructures clés !",
+    strategicTip:
+      "Toutes les économies nagent dans l'or : profitez de ces liquidités pour investir dans vos infrastructures clés !",
     modifierBadges: [
       "💎 Or Passif +100%",
       "🏗️ Coût Infrastructures -25%",
@@ -1558,7 +1630,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#0284c7",
     borderGlow: "rgba(2, 132, 199, 0.45)",
     lore: "Une vague d'innovations dans l'usinage automatique et la métallurgie réduit le coût des chantiers d'envergure.",
-    strategicTip: "Bâtir des usines et des ports coûte 40% moins cher : industrialisez votre territoire à marche forcée !",
+    strategicTip:
+      "Bâtir des usines et des ports coûte 40% moins cher : industrialisez votre territoire à marche forcée !",
     modifierBadges: [
       "🏗️ Coût Infrastructures -40%",
       "💎 Or Passif +50%",
@@ -1581,7 +1654,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#ef4444",
     borderGlow: "rgba(239, 68, 68, 0.45)",
     lore: "L'effondrement des devises fiat paralyse les marchés financiers : la valeur se réfugie dans la force brute et les hommes.",
-    strategicTip: "Construire des bâtiments coûte une fortune, mais les populations s'engagent en masse dans l'armée !",
+    strategicTip:
+      "Construire des bâtiments coûte une fortune, mais les populations s'engagent en masse dans l'armée !",
     modifierBadges: [
       "🏗️ Coût Infrastructures +40%",
       "💎 Or Passif -30%",
@@ -1604,7 +1678,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#3b82f6",
     borderGlow: "rgba(59, 130, 246, 0.45)",
     lore: "L'interconnexion des corridors ferroviaires permet une rotation effrénée des convois de fret lourd.",
-    strategicTip: "Chaque train en circulation rapporte des dividendes colossaux (x2.5) : reliez vos métropoles !",
+    strategicTip:
+      "Chaque train en circulation rapporte des dividendes colossaux (x2.5) : reliez vos métropoles !",
     modifierBadges: [
       "🚂 Revenus Ferroviaires +150% (x2.5)",
       "🏗️ Coût Infrastructures -20%",
@@ -1630,7 +1705,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#d946ef",
     borderGlow: "rgba(217, 70, 239, 0.55)",
     lore: "Des retombées radioactives massives sont entraînées par les courants de haute altitude, contaminant les no man's lands.",
-    strategicTip: "Conquérir des territoires neutres irradiés est très meurtrier, mais les armes nucléaires bénéficient d'un soutien total.",
+    strategicTip:
+      "Conquérir des territoires neutres irradiés est très meurtrier, mais les armes nucléaires bénéficient d'un soutien total.",
     modifierBadges: [
       "🚩 Pertes Terres Neutres +80%",
       "☢️ Coût Bombes & Silos -30%",
@@ -1653,7 +1729,8 @@ export const WORLD_EVENTS_CATALOG: WorldEventDefinition[] = [
     accentColor: "#06b6d4",
     borderGlow: "rgba(6, 182, 212, 0.55)",
     lore: "Des constellations de satellites militaires déchaînent des tirs de tiges cinétiques perçant les bunkers les plus profonds.",
-    strategicTip: "Les Postes de Défense ne peuvent résister aux frappes venant de l'orbite : anéantissez les réduits fortifiés ennemis !",
+    strategicTip:
+      "Les Postes de Défense ne peuvent résister aux frappes venant de l'orbite : anéantissez les réduits fortifiés ennemis !",
     modifierBadges: [
       "🛡️ Puissance Défense -60%",
       "🚀 Vitesse Missiles +50%",
@@ -1691,7 +1768,9 @@ function pseudoRandomMix(base: number, salt: number): number {
   return (x ^ (x >>> 16)) >>> 0;
 }
 
-export function getWorldEventStartDelay(seedString: string = "hexafront"): number {
+export function getWorldEventStartDelay(
+  seedString: string = "hexafront",
+): number {
   const base = simpleHash(`${seedString}:start_delay`);
   const mixed = pseudoRandomMix(base, 101);
   return 750 + (mixed % 350); // 75s to 110s (~1.25 à 1.8 min de calme initial)
@@ -2279,7 +2358,8 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🦅",
     rarity: "Épique",
     rarityColor: "#a855f7",
-    description: "Contrôler plus de 1 500 cases de territoire au cours d'une partie.",
+    description:
+      "Contrôler plus de 1 500 cases de territoire au cours d'une partie.",
     xpBonus: 40,
   },
   {
@@ -2288,7 +2368,8 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🏙️",
     rarity: "Rare",
     rarityColor: "#06b6d4",
-    description: "Ériger la Mégastructure Arcologie Cybernétique (3+ niveaux de Villes).",
+    description:
+      "Ériger la Mégastructure Arcologie Cybernétique (3+ niveaux de Villes).",
     xpBonus: 30,
   },
   {
@@ -2315,7 +2396,8 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "☢️",
     rarity: "Épique",
     rarityColor: "#f43f5e",
-    description: "Déployer le Centre de Commandement Orbital (2+ niveaux de Silos).",
+    description:
+      "Déployer le Centre de Commandement Orbital (2+ niveaux de Silos).",
     xpBonus: 45,
   },
   {
@@ -2360,7 +2442,8 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     icon: "🏛️",
     rarity: "Légendaire",
     rarityColor: "#f59e0b",
-    description: "Contrôler 3 Mégastructures simultanément dans une même partie.",
+    description:
+      "Contrôler 3 Mégastructures simultanément dans une même partie.",
     xpBonus: 60,
   },
   {
@@ -2373,4 +2456,3 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     xpBonus: 75,
   },
 ];
-

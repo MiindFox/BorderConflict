@@ -29,19 +29,19 @@ import "./FluentSlider";
 import "./map/MapPicker";
 
 const ACTIVE_CARD =
-  "bg-malibu-blue/20 border-malibu-blue/50 shadow-[var(--shadow-malibu-blue)]";
+  "bg-[#243326] border-amber-400 text-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.35)]";
 const INACTIVE_CARD =
-  "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20";
+  "bg-[#111712] border-[#2b3a2d] hover:bg-[#182219] hover:border-[#3c4f3e] text-[#8fa382]";
 
 const DISABLED_CARD =
-  "w-full rounded-xl border transition-all duration-200 opacity-30 grayscale cursor-not-allowed bg-white/5 border-white/5";
+  "w-full rounded-xl border transition-all duration-200 opacity-30 grayscale cursor-not-allowed bg-[#0d120e] border-[#1f2820]";
 
 function cardClass(active: boolean, extra = ""): string {
-  return `w-full rounded-xl border cursor-pointer transition-all duration-200 active:scale-95 ${extra} ${active ? ACTIVE_CARD : INACTIVE_CARD}`;
+  return `w-full rounded-xl border-2 cursor-pointer transition-all duration-150 active:scale-95 ${extra} ${active ? ACTIVE_CARD : INACTIVE_CARD}`;
 }
 
 const CARD_LABEL_CLASS =
-  "text-xs uppercase font-bold tracking-wider leading-tight break-words hyphens-auto";
+  "text-[9.5px] uppercase font-pixel font-bold tracking-wider leading-tight break-words hyphens-auto";
 
 const DIFFICULTY_OPTIONS = Object.entries(Difficulty).filter(([key]) =>
   isNaN(Number(key)),
@@ -60,7 +60,7 @@ const TEAM_COUNT_OPTIONS: TeamCountConfig[] = [
 ];
 
 function stateTextClass(active: boolean): string {
-  return active ? "text-white" : "text-white/60";
+  return active ? "text-amber-200" : "text-[#8fa382]";
 }
 
 function renderTextCardButton(
@@ -161,20 +161,22 @@ function renderSectionHeader(
   headerAction?: TemplateResult,
 ): TemplateResult {
   return html`
-    <div class="flex items-center gap-4 pb-2 border-b border-white/10">
+    <div class="flex items-center gap-3 pb-2 border-b-2 border-[#2b3a2d]">
       <div
-        class="w-8 h-8 rounded-lg flex items-center justify-center ${bgClass} ${colorClass}"
+        class="w-7 h-7 rounded-lg flex items-center justify-center bg-[#172119] border border-[#2d3d2f] text-green-400 shrink-0 shadow-inner"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          class="w-5 h-5"
+          class="w-4 h-4"
         >
           ${iconSvg}
         </svg>
       </div>
-      <h3 class="text-lg font-bold text-white uppercase tracking-wider">
+      <h3
+        class="text-xs sm:text-sm font-pixel font-bold text-amber-200 uppercase tracking-widest glow-amber"
+      >
         ${translateText(titleKey)}
       </h3>
       ${headerAction ? html`<div class="ml-auto">${headerAction}</div>` : null}
@@ -399,10 +401,10 @@ export class GameConfigSettings extends LitElement {
         placeholder="${translateText("map_component.search_maps")}"
         .value=${this.mapSearchQuery}
         @input=${this.handleMapSearchInput}
-        class="w-48 px-3 py-1.5 pl-8 pr-7 rounded-lg text-sm bg-transparent border border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-malibu-blue/50 transition-all"
+        class="w-44 sm:w-52 px-2.5 py-1.5 pl-8 pr-7 rounded bg-[#0a0f0b] border border-[#2b3a2d] text-green-400 font-terminal text-sm placeholder-zinc-500 focus:outline-none focus:border-green-400 shadow-inner"
       />
       <svg
-        class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40"
+        class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400"
         viewBox="0 0 20 20"
         fill="currentColor"
       >
@@ -416,13 +418,9 @@ export class GameConfigSettings extends LitElement {
         ? html`<button
             type="button"
             @click=${this.clearMapSearch}
-            class="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all"
+            class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center rounded-full text-zinc-400 hover:text-white"
           >
-            <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
-              />
-            </svg>
+            ✕
           </button>`
         : null}
     </div>`;

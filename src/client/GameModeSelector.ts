@@ -435,6 +435,7 @@ export class GameModeSelector extends LitElement {
     );
     document.addEventListener("join-lobby", this.onJoinLobby);
     document.addEventListener("leave-lobby", this.onLeaveLobby);
+    document.addEventListener("trigger-quick-deploy", this.handleQuickDeploy);
     // Pick up the current value in case username-input validated before us.
     const usernameInput = document.querySelector(
       "username-input",
@@ -467,8 +468,24 @@ export class GameModeSelector extends LitElement {
     );
     document.removeEventListener("join-lobby", this.onJoinLobby);
     document.removeEventListener("leave-lobby", this.onLeaveLobby);
+    document.removeEventListener(
+      "trigger-quick-deploy",
+      this.handleQuickDeploy,
+    );
     super.disconnectedCallback();
   }
+
+  private handleQuickDeploy = () => {
+    const ffa = this.lobbies?.games?.["ffa"]?.[0];
+    const teams = this.lobbies?.games?.["team"]?.[0];
+    if (ffa) {
+      this.validateAndJoin(ffa);
+    } else if (teams) {
+      this.validateAndJoin(teams);
+    } else {
+      this.openDetailedView();
+    }
+  };
 
   private onJoinLobby = () => {
     this.inLobby = true;
@@ -608,29 +625,42 @@ export class GameModeSelector extends LitElement {
         ></div>
 
         <!-- Animated radar disc -->
-        <div class="relative flex items-center justify-center size-14 rounded-2xl bg-slate-900 border border-cyan-400/40 text-2xl shadow-[0_0_20px_rgba(6,182,212,0.25)] shrink-0">
+        <div
+          class="relative flex items-center justify-center size-14 rounded-2xl bg-slate-900 border border-cyan-400/40 text-2xl shadow-[0_0_20px_rgba(6,182,212,0.25)] shrink-0"
+        >
           <span class="animate-pulse">📡</span>
-          <span class="absolute inset-0 rounded-2xl border border-cyan-400/40 animate-ping opacity-25 pointer-events-none"></span>
+          <span
+            class="absolute inset-0 rounded-2xl border border-cyan-400/40 animate-ping opacity-25 pointer-events-none"
+          ></span>
         </div>
 
         <!-- Typography -->
         <div class="flex flex-col gap-1 max-w-md z-10">
           <div class="flex items-center justify-center gap-1.5">
-            <span class="inline-block size-2 rounded-full bg-amber-400 animate-pulse"></span>
-            <span class="text-[11px] font-mono font-black uppercase tracking-widest text-amber-300">
+            <span
+              class="inline-block size-2 rounded-full bg-amber-400 animate-pulse"
+            ></span>
+            <span
+              class="text-[11px] font-mono font-black uppercase tracking-widest text-amber-300"
+            >
               Serveurs BorderConflict
             </span>
           </div>
-          <h4 class="text-sm sm:text-base font-black text-white uppercase tracking-wide">
+          <h4
+            class="text-sm sm:text-base font-black text-white uppercase tracking-wide"
+          >
             ${translateText(message)}
           </h4>
           <p class="text-xs text-slate-300/80 leading-relaxed">
-            Vérifiez votre connexion internet ou relancez la détection du réseau de jeu.
+            Vérifiez votre connexion internet ou relancez la détection du réseau
+            de jeu.
           </p>
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center gap-2.5 flex-wrap justify-center z-10 pt-1">
+        <div
+          class="flex items-center gap-2.5 flex-wrap justify-center z-10 pt-1"
+        >
           ${canRetry
             ? html`<button
                 type="button"
@@ -638,7 +668,12 @@ export class GameModeSelector extends LitElement {
                 ?disabled=${this.retryCoolingDown}
                 @click=${this.retryLobbies}
               >
-                <span class=${this.retryCoolingDown ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}>🔄</span>
+                <span
+                  class=${this.retryCoolingDown
+                    ? "animate-spin"
+                    : "group-hover:rotate-180 transition-transform duration-500"}
+                  >🔄</span
+                >
                 <span>${translateText("mode_selector.retry_lobbies")}</span>
               </button>`
             : nothing}
@@ -698,145 +733,194 @@ export class GameModeSelector extends LitElement {
     const special = this.lobbies?.games?.["special"]?.[0];
 
     return html`
-      <div class="flex flex-col gap-3.5 w-full">
+      <div class="flex flex-col gap-2.5 w-full select-none">
         <ios-add-to-home-screen-banner
           class="no-game-portal [&:empty]:hidden"
         ></ios-add-to-home-screen-banner>
 
-        <!-- Modern Tactical Mode Selection Tabs -->
-        <div
-          class="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1.5 rounded-2xl bg-slate-950/90 backdrop-blur-xl border border-cyan-500/25 shadow-lg w-full"
-        >
+        <!-- Mode Selection Push-Button Rack (Image 2 in Retro Military Style) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full">
+          <!-- BATAILLE ROYALE (FFA) -->
           <button
             type="button"
             @click=${() => (this.activeTab = "ffa")}
-            class="flex flex-col items-center justify-center gap-1 py-2 sm:py-2.5 px-1.5 rounded-xl text-center transition-all duration-200 cursor-pointer select-none min-h-[58px] ${this
+            class="retro-metal-btn flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-2 rounded-lg cursor-pointer transition-all ${this
               .activeTab === "ffa"
-              ? "bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.45)] border border-cyan-300/40 scale-[1.02]"
-              : "bg-slate-900/80 text-slate-200 hover:text-white hover:bg-slate-800/90 border border-white/10 hover:border-cyan-500/30"}"
+              ? "ring-2 ring-amber-400 bg-[#28382b] text-amber-200 brightness-110 shadow-[0_0_12px_rgba(245,158,11,0.4)]"
+              : "text-[#8fa382] hover:text-white"}"
+            title="Bataille Royale (Chacun pour soi)"
           >
-            <span class="text-base sm:text-lg shrink-0 leading-none">🚀</span>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
-              Bataille Royale
+            <span
+              class="size-1.5 sm:size-2 shrink-0 rounded-full ${this
+                .activeTab === "ffa"
+                ? "led-green-on"
+                : "led-off"}"
+            ></span>
+            <span class="text-xs shrink-0">🚀</span>
+            <span
+              class="font-retro text-[9px] sm:text-[10px] font-bold uppercase tracking-tight whitespace-nowrap"
+            >
+              BATAILLE ROYALE
             </span>
           </button>
+
+          <!-- EQUIPES -->
           <button
             type="button"
             @click=${() => (this.activeTab = "team")}
-            class="flex flex-col items-center justify-center gap-1 py-2 sm:py-2.5 px-1.5 rounded-xl text-center transition-all duration-200 cursor-pointer select-none min-h-[58px] ${this
+            class="retro-metal-btn flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-2 rounded-lg cursor-pointer transition-all ${this
               .activeTab === "team"
-              ? "bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.45)] border border-cyan-300/40 scale-[1.02]"
-              : "bg-slate-900/80 text-slate-200 hover:text-white hover:bg-slate-800/90 border border-white/10 hover:border-cyan-500/30"}"
+              ? "ring-2 ring-amber-400 bg-[#28382b] text-amber-200 brightness-110 shadow-[0_0_12px_rgba(245,158,11,0.4)]"
+              : "text-[#8fa382] hover:text-white"}"
+            title="Guerre en équipes"
           >
-            <span class="text-base sm:text-lg shrink-0 leading-none">🛡️</span>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
-              Équipes
+            <span
+              class="size-1.5 sm:size-2 shrink-0 rounded-full ${this
+                .activeTab === "team"
+                ? "led-green-on"
+                : "led-off"}"
+            ></span>
+            <span class="text-xs shrink-0">🛡️</span>
+            <span
+              class="font-retro text-[9px] sm:text-[10px] font-bold uppercase tracking-tight whitespace-nowrap"
+            >
+              EQUIPES
             </span>
           </button>
+
+          <!-- SOLO (IA) -->
           <button
             type="button"
             @click=${() => (this.activeTab = "solo")}
-            class="flex flex-col items-center justify-center gap-1 py-2 sm:py-2.5 px-1.5 rounded-xl text-center transition-all duration-200 cursor-pointer select-none min-h-[58px] ${this
+            class="retro-metal-btn flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-2 rounded-lg cursor-pointer transition-all ${this
               .activeTab === "solo"
-              ? "bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.45)] border border-cyan-300/40 scale-[1.02]"
-              : "bg-slate-900/80 text-slate-200 hover:text-white hover:bg-slate-800/90 border border-white/10 hover:border-cyan-500/30"}"
+              ? "ring-2 ring-amber-400 bg-[#28382b] text-amber-200 brightness-110 shadow-[0_0_12px_rgba(245,158,11,0.4)]"
+              : "text-[#8fa382] hover:text-white"}"
+            title="Entraînement contre l'intelligence artificielle"
           >
-            <span class="text-base sm:text-lg shrink-0 leading-none">⚔️</span>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
-              Solo (IA)
+            <span
+              class="size-1.5 sm:size-2 shrink-0 rounded-full ${this
+                .activeTab === "solo"
+                ? "led-green-on"
+                : "led-off"}"
+            ></span>
+            <span class="text-xs shrink-0">🤖</span>
+            <span
+              class="font-retro text-[9px] sm:text-[10px] font-bold uppercase tracking-tight whitespace-nowrap"
+            >
+              SOLO (IA)
             </span>
           </button>
+
+          <!-- CLASSES -->
           <button
             type="button"
-            @click=${this.openRankedMenu}
-            class="flex flex-col items-center justify-center gap-1 py-2 sm:py-2.5 px-1.5 rounded-xl text-center transition-all duration-200 cursor-pointer relative select-none min-h-[58px] ${this
+            @click=${() => (this.activeTab = "ranked")}
+            class="retro-metal-btn flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-2 rounded-lg cursor-pointer transition-all ${this
               .activeTab === "ranked"
-              ? "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-[0_0_20px_rgba(245,158,11,0.45)] border border-amber-300/40 scale-[1.02]"
-              : "bg-slate-900/80 text-slate-200 hover:text-white hover:bg-slate-800/90 border border-white/10 hover:border-amber-500/30"}"
+              ? "ring-2 ring-amber-400 bg-[#28382b] text-amber-200 brightness-110 shadow-[0_0_12px_rgba(245,158,11,0.4)]"
+              : "text-[#8fa382] hover:text-white"}"
+            title="Opérations classées compétitives"
           >
-            <span class="text-base sm:text-lg shrink-0 leading-none">🎯</span>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
-              ${translateText("mode_selector.ranked_title")}
+            <span
+              class="size-1.5 sm:size-2 shrink-0 rounded-full ${this
+                .activeTab === "ranked"
+                ? "led-green-on"
+                : "led-off"}"
+            ></span>
+            <span class="text-xs shrink-0">🎯</span>
+            <span
+              class="font-retro text-[9px] sm:text-[10px] font-bold uppercase tracking-tight whitespace-nowrap"
+            >
+              CLASSES
             </span>
-            ${this.viewerTrusted
-              ? trustLockIcon(true, {
-                  tooltipTitle: translateText(
-                    "mode_selector.ranked_trust_tooltip_title",
-                  ),
-                  position: "top-1 right-1",
-                  small: true,
-                })
-              : nothing}
           </button>
         </div>
 
-        <!-- Dynamic Hero Mode Hub -->
-        ${this.renderHeroMode(ffa, teams, special)}
+        <!-- Central Tactical Reconnaissance & Hero Card Display -->
+        <div class="w-full">${this.renderHeroMode(ffa, teams, special)}</div>
 
-        <!-- Tactical Quick Dock -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full">
-          <button
-            type="button"
-            @click=${this.openHostLobby}
-            ?disabled=${!this.inputValid}
-            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800/95 border border-cyan-500/30 hover:border-cyan-400 text-slate-100 hover:text-white transition-all duration-200 shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden select-none min-h-[68px]"
+        <!-- Action Row from Image 2 wrapped in Retro Industrial Hazard Stripes -->
+        <div class="hazard-stripes p-1 rounded-xl shadow-2xl w-full">
+          <div
+            class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-lg bg-[#182119] border border-[#2d3d2f]"
           >
-            <span class="text-cyan-400 text-xl shrink-0 group-hover:scale-110 transition-transform leading-none">➕</span>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
-              Créer Salon
-            </span>
-          </button>
-          <button
-            type="button"
-            @click=${this.openJoinLobby}
-            ?disabled=${!this.inputValid}
-            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800/95 border border-cyan-500/30 hover:border-cyan-400 text-slate-100 hover:text-white transition-all duration-200 shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden select-none min-h-[68px]"
-          >
-            <span class="text-cyan-400 text-xl shrink-0 group-hover:scale-110 transition-transform leading-none">🔑</span>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
-              Code Privé
-            </span>
-            ${this.hostedLobbyCount() > 0
-              ? html`<span
-                  class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-cyan-500/25 border border-cyan-400/40 text-cyan-200 text-[9px] font-mono font-black tracking-wider leading-none shadow-sm pointer-events-none"
-                  >${this.hostedLobbyCount()}</span
-                >`
-              : ""}
-          </button>
-          <button
-            type="button"
-            @click=${this.startTutorial}
-            ?disabled=${!this.inputValid}
-            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-400/40 hover:border-amber-400 text-amber-200 hover:text-white transition-all duration-200 shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden select-none min-h-[68px]"
-          >
-            <span class="text-amber-400 text-xl shrink-0 group-hover:scale-110 transition-transform leading-none">🎓</span>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
-              Tutoriel
-            </span>
-            <span
-              class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-amber-400/30 border border-amber-400/40 text-amber-300 text-[9px] font-black tracking-wider leading-none shadow-sm pointer-events-none"
-              >+XP</span
+            <!-- CREER SALON -->
+            <button
+              type="button"
+              @click=${this.openHostLobby}
+              ?disabled=${!this.inputValid}
+              class="retro-metal-btn flex items-center justify-center gap-1 py-2 px-1 sm:px-1.5 rounded font-retro text-[9px] sm:text-[10px] font-bold text-amber-300 hover:text-amber-100 transition-all uppercase tracking-tight cursor-pointer whitespace-nowrap"
+              title="Créer un salon personnalisé"
             >
-          </button>
+              <span class="text-xs shrink-0">➕</span>
+              <span class="whitespace-nowrap">CREER SALON</span>
+            </button>
+
+            <!-- CODE PRIVE -->
+            <button
+              type="button"
+              @click=${this.openJoinLobby}
+              ?disabled=${!this.inputValid}
+              class="retro-metal-btn flex items-center justify-center gap-1 py-2 px-1 sm:px-1.5 rounded font-retro text-[9px] sm:text-[10px] font-bold text-slate-200 hover:text-white transition-all uppercase tracking-tight cursor-pointer whitespace-nowrap"
+              title="Rejoindre avec un code d'invitation"
+            >
+              <span class="text-xs shrink-0">🔑</span>
+              <span class="whitespace-nowrap">CODE PRIVE</span>
+            </button>
+
+            <!-- TUTORIEL (+XP) -->
+            <button
+              type="button"
+              @click=${() => this.startTutorial()}
+              class="retro-metal-btn relative flex items-center justify-center gap-1 py-2 px-1 sm:px-1.5 rounded font-retro text-[9px] sm:text-[10px] font-bold text-amber-200 hover:text-amber-100 transition-all uppercase tracking-tight cursor-pointer whitespace-nowrap"
+              title="Lancer le tutoriel tactique"
+            >
+              <span class="text-xs shrink-0">🎓</span>
+              <span class="whitespace-nowrap">TUTORIEL</span>
+              <span
+                class="text-[7.5px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30 shrink-0 font-pixel"
+                >+XP</span
+              >
+            </button>
+
+            <!-- TOUS SALONS -->
+            <button
+              type="button"
+              @click=${this.openDetailedView}
+              ?disabled=${!this.inputValid}
+              class="retro-metal-btn flex items-center justify-center gap-1 py-2 px-1 sm:px-1.5 rounded font-retro text-[9px] sm:text-[10px] font-bold text-green-300 hover:text-green-100 transition-all uppercase tracking-tight cursor-pointer whitespace-nowrap"
+              title="Afficher la liste détaillée des salons"
+            >
+              <span class="text-xs shrink-0">🌐</span>
+              <span class="whitespace-nowrap">TOUS SALONS</span>
+              <span
+                class="text-[8px] px-1.5 py-0.2 rounded bg-green-500/20 text-green-300 border border-green-400/30 font-mono shrink-0"
+                >${this.advertisedLobbyCount()}</span
+              >
+            </button>
+          </div>
+        </div>
+
+        <!-- Teletype Link Below Action Row -->
+        <div
+          class="flex items-center justify-between px-2 pt-0.5 text-[11px] font-terminal text-[#7e9482]"
+        >
+          <span class="flex items-center gap-1.5">
+            <span class="size-1.5 rounded-full led-green-on"></span>
+            <span
+              >THEATRES ACTIFS : ${this.advertisedLobbyCount()} SALONS
+              DISPONIBLES</span
+            >
+          </span>
           <button
             type="button"
             @click=${this.openDetailedView}
-            ?disabled=${!this.inputValid}
-            class="group relative flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800/95 border border-cyan-500/30 hover:border-cyan-400 text-slate-100 hover:text-white transition-all duration-200 shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden select-none min-h-[68px]"
+            class="text-[#4ade80] hover:text-[#6ee7b7] hover:underline font-bold uppercase tracking-wider cursor-pointer"
           >
-            <span class="text-cyan-400 text-xl shrink-0 group-hover:scale-110 transition-transform leading-none">🌐</span>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wide leading-tight text-center break-words max-w-full">
-              Tous Salons
-            </span>
-            <span
-              class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-cyan-500/25 border border-cyan-400/40 text-cyan-200 text-[10px] font-mono font-black tracking-wider leading-none shadow-sm pointer-events-none"
-              >${this.advertisedLobbyCount()}</span
-            >
+            Voir tous les salons (${this.advertisedLobbyCount()}) →
           </button>
         </div>
-
-        <!-- Secondary Upcoming Lobbies Strip -->
-        ${this.renderUpcomingStrip(ffa, teams, special)}
 
         ${this.showTrustRequired
           ? trustRequiredDialog(
@@ -856,23 +940,23 @@ export class GameModeSelector extends LitElement {
     if (this.activeTab === "ffa") {
       if (ffa) {
         return html`
-          <div class="flex flex-col gap-3">
-            <div class="h-56 sm:h-72 w-full">
+          <div class="flex flex-col gap-2 w-full">
+            <div class="h-44 sm:h-52 w-full">
               ${this.renderLobbyCard(ffa, getGameModeLabel(ffa.gameConfig!))}
             </div>
+            <!-- Big Fast Deploy Button -->
             <button
               type="button"
               @click=${() => this.validateAndJoin(ffa)}
               ?disabled=${!this.inputValid}
-              class="group relative flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:via-sky-400 hover:to-indigo-500 text-white font-black text-base sm:text-xl uppercase tracking-widest shadow-[0_8px_32px_rgba(6,182,212,0.45)] hover:shadow-[0_12px_44px_rgba(6,182,212,0.65)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer overflow-hidden border border-cyan-200/40"
+              class="retro-red-btn flex items-center justify-center gap-2 sm:gap-3 w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl font-retro text-[11px] sm:text-xs font-bold text-white hover:brightness-110 active:translate-y-0.5 transition-all shadow-[0_0_20px_rgba(220,38,38,0.5)] cursor-pointer whitespace-nowrap tracking-wide"
             >
               <span
-                class="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-25deg] -translate-x-full group-hover:translate-x-[400%] transition-transform duration-1000"
+                class="size-2 sm:size-2.5 rounded-full bg-yellow-300 animate-ping shrink-0"
               ></span>
-              <span class="text-2xl animate-pulse">⚡</span>
-              <span class="tracking-widest">DÉPLOIEMENT RAPIDE</span>
+              <span class="shrink-0">⚡ ENGAGER LE DEPLOIEMENT RAPIDE</span>
               <span
-                class="text-xs font-mono font-extrabold px-2 py-0.5 rounded-full bg-slate-950/50 border border-white/20 text-cyan-200"
+                class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black/50 border border-white/20 text-yellow-200 shrink-0"
               >
                 ${ffa.gameConfig?.maxPlayers
                   ? `${ffa.numClients}/${ffa.gameConfig.maxPlayers}`
@@ -887,15 +971,15 @@ export class GameModeSelector extends LitElement {
       }
       return html`
         <div
-          class="flex flex-col items-center justify-center gap-3 h-56 sm:h-72 rounded-2xl bg-slate-950/60 border border-cyan-500/20"
+          class="flex flex-col items-center justify-center gap-3 h-44 sm:h-52 rounded-xl bg-[#121813] border-2 border-[#2b3a2d]"
         >
           <span
-            class="size-16 rounded-full border-4 border-cyan-500/30 border-t-cyan-400 animate-spin"
+            class="size-10 rounded-full border-3 border-green-500/30 border-t-green-400 animate-spin"
           ></span>
           <span
-            class="text-xs font-mono font-bold text-cyan-300 uppercase tracking-widest"
+            class="text-[11px] font-pixel text-green-300 uppercase tracking-widest"
           >
-            Recherche du meilleur front FFA...
+            RECHERCHE DU MEILLEUR THEATRE TACTIQUE FFA...
           </span>
         </div>
       `;
@@ -904,20 +988,23 @@ export class GameModeSelector extends LitElement {
     if (this.activeTab === "team") {
       if (teams) {
         return html`
-          <div class="flex flex-col gap-3">
-            <div class="h-56 sm:h-72 w-full">
-              ${this.renderLobbyCard(teams, getGameModeLabel(teams.gameConfig!))}
+          <div class="flex flex-col gap-2 w-full">
+            <div class="h-44 sm:h-52 w-full">
+              ${this.renderLobbyCard(
+                teams,
+                getGameModeLabel(teams.gameConfig!),
+              )}
             </div>
             <button
               type="button"
               @click=${() => this.validateAndJoin(teams)}
               ?disabled=${!this.inputValid}
-              class="group relative flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:via-sky-400 hover:to-indigo-500 text-white font-black text-base sm:text-xl uppercase tracking-widest shadow-[0_8px_32px_rgba(6,182,212,0.45)] hover:shadow-[0_12px_44px_rgba(6,182,212,0.65)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer overflow-hidden border border-cyan-200/40"
+              class="retro-metal-btn flex items-center justify-center gap-2 sm:gap-3 w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl font-retro text-[11px] sm:text-xs font-bold text-green-300 hover:brightness-110 active:translate-y-0.5 transition-all shadow-xl cursor-pointer whitespace-nowrap tracking-wide"
             >
-              <span class="text-2xl">🤝</span>
-              <span class="tracking-widest">REJOINDRE L'ALLIANCE</span>
+              <span class="size-2 rounded-full led-green-on shrink-0"></span>
+              <span class="shrink-0">🤝 REJOINDRE L'ALLIANCE</span>
               <span
-                class="text-xs font-mono font-extrabold px-2 py-0.5 rounded-full bg-slate-950/50 border border-white/20 text-cyan-200"
+                class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black/50 border border-white/20 text-green-200 shrink-0"
               >
                 ${teams.gameConfig?.maxPlayers
                   ? `${teams.numClients}/${teams.gameConfig.maxPlayers}`
@@ -932,22 +1019,24 @@ export class GameModeSelector extends LitElement {
       }
       return html`
         <div
-          class="flex flex-col items-center justify-center gap-3 p-6 text-center h-56 sm:h-72 rounded-2xl bg-slate-950/80 border border-cyan-500/20"
+          class="flex flex-col items-center justify-center gap-2 p-5 text-center h-44 sm:h-52 rounded-xl bg-[#121813] border-2 border-[#2b3a2d]"
         >
-          <span class="text-4xl">🛡️</span>
-          <h3 class="text-base font-extrabold uppercase text-white">
-            Guerre des Factions (Équipes)
+          <span class="text-3xl">🛡️</span>
+          <h3
+            class="text-xs sm:text-sm font-pixel font-bold uppercase text-amber-200"
+          >
+            GUERRE DES COALITIONS (EQUIPES)
           </h3>
-          <p class="text-xs text-slate-400 max-w-sm">
-            Aucun salon d'équipe n'est en attente. Créez votre propre alliance
-            tactique 2v2, 3v3 ou 50v50 !
+          <p class="text-[11px] font-terminal text-[#8fa382] max-w-sm">
+            Aucun salon d'équipe en attente. Fondez votre alliance 2v2, 3v3 ou
+            50v50 !
           </p>
           <button
             type="button"
             @click=${this.openHostLobby}
-            class="mt-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-extrabold text-xs uppercase tracking-wider shadow-md hover:scale-105 transition-all cursor-pointer"
+            class="retro-metal-btn mt-1 px-4 py-2 rounded-lg font-pixel text-[10px] text-amber-200 uppercase tracking-wider"
           >
-            ➕ Créer un Salon d'Équipe
+            ➕ CREER UN SALON D'EQUIPE
           </button>
         </div>
       `;
@@ -956,42 +1045,31 @@ export class GameModeSelector extends LitElement {
     if (this.activeTab === "solo") {
       return html`
         <div
-          class="relative flex flex-col justify-between overflow-hidden p-6 sm:p-8 h-56 sm:h-72 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border border-cyan-500/30 shadow-xl"
+          class="relative flex flex-col justify-between overflow-hidden p-4 sm:p-5 h-44 sm:h-52 rounded-xl bg-[#121813] border-2 border-[#2b3a2d] shadow-2xl"
         >
           <div
-            class="absolute -right-10 -bottom-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"
+            class="crt-scanlines absolute inset-0 opacity-20 pointer-events-none"
           ></div>
-          <div class="relative z-10 flex flex-col gap-2">
-            <div class="flex items-center gap-2 flex-wrap">
+          <div class="relative z-10 flex flex-col gap-1.5">
+            <div class="flex items-center gap-2">
+              <span class="size-2 rounded-full led-green-on"></span>
               <span
-                class="px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[10px] font-mono font-bold uppercase"
-                >🤖 IA Tactique</span
-              >
-              <span
-                class="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-[10px] font-mono font-bold uppercase"
-                >🗺️ 15+ Cartes</span
-              >
-              <span
-                class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-mono font-bold uppercase"
-                >💾 Sauvegarde Incluse</span
+                class="font-pixel text-xs font-bold text-amber-200 uppercase tracking-widest"
+                >SIMULATION COMBAT TACTIQUE CONTRE IA</span
               >
             </div>
-            <h3 class="text-xl sm:text-2xl font-black uppercase text-white tracking-wide">
-              Conquête Mondiale Solo
-            </h3>
-            <p class="text-xs sm:text-sm text-slate-300 max-w-lg leading-relaxed">
-              Affrontez jusqu'à 50 nations contrôlées par l'IA sur toutes les
-              cartes de la planète. Testez vos doctrines de combat et perfectionnez
-              votre art militaire en toute sérénité !
+            <p class="font-terminal text-xs text-[#8fa382] leading-tight">
+              Entraînement en conditions réelles sans connexion requise. 15+
+              théâtres opérationnels avec IA paramétrable.
             </p>
           </div>
           <button
             type="button"
-            @click=${this.openSinglePlayerModal}
-            class="relative z-10 group flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:via-sky-400 hover:to-indigo-500 text-white font-black text-base sm:text-xl uppercase tracking-widest shadow-[0_8px_32px_rgba(6,182,212,0.45)] hover:shadow-[0_12px_44px_rgba(6,182,212,0.65)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer overflow-hidden border border-cyan-200/40"
+            @click=${() => this.openSinglePlayerModal()}
+            class="retro-metal-btn relative z-10 flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg font-retro text-xs font-bold text-amber-200 hover:text-white uppercase tracking-wide whitespace-nowrap"
           >
-            <span class="text-2xl">⚔️</span>
-            <span class="tracking-widest">LANCER LA CONQUÊTE SOLO</span>
+            <span>🤖</span>
+            <span>LANCER LA SIMULATION SOLO</span>
           </button>
         </div>
       `;
@@ -1000,42 +1078,31 @@ export class GameModeSelector extends LitElement {
     // ranked tab
     return html`
       <div
-        class="relative flex flex-col justify-between overflow-hidden p-6 sm:p-8 h-56 sm:h-72 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border border-amber-500/30 shadow-xl"
+        class="relative flex flex-col justify-between overflow-hidden p-4 sm:p-5 h-44 sm:h-52 rounded-xl bg-[#121813] border-2 border-[#2b3a2d] shadow-2xl"
       >
         <div
-          class="absolute -right-10 -bottom-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"
+          class="crt-scanlines absolute inset-0 opacity-20 pointer-events-none"
         ></div>
-        <div class="relative z-10 flex flex-col gap-2">
-          <div class="flex items-center gap-2 flex-wrap">
+        <div class="relative z-10 flex flex-col gap-1.5">
+          <div class="flex items-center gap-2">
+            <span class="size-2 rounded-full led-amber-on"></span>
             <span
-              class="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] font-mono font-bold uppercase"
-              >🏆 Matchmaking ELO</span
-            >
-            <span
-              class="px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-400/40 text-orange-300 text-[10px] font-mono font-bold uppercase"
-              >🏅 Médailles de Guerre</span
-            >
-            <span
-              class="px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 text-[10px] font-mono font-bold uppercase"
-              >👑 Rang Suprême</span
+              class="font-pixel text-xs font-bold text-amber-300 uppercase tracking-widest"
+              >OPERATIONS CLASSES : LIGUE DE GUERRE</span
             >
           </div>
-          <h3 class="text-xl sm:text-2xl font-black uppercase text-white tracking-wide">
-            Arène de Compétition Classée
-          </h3>
-          <p class="text-xs sm:text-sm text-slate-300 max-w-lg leading-relaxed">
-            Mesurez votre sens stratégique contre les commandants les plus aguerris
-            de la planète. Gravissez les échelons du classement mondial et remportez
-            des récompenses saisonnières exclusives !
+          <p class="font-terminal text-xs text-[#8fa382] leading-tight">
+            Affrontez les meilleurs stratèges mondiaux. Gagnez des points de
+            doctrine et hissez votre drapeau au sommet.
           </p>
         </div>
         <button
           type="button"
           @click=${this.openRankedMenu}
-          class="relative z-10 group flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-base sm:text-xl uppercase tracking-widest shadow-[0_8px_32px_rgba(245,158,11,0.45)] hover:shadow-[0_12px_44px_rgba(245,158,11,0.65)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer overflow-hidden border border-amber-200/40"
+          class="retro-metal-btn relative z-10 flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg font-retro text-xs font-bold text-amber-200 hover:text-white uppercase tracking-wide whitespace-nowrap"
         >
-          <span class="text-2xl">🎯</span>
-          <span class="tracking-widest">ENTRER DANS L'ARÈNE CLASSÉE</span>
+          <span>🏆</span>
+          <span>ACCEDER AU FRONT COMPETITIF</span>
         </button>
       </div>
     `;

@@ -164,7 +164,9 @@ export class PrivilegeCheckerImpl implements PrivilegeChecker {
 
   isSkinAllowed(flares: string[], name: string): PlayerSkin {
     if (name.startsWith("custom_")) {
-      const safeId = name.replace("custom_", "").replace(/[^a-zA-Z0-9_-]/g, "_");
+      const safeId = name
+        .replace("custom_", "")
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
       return {
         name,
         url: `/static/skins/custom/skin_${safeId}.png`,

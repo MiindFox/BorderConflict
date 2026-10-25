@@ -1319,8 +1319,9 @@ export class PlayerPanel extends LitElement implements Controller {
                         </span>
                       </div>
                       <p class="text-[11.5px] text-zinc-300 leading-snug">
-                        Sélectionnez le montant de Capsules à placer sur sa tête.
-                        Le commandant qui le terrassera empochera la prime !
+                        Sélectionnez le montant de Capsules à placer sur sa
+                        tête. Le commandant qui le terrassera empochera la prime
+                        !
                       </p>
                       <div class="grid grid-cols-4 gap-1.5 mt-0.5">
                         ${[100, 250, 500, 1000].map(
@@ -1439,9 +1440,13 @@ export class PlayerPanel extends LitElement implements Controller {
               class="absolute inset-2 -z-10 rounded-2xl bg-black/25 backdrop-blur-[2px]"
             ></div>
             <div
-              class=${`relative w-full bg-zinc-900/95 rounded-2xl text-zinc-100 shadow-2xl shadow-black/50
-                 ${other.isTraitor() ? "traitor-ring" : "ring-1 ring-white/5"}`}
+              class=${`relative w-full bg-[#121813]/98 border-2 border-[#2b3a2d] rounded-2xl text-slate-100 shadow-2xl shadow-black/80 font-mono overflow-hidden
+                 ${other.isTraitor() ? "traitor-ring" : ""}`}
             >
+              <div class="crt-screw crt-screw-tl hidden sm:block"></div>
+              <div class="crt-screw crt-screw-tr hidden sm:block"></div>
+              <div class="crt-screw crt-screw-bl hidden sm:block"></div>
+              <div class="crt-screw crt-screw-br hidden sm:block"></div>
               <div class="overflow-visible">
                 <div
                   class="overflow-auto [-webkit-overflow-scrolling:touch] resize-y max-h-[calc(100vh-120px-env(safe-area-inset-bottom))]"
@@ -1449,7 +1454,7 @@ export class PlayerPanel extends LitElement implements Controller {
                   <div class="sticky top-0 z-20 flex justify-end p-2">
                     <button
                       @click=${this.handleClose}
-                      class="absolute right-3 top-3 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-700 text-white shadow-sm hover:bg-red-500 transition-colors"
+                      class="retro-metal-btn absolute right-3 top-3 z-20 flex h-7 w-7 items-center justify-center rounded-lg bg-[#18231a] text-slate-300 border border-[#2b3a2d] shadow-sm hover:text-red-400 hover:border-red-500 transition-colors font-mono font-bold"
                       aria-label=${translateText("common.close") || "Close"}
                       title=${translateText("common.close") || "Close"}
                     >

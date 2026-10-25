@@ -168,7 +168,11 @@ export class FlagAtlasArray {
       img.crossOrigin = "anonymous";
     }
     img.onerror = (e) => {
-      console.warn("Failed to load icon/flag/crown URL in FlagAtlasArray:", url, e);
+      console.warn(
+        "Failed to load icon/flag/crown URL in FlagAtlasArray:",
+        url,
+        e,
+      );
     };
     img.onload = () => {
       // Draw into a fixed-size cell to normalize the image to layer dimensions.
@@ -176,7 +180,7 @@ export class FlagAtlasArray {
       this.ctx.clearRect(0, 0, this.cellW, this.cellH);
       const srcW = img.naturalWidth || img.width || this.cellW;
       const srcH = img.naturalHeight || img.height || this.cellH;
-      const srcAspect = (srcW && srcH) ? (srcW / srcH) : 1;
+      const srcAspect = srcW && srcH ? srcW / srcH : 1;
       const dstAspect = this.cellW / this.cellH;
       let dw: number, dh: number;
       if (srcAspect > dstAspect) {

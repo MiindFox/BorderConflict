@@ -54,10 +54,15 @@ function encodePatternGrid(
 function svgDataUri(svgContent: string): string {
   let content = svgContent.trim();
   if (!content.includes('xmlns="http://www.w3.org/2000/svg"')) {
-    content = content.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
+    content = content.replace(
+      "<svg",
+      '<svg xmlns="http://www.w3.org/2000/svg"',
+    );
   }
   if (!content.includes("width=")) {
-    const vbMatch = content.match(/viewBox=["']\s*0\s+0\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s*["']/);
+    const vbMatch = content.match(
+      /viewBox=["']\s*0\s+0\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s*["']/,
+    );
     const w = vbMatch ? vbMatch[1] : "64";
     const h = vbMatch ? vbMatch[2] : "64";
     content = content.replace("<svg", `<svg width="${w}" height="${h}"`);
@@ -286,22 +291,19 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     name: "crosshair_grid",
     label: "Quadrillage de Visée",
     rarity: "common",
-    fn: (x, y) =>
-      (x % 8 === 0 && y % 2 === 0) || (y % 8 === 0 && x % 2 === 0),
+    fn: (x, y) => (x % 8 === 0 && y % 2 === 0) || (y % 8 === 0 && x % 2 === 0),
   },
   {
     name: "barbed_wire",
     label: "Barbelés de Frontière",
     rarity: "common",
-    fn: (x, y) =>
-      y % 8 === 4 || ((y % 8 === 3 || y % 8 === 5) && x % 4 === 2),
+    fn: (x, y) => y % 8 === 4 || ((y % 8 === 3 || y % 8 === 5) && x % 4 === 2),
   },
   {
     name: "sandbag_wall",
     label: "Mur de Sacs de Sable",
     rarity: "common",
-    fn: (x, y) =>
-      y % 4 === 0 || (x + (Math.floor(y / 4) % 2) * 4) % 8 === 0,
+    fn: (x, y) => y % 4 === 0 || (x + (Math.floor(y / 4) % 2) * 4) % 8 === 0,
   },
   {
     name: "tank_treads",
@@ -314,7 +316,11 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     name: "radar_sweep_grid",
     label: "Grille de Balayage",
     rarity: "common",
-    fn: (x, y) => x === 0 || y === 0 || (x === 8 && y % 2 === 0) || (y === 8 && x % 2 === 0),
+    fn: (x, y) =>
+      x === 0 ||
+      y === 0 ||
+      (x === 8 && y % 2 === 0) ||
+      (y === 8 && x % 2 === 0),
   },
   {
     name: "steel_mesh",
@@ -352,7 +358,7 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     label: "Tôle Larmée",
     rarity: "common",
     fn: (x, y) =>
-      ((x % 8 < 3 && y % 8 === 1) || (y % 8 >= 4 && y % 8 < 7 && x % 8 === 5)),
+      (x % 8 < 3 && y % 8 === 1) || (y % 8 >= 4 && y % 8 < 7 && x % 8 === 5),
   },
   {
     name: "picket_fence",
@@ -370,15 +376,13 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     name: "brick_fortress",
     label: "Maçonnerie de Fort",
     rarity: "common",
-    fn: (x, y) =>
-      y % 4 === 0 || ((x + (y >> 2) * 3) % 6 === 0),
+    fn: (x, y) => y % 4 === 0 || (x + (y >> 2) * 3) % 6 === 0,
   },
   {
     name: "sentry_posts",
     label: "Postes de Garde",
     rarity: "common",
-    fn: (x, y) =>
-      (x % 8 < 3 && y % 8 < 3) && !(x % 8 === 1 && y % 8 === 1),
+    fn: (x, y) => x % 8 < 3 && y % 8 < 3 && !(x % 8 === 1 && y % 8 === 1),
   },
 
   // ============================================================================
@@ -397,7 +401,11 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const u = x % 8;
       const v = y % 8;
-      return (u < 4 && v < 4) || (u >= 4 && v < 4 && u - 4 === v) || (u < 4 && v >= 4 && u === v - 4);
+      return (
+        (u < 4 && v < 4) ||
+        (u >= 4 && v < 4 && u - 4 === v) ||
+        (u < 4 && v >= 4 && u === v - 4)
+      );
     },
   },
   {
@@ -434,7 +442,9 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     label: "Portes de Citadelle",
     rarity: "uncommon",
     fn: (x, y) =>
-      x === 2 || x === 13 || (x >= 2 && x <= 13 && (y === 2 || (y >= 6 && y <= 15 && x % 3 === 0))),
+      x === 2 ||
+      x === 13 ||
+      (x >= 2 && x <= 13 && (y === 2 || (y >= 6 && y <= 15 && x % 3 === 0))),
   },
   {
     name: "chainlink_fence",
@@ -487,7 +497,9 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     rarity: "uncommon",
     fn: (x, y) => {
       const dx = Math.abs(x - 7.5);
-      return Math.abs(y - (3 + dx * 0.8)) < 1.2 || Math.abs(y - (8 + dx * 0.8)) < 1.2;
+      return (
+        Math.abs(y - (3 + dx * 0.8)) < 1.2 || Math.abs(y - (8 + dx * 0.8)) < 1.2
+      );
     },
   },
   {
@@ -519,7 +531,12 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     label: "Pont Métallique",
     rarity: "uncommon",
     fn: (x, y) =>
-      y === 0 || y === 7 || y === 8 || y === 15 || (x + y) % 8 === 0 || (x - y + 16) % 8 === 0,
+      y === 0 ||
+      y === 7 ||
+      y === 8 ||
+      y === 15 ||
+      (x + y) % 8 === 0 ||
+      (x - y + 16) % 8 === 0,
   },
   {
     name: "vault_locks",
@@ -527,7 +544,10 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     rarity: "uncommon",
     fn: (x, y) => {
       const b = Math.max(Math.abs(x - 7.5), Math.abs(y - 7.5));
-      return (b >= 4.5 && b <= 5.5) || (b <= 2.5 && (x === 7 || x === 8 || y === 7 || y === 8));
+      return (
+        (b >= 4.5 && b <= 5.5) ||
+        (b <= 2.5 && (x === 7 || x === 8 || y === 7 || y === 8))
+      );
     },
   },
   {
@@ -597,7 +617,10 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const dx = Math.abs(x - 7.5);
       const dy = Math.abs(y - 7.5);
-      return (dx <= dy && dy <= 6 && dx <= 2.5 && dy >= 1.5) || (dy <= dx && dx <= 6 && dy <= 2.5 && dx >= 1.5);
+      return (
+        (dx <= dy && dy <= 6 && dx <= 2.5 && dy >= 1.5) ||
+        (dy <= dx && dx <= 6 && dy <= 2.5 && dx >= 1.5)
+      );
     },
   },
   {
@@ -621,7 +644,11 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
       const dx = Math.abs(x - 7.5);
       return (
         (dx < 1.5 && y >= 3 && y <= 12) ||
-        (y >= 4 && y <= 9 && dx >= 2 && dx <= 6.5 && (y + Math.floor(dx)) % 2 === 0)
+        (y >= 4 &&
+          y <= 9 &&
+          dx >= 2 &&
+          dx <= 6.5 &&
+          (y + Math.floor(dx)) % 2 === 0)
       );
     },
   },
@@ -650,7 +677,11 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const dx = Math.abs(x - 7.5);
       const dy = Math.abs(y - 7.5);
-      return Math.abs(dx - dy) < 1.1 || (dx < 1 && dy < 6.5) || (dy === 4.5 && dx < 4.5);
+      return (
+        Math.abs(dx - dy) < 1.1 ||
+        (dx < 1 && dy < 6.5) ||
+        (dy === 4.5 && dx < 4.5)
+      );
     },
   },
   {
@@ -678,7 +709,11 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const dx = Math.abs(x - 7.5);
       const loop = Math.hypot(dx, y - 4.5);
-      return (loop >= 2 && loop <= 3.3) || (y === 8 && dx <= 4.5) || (y >= 8 && y <= 14 && dx < 1.2);
+      return (
+        (loop >= 2 && loop <= 3.3) ||
+        (y === 8 && dx <= 4.5) ||
+        (y >= 8 && y <= 14 && dx < 1.2)
+      );
     },
   },
   {
@@ -697,7 +732,14 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const u = x % 8;
       const v = y % 8;
-      return v === 0 || v === 7 || (u === 0 && v <= 5) || (v === 5 && u <= 5) || (u === 5 && v >= 2 && v <= 5) || (v === 2 && u >= 2 && u <= 5);
+      return (
+        v === 0 ||
+        v === 7 ||
+        (u === 0 && v <= 5) ||
+        (v === 5 && u <= 5) ||
+        (u === 5 && v >= 2 && v <= 5) ||
+        (v === 2 && u >= 2 && u <= 5)
+      );
     },
   },
   {
@@ -706,8 +748,10 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     rarity: "rare",
     fn: (x, y) => {
       const dx = Math.abs(x - 7.5);
-      const inShield = y >= 2 && y <= 13 && dx <= 6 - Math.max(0, (y - 7) * 0.8);
-      const border = y === 2 || Math.abs(dx - (6 - Math.max(0, (y - 7) * 0.8))) < 1.1;
+      const inShield =
+        y >= 2 && y <= 13 && dx <= 6 - Math.max(0, (y - 7) * 0.8);
+      const border =
+        y === 2 || Math.abs(dx - (6 - Math.max(0, (y - 7) * 0.8))) < 1.1;
       return inShield && (border || dx < 1.1 || y === 6);
     },
   },
@@ -726,7 +770,14 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     rarity: "rare",
     fn: (x, y) => {
       const dx = Math.abs(x - 7.5);
-      return (y >= 10 && y <= 12 && dx <= 5.5) || (y >= 4 && y <= 10 && (dx < 1 || Math.abs(dx - 5) < 1 || Math.abs(dx - (10 - y) * 0.7) < 0.9));
+      return (
+        (y >= 10 && y <= 12 && dx <= 5.5) ||
+        (y >= 4 &&
+          y <= 10 &&
+          (dx < 1 ||
+            Math.abs(dx - 5) < 1 ||
+            Math.abs(dx - (10 - y) * 0.7) < 0.9))
+      );
     },
   },
   {
@@ -736,7 +787,11 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const dx = Math.abs(x - 7.5);
       const dy = Math.abs(y - 7.5);
-      return (dx < 1.2 && dy < 6.5) || (dy < 1.2 && dx < 6.5) || (dx + dy < 5.5 && dx + dy > 3.5);
+      return (
+        (dx < 1.2 && dy < 6.5) ||
+        (dy < 1.2 && dx < 6.5) ||
+        (dx + dy < 5.5 && dx + dy > 3.5)
+      );
     },
   },
   {
@@ -794,7 +849,7 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     name: "matrix_rain",
     label: "Pluie Matricielle",
     rarity: "epic",
-    fn: (x, y) => x % 2 === 0 && ((y + x * 3) % 7 < 4) && ((y + x * 5) % 3 !== 0),
+    fn: (x, y) => x % 2 === 0 && (y + x * 3) % 7 < 4 && (y + x * 5) % 3 !== 0,
   },
   {
     name: "microchip_bus",
@@ -803,7 +858,10 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const b = Math.max(Math.abs(x - 7.5), Math.abs(y - 7.5));
       if (b <= 3.5) return b >= 2.5 || (x === 7 && y === 7);
-      return (x % 2 === 0 && (x === 6 || x === 8 || x === 10)) || (y % 2 === 0 && (y === 6 || y === 8 || y === 10));
+      return (
+        (x % 2 === 0 && (x === 6 || x === 8 || x === 10)) ||
+        (y % 2 === 0 && (y === 6 || y === 8 || y === 10))
+      );
     },
   },
   {
@@ -853,7 +911,12 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
       const u = (x % 8) - 3.5;
       const v = (y % 8) - 3.5;
       const d = Math.abs(u) + Math.abs(v);
-      return (d >= 2 && d <= 3) || (Math.abs(u) < 0.8 && Math.abs(v) < 0.8) || x % 8 === 0 || y % 8 === 0;
+      return (
+        (d >= 2 && d <= 3) ||
+        (Math.abs(u) < 0.8 && Math.abs(v) < 0.8) ||
+        x % 8 === 0 ||
+        y % 8 === 0
+      );
     },
   },
   {
@@ -863,7 +926,12 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const d1 = Math.hypot(x - 4, y - 4);
       const d2 = Math.hypot(x - 12, y - 12);
-      return d1 < 2.2 || d2 < 2.2 || Math.abs(x - y) < 1.1 || Math.abs(x + y - 16) < 1.1;
+      return (
+        d1 < 2.2 ||
+        d2 < 2.2 ||
+        Math.abs(x - y) < 1.1 ||
+        Math.abs(x + y - 16) < 1.1
+      );
     },
   },
   {
@@ -888,7 +956,11 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const ell = Math.hypot((x - 7.5) * 0.8, (y - 7.5) * 1.4);
       const ell2 = Math.hypot((x - 7.5) * 1.4, (y - 7.5) * 0.8);
-      return Math.abs(ell - 5) < 0.9 || Math.abs(ell2 - 5) < 0.9 || Math.hypot(x - 7.5, y - 7.5) < 1.5;
+      return (
+        Math.abs(ell - 5) < 0.9 ||
+        Math.abs(ell2 - 5) < 0.9 ||
+        Math.hypot(x - 7.5, y - 7.5) < 1.5
+      );
     },
   },
   {
@@ -905,7 +977,12 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     label: "Grille Synthwave",
     rarity: "epic",
     fn: (x, y) =>
-      y === 4 || y === 8 || y === 11 || y === 13 || y === 15 || Math.abs(x - 7.5) === Math.floor(y * 0.45),
+      y === 4 ||
+      y === 8 ||
+      y === 11 ||
+      y === 13 ||
+      y === 15 ||
+      Math.abs(x - 7.5) === Math.floor(y * 0.45),
   },
   {
     name: "biohazard_seal",
@@ -914,7 +991,10 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const d = Math.hypot(x - 7.5, y - 7.5);
       const a = Math.atan2(y - 7.5, x - 7.5);
-      return (d >= 2.2 && d <= 6.2 && Math.cos(a * 3) > 0.15) || (d >= 1.2 && d <= 2.0);
+      return (
+        (d >= 2.2 && d <= 6.2 && Math.cos(a * 3) > 0.15) ||
+        (d >= 1.2 && d <= 2.0)
+      );
     },
   },
   {
@@ -944,7 +1024,9 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const u = (x % 4) - 1.5;
       const v = (y % 4) - 1.5;
-      return Math.abs(u) + Math.abs(v) <= 1.5 && ((x >> 2) + (y >> 2)) % 2 === 0;
+      return (
+        Math.abs(u) + Math.abs(v) <= 1.5 && ((x >> 2) + (y >> 2)) % 2 === 0
+      );
     },
   },
   {
@@ -960,7 +1042,7 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     rarity: "epic",
     fn: (x, y) => {
       const d = Math.hypot(x - 7.5, y - 7.5);
-      return d >= 2.5 && d <= 6.5 && (Math.floor(d + (x + y) * 0.25) % 2 === 0);
+      return d >= 2.5 && d <= 6.5 && Math.floor(d + (x + y) * 0.25) % 2 === 0;
     },
   },
 
@@ -1070,7 +1152,11 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const b = Math.max(Math.abs(x - 7.5), Math.abs(y - 7.5));
       const diag = Math.abs(Math.abs(x - 7.5) - Math.abs(y - 7.5));
-      return Math.abs(b - 6.5) < 0.7 || Math.abs(b - 2.8) < 0.7 || (b >= 2.8 && b <= 6.5 && diag < 0.9);
+      return (
+        Math.abs(b - 6.5) < 0.7 ||
+        Math.abs(b - 2.8) < 0.7 ||
+        (b >= 2.8 && b <= 6.5 && diag < 0.9)
+      );
     },
   },
   {
@@ -1113,7 +1199,12 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
       const d = Math.hypot(x - 7.5, y - 7.5);
       const dx = Math.abs(x - 7.5);
       const dy = Math.abs(y - 7.5);
-      return (d >= 4.5 && d <= 5.8) || (dx + dy <= 3.2 && dx + dy >= 1.8) || (dx < 0.8 || dy < 0.8);
+      return (
+        (d >= 4.5 && d <= 5.8) ||
+        (dx + dy <= 3.2 && dx + dy >= 1.8) ||
+        dx < 0.8 ||
+        dy < 0.8
+      );
     },
   },
   {
@@ -1123,7 +1214,10 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     fn: (x, y) => {
       const dx = Math.abs(x - 7.5);
       const dy = Math.abs(y - 7.5);
-      return dy === 6.5 || (dy <= 6.5 && (Math.abs(dx - dy) < 1.1 || (dx < dy && y > 7)));
+      return (
+        dy === 6.5 ||
+        (dy <= 6.5 && (Math.abs(dx - dy) < 1.1 || (dx < dy && y > 7)))
+      );
     },
   },
   {
@@ -1139,7 +1233,11 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     rarity: "legendary",
     fn: (x, y) => {
       const dx = Math.abs(x - 7.5);
-      return (dx < 1.0 && y >= 1 && y <= 14) || Math.abs(dx - y * 0.45) < 1.0 || (y === 11 && dx <= 4);
+      return (
+        (dx < 1.0 && y >= 1 && y <= 14) ||
+        Math.abs(dx - y * 0.45) < 1.0 ||
+        (y === 11 && dx <= 4)
+      );
     },
   },
   {
@@ -1198,85 +1296,131 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     name: "hypercube_tesseract",
     label: "Tesseract Hypercube",
     rarity: "legendary",
-    fn: (x, y) => { const dx = Math.abs(x - 7.5); const dy = Math.abs(y - 7.5); return (dx <= 5 && dy <= 5 && (dx === 5 || dy === 5)) || (dx <= 2 && dy <= 2 && (dx === 2 || dy === 2)) || Math.abs(dx - dy) < 0.8; },
+    fn: (x, y) => {
+      const dx = Math.abs(x - 7.5);
+      const dy = Math.abs(y - 7.5);
+      return (
+        (dx <= 5 && dy <= 5 && (dx === 5 || dy === 5)) ||
+        (dx <= 2 && dy <= 2 && (dx === 2 || dy === 2)) ||
+        Math.abs(dx - dy) < 0.8
+      );
+    },
   },
   {
     name: "supernova_blast",
     label: "Souffle de Supernova",
     rarity: "legendary",
-    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); const a = Math.atan2(y - 7.5, x - 7.5); return d < 2.0 || Math.sin(a * 10 - d * 0.8) > 0.45; },
+    fn: (x, y) => {
+      const d = Math.hypot(x - 7.5, y - 7.5);
+      const a = Math.atan2(y - 7.5, x - 7.5);
+      return d < 2.0 || Math.sin(a * 10 - d * 0.8) > 0.45;
+    },
   },
   {
     name: "chono_warp_weave",
     label: "Tissage Chrono-Warp",
     rarity: "legendary",
-    fn: (x, y) => Math.sin(x * 0.9 + y * 0.4) * Math.cos(x * 0.4 - y * 0.9) > 0.25,
+    fn: (x, y) =>
+      Math.sin(x * 0.9 + y * 0.4) * Math.cos(x * 0.4 - y * 0.9) > 0.25,
   },
   {
     name: "quantum_fractal_tree",
     label: "Arbre Fractal Quantique",
     rarity: "legendary",
-    fn: (x, y) => ((x ^ y) % 5 === 0) || ((x + y * 3) % 7 === 0),
+    fn: (x, y) => (x ^ y) % 5 === 0 || (x + y * 3) % 7 === 0,
   },
   {
     name: "seraph_sacred_wings",
     label: "Ailes Séraphiques Sacrées",
     rarity: "legendary",
-    fn: (x, y) => { const dx = Math.abs(x - 7.5); return (dx < 1.2 && y >= 1) || Math.abs(y - (14 - dx * 1.2)) < 1.2 || (dx >= 3 && Math.abs(y - (10 - dx * 0.8)) < 1.0); },
+    fn: (x, y) => {
+      const dx = Math.abs(x - 7.5);
+      return (
+        (dx < 1.2 && y >= 1) ||
+        Math.abs(y - (14 - dx * 1.2)) < 1.2 ||
+        (dx >= 3 && Math.abs(y - (10 - dx * 0.8)) < 1.0)
+      );
+    },
   },
   {
     name: "singularity_accretion",
     label: "Disque d'Accrétion",
     rarity: "legendary",
-    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); return (d >= 2 && d <= 3.2) || (d >= 4.5 && d <= 5.8) || (d >= 6.8 && d <= 7.4); },
+    fn: (x, y) => {
+      const d = Math.hypot(x - 7.5, y - 7.5);
+      return (
+        (d >= 2 && d <= 3.2) || (d >= 4.5 && d <= 5.8) || (d >= 6.8 && d <= 7.4)
+      );
+    },
   },
   {
     name: "omega_monolith_seal",
     label: "Sceau du Monolithe Oméga",
     rarity: "legendary",
-    fn: (x, y) => { const dx = Math.abs(x - 7.5); return (dx <= 3 && y >= 3 && y <= 13) || (dx <= 6 && (y === 3 || y === 13)) || (dx === 6 && y >= 6 && y <= 10); },
+    fn: (x, y) => {
+      const dx = Math.abs(x - 7.5);
+      return (
+        (dx <= 3 && y >= 3 && y <= 13) ||
+        (dx <= 6 && (y === 3 || y === 13)) ||
+        (dx === 6 && y >= 6 && y <= 10)
+      );
+    },
   },
   {
     name: "valkyrie_runic_ring",
     label: "Rune Runique Valkyrie",
     rarity: "legendary",
-    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); const a = Math.atan2(y - 7.5, x - 7.5); return Math.abs(d - 5) < 1.2 && Math.cos(a * 8) > 0.1; },
+    fn: (x, y) => {
+      const d = Math.hypot(x - 7.5, y - 7.5);
+      const a = Math.atan2(y - 7.5, x - 7.5);
+      return Math.abs(d - 5) < 1.2 && Math.cos(a * 8) > 0.1;
+    },
   },
   {
     name: "stellar_constellation",
     label: "Constellation Cosmique",
     rarity: "legendary",
-    fn: (x, y) => (x % 4 === 1 && y % 4 === 1) || (Math.abs(x - y) === 3) || (x + y === 15),
+    fn: (x, y) =>
+      (x % 4 === 1 && y % 4 === 1) || Math.abs(x - y) === 3 || x + y === 15,
   },
   {
     name: "apex_predator_scales",
     label: "Écailles du Prédateur Apex",
     rarity: "legendary",
-    fn: (x, y) => { const u = (x + (y % 2) * 2) % 4; return u === 1 || u === 2; },
+    fn: (x, y) => {
+      const u = (x + (y % 2) * 2) % 4;
+      return u === 1 || u === 2;
+    },
   },
   {
     name: "plasma_lightning_grid",
     label: "Éclairs de Plasma",
     rarity: "epic",
-    fn: (x, y) => ((x * 3 + y * 7) % 11 < 3) || (Math.abs(x - 7.5) === Math.abs(y - 7.5)),
+    fn: (x, y) =>
+      (x * 3 + y * 7) % 11 < 3 || Math.abs(x - 7.5) === Math.abs(y - 7.5),
   },
   {
     name: "tachyon_circuit",
     label: "Circuit Tachyon",
     rarity: "epic",
-    fn: (x, y) => (x % 3 === 0 && y % 2 === 0) || (y % 6 === 0 && x >= 4 && x <= 12),
+    fn: (x, y) =>
+      (x % 3 === 0 && y % 2 === 0) || (y % 6 === 0 && x >= 4 && x <= 12),
   },
   {
     name: "hex_honeycomb_pulse",
     label: "Ruche Cybernétique",
     rarity: "epic",
-    fn: (x, y) => ((x + (y >> 1)) % 3 === 0 && y % 2 === 0) || (x % 3 === 0 && y % 2 === 1),
+    fn: (x, y) =>
+      ((x + (y >> 1)) % 3 === 0 && y % 2 === 0) || (x % 3 === 0 && y % 2 === 1),
   },
   {
     name: "vortex_maelstrom",
     label: "Maelström Océanique",
     rarity: "epic",
-    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); return Math.sin(d * 1.5 + Math.atan2(y - 7.5, x - 7.5) * 3) > 0.35; },
+    fn: (x, y) => {
+      const d = Math.hypot(x - 7.5, y - 7.5);
+      return Math.sin(d * 1.5 + Math.atan2(y - 7.5, x - 7.5) * 3) > 0.35;
+    },
   },
   {
     name: "titan_armor_plates",
@@ -1288,13 +1432,17 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     name: "solar_flare_loops",
     label: "Boucles Coronales",
     rarity: "epic",
-    fn: (x, y) => { const dx = x - 7.5; const dy = y - 7.5; return Math.abs(dx * dx + dy * dy - 25) < 7 && Math.abs(dx) > 1; },
+    fn: (x, y) => {
+      const dx = x - 7.5;
+      const dy = y - 7.5;
+      return Math.abs(dx * dx + dy * dy - 25) < 7 && Math.abs(dx) > 1;
+    },
   },
   {
     name: "void_interference",
     label: "Interférence du Néant",
     rarity: "epic",
-    fn: (x, y) => ((x * y) % 9 < 3) || ((x + y) % 7 === 0),
+    fn: (x, y) => (x * y) % 9 < 3 || (x + y) % 7 === 0,
   },
   {
     name: "bio_matrix_mesh",
@@ -1306,49 +1454,66 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     name: "cyber_hazard_cross",
     label: "Croix de Danger Cyber",
     rarity: "epic",
-    fn: (x, y) => { const dx = Math.abs(x - 7.5); const dy = Math.abs(y - 7.5); return (dx <= 6 && dy <= 2) || (dy <= 6 && dx <= 2); },
+    fn: (x, y) => {
+      const dx = Math.abs(x - 7.5);
+      const dy = Math.abs(y - 7.5);
+      return (dx <= 6 && dy <= 2) || (dy <= 6 && dx <= 2);
+    },
   },
   {
     name: "emp_core_rings",
     label: "Noyau IEM Résonant",
     rarity: "epic",
-    fn: (x, y) => { const d = Math.hypot(x - 7.5, y - 7.5); return Math.floor(d) === 2 || Math.floor(d) === 4 || Math.floor(d) === 6; },
+    fn: (x, y) => {
+      const d = Math.hypot(x - 7.5, y - 7.5);
+      return Math.floor(d) === 2 || Math.floor(d) === 4 || Math.floor(d) === 6;
+    },
   },
   {
     name: "radar_sweep_lines",
     label: "Balayage Radar",
     rarity: "rare",
-    fn: (x, y) => { const a = Math.atan2(y - 7.5, x - 7.5); return Math.abs(a - 0.7) < 0.25 || Math.hypot(x - 7.5, y - 7.5) === 5; },
+    fn: (x, y) => {
+      const a = Math.atan2(y - 7.5, x - 7.5);
+      return Math.abs(a - 0.7) < 0.25 || Math.hypot(x - 7.5, y - 7.5) === 5;
+    },
   },
   {
     name: "artillery_crosshairs",
     label: "Réticule d'Artillerie",
     rarity: "rare",
-    fn: (x, y) => x === 7 || y === 7 || Math.abs(Math.hypot(x - 7.5, y - 7.5) - 4) < 0.9,
+    fn: (x, y) =>
+      x === 7 || y === 7 || Math.abs(Math.hypot(x - 7.5, y - 7.5) - 4) < 0.9,
   },
   {
     name: "tactical_camo_digital",
     label: "Camouflage Digital",
     rarity: "rare",
-    fn: (x, y) => ((x >> 1) + (y >> 1)) % 3 === 0 || (x % 5 === 0 && y % 3 === 0),
+    fn: (x, y) =>
+      ((x >> 1) + (y >> 1)) % 3 === 0 || (x % 5 === 0 && y % 3 === 0),
   },
   {
     name: "reinforced_bulkhead",
     label: "Cloison Cuirassée",
     rarity: "rare",
-    fn: (x, y) => x === 3 || x === 12 || y === 3 || y === 12 || (x >= 4 && x <= 11 && y >= 4 && y <= 11 && (x === y || x === 15 - y)),
+    fn: (x, y) =>
+      x === 3 ||
+      x === 12 ||
+      y === 3 ||
+      y === 12 ||
+      (x >= 4 && x <= 11 && y >= 4 && y <= 11 && (x === y || x === 15 - y)),
   },
   {
     name: "supply_depot_grid",
     label: "Grille Logistique",
     rarity: "rare",
-    fn: (x, y) => (x % 3 === 0 || y % 3 === 0) && !((x % 6 === 0 && y % 6 === 0)),
+    fn: (x, y) => (x % 3 === 0 || y % 3 === 0) && !(x % 6 === 0 && y % 6 === 0),
   },
   {
     name: "energy_shield_lattice",
     label: "Réseau de Bouclier",
     rarity: "rare",
-    fn: (x, y) => (Math.abs(x - y) % 4 === 0) || ((x + y) % 4 === 0),
+    fn: (x, y) => Math.abs(x - y) % 4 === 0 || (x + y) % 4 === 0,
   },
   {
     name: "desert_sand_ripples",
@@ -1366,14 +1531,20 @@ const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
     name: "naval_anchor_pattern",
     label: "Motif d'Ancre Marine",
     rarity: "rare",
-    fn: (x, y) => (x === 7 && y >= 3 && y <= 12) || (y === 11 && Math.abs(x - 7.5) <= 4) || (y === 5 && Math.abs(x - 7.5) <= 3),
+    fn: (x, y) =>
+      (x === 7 && y >= 3 && y <= 12) ||
+      (y === 11 && Math.abs(x - 7.5) <= 4) ||
+      (y === 5 && Math.abs(x - 7.5) <= 3),
   },
   {
     name: "command_diamond_chevron",
     label: "Chevrons de Commandement",
     rarity: "rare",
-    fn: (x, y) => { const dx = Math.abs(x - 7.5); return Math.abs(y - dx) < 1.1 || Math.abs(y - (dx + 4)) < 1.1; },
-  }
+    fn: (x, y) => {
+      const dx = Math.abs(x - 7.5);
+      return Math.abs(y - dx) < 1.1 || Math.abs(y - (dx + 4)) < 1.1;
+    },
+  },
 ];
 
 interface CrownSpec {
@@ -2360,7 +2531,7 @@ const TWENTY_CROWN_SPECS: CrownSpec[] = [
     <rect x="6" y="50" width="52" height="6" rx="2" fill="#7c2d12" stroke="#ea580c" stroke-width="1.5"/>
   </g>
 </svg>`,
-  }
+  },
 ];
 
 interface FlagSpec {
@@ -2370,58 +2541,426 @@ interface FlagSpec {
   bg: string;
   accent: string;
   emblemColor: string;
-  shape: "hex" | "eagle" | "diamond" | "cross" | "sun" | "star" | "chevron" | "shield";
+  shape:
+    | "hex"
+    | "eagle"
+    | "diamond"
+    | "cross"
+    | "sun"
+    | "star"
+    | "chevron"
+    | "shield";
 }
 
 /**
  * 20 Custom Faction SVG Flags.
  */
 const TWENTY_FLAG_SPECS: FlagSpec[] = [
-  { name: "hexafront_command", label: "Commandement BorderConflict", rarity: "epic", bg: "#090d16", accent: "#22d3ee", emblemColor: "#6366f1", shape: "hex" },
-  { name: "imperial_phoenix", label: "Phénix Impérial", rarity: "legendary", bg: "#450a0a", accent: "#fbbf24", emblemColor: "#f43f5e", shape: "eagle" },
-  { name: "cyber_syndicate", label: "Syndicat Cybernétique", rarity: "rare", bg: "#022c22", accent: "#10b981", emblemColor: "#34d399", shape: "diamond" },
-  { name: "aegis_coalition", label: "Coalition Aegis", rarity: "common", bg: "#172554", accent: "#60a5fa", emblemColor: "#ffffff", shape: "shield" },
-  { name: "iron_vanguard", label: "Avant-Garde de Fer", rarity: "common", bg: "#1e293b", accent: "#94a3b8", emblemColor: "#f8fafc", shape: "chevron" },
-  { name: "crimson_legion", label: "Légion Écarlate", rarity: "uncommon", bg: "#3f0713", accent: "#f43f5e", emblemColor: "#fecdd3", shape: "cross" },
-  { name: "emerald_republic", label: "République d'Émeraude", rarity: "uncommon", bg: "#064e3b", accent: "#34d399", emblemColor: "#fef08a", shape: "star" },
-  { name: "solar_imperium", label: "Impérium Solaire", rarity: "rare", bg: "#431407", accent: "#fb923c", emblemColor: "#fde047", shape: "sun" },
-  { name: "arctic_directorate", label: "Directoire Arctique", rarity: "rare", bg: "#0f172a", accent: "#38bdf8", emblemColor: "#e0f2fe", shape: "hex" },
-  { name: "void_covenant", label: "Pacte du Néant", rarity: "epic", bg: "#1e1035", accent: "#c084fc", emblemColor: "#f472b6", shape: "diamond" },
-  { name: "toxic_brotherhood", label: "Confrérie Rad-Toxique", rarity: "rare", bg: "#1a2e05", accent: "#a3e635", emblemColor: "#ecfccb", shape: "sun" },
-  { name: "golden_hegemony", label: "Hégémonie Dorée", rarity: "legendary", bg: "#1e1b4b", accent: "#fbbf24", emblemColor: "#ffffff", shape: "star" },
-  { name: "obsidian_ops", label: "Division Obsidienne", rarity: "uncommon", bg: "#050505", accent: "#475569", emblemColor: "#22d3ee", shape: "chevron" },
-  { name: "sakura_shogunate", label: "Shogunat Sakura", rarity: "epic", bg: "#3b0764", accent: "#f472b6", emblemColor: "#fdf2f8", shape: "sun" },
-  { name: "desert_scorpions", label: "Scorpions du Désert", rarity: "common", bg: "#422006", accent: "#f59e0b", emblemColor: "#fef9c3", shape: "shield" },
-  { name: "abyssal_armada", label: "Armada Abyssale", rarity: "rare", bg: "#042f2e", accent: "#2dd4bf", emblemColor: "#ccfbf1", shape: "chevron" },
-  { name: "magma_forge", label: "Forge Magmatique", rarity: "epic", bg: "#270905", accent: "#f97316", emblemColor: "#fde047", shape: "hex" },
-  { name: "starlight_federation", label: "Fédération Stellaire", rarity: "epic", bg: "#090d16", accent: "#818cf8", emblemColor: "#e0e7ff", shape: "star" },
-  { name: "valkyrie_order", label: "Ordre des Valkyries", rarity: "legendary", bg: "#31102f", accent: "#fcd34d", emblemColor: "#f43f5e", shape: "eagle" },
-  { name: "omega_sovereignty", label: "Souveraineté Oméga", rarity: "legendary", bg: "#020617", accent: "#22d3ee", emblemColor: "#fbbf24", shape: "hex" },
-  { name: "stellar_imperium", label: "Imperium Stellaire", rarity: "legendary", bg: "#030712", accent: "#fbbf24", emblemColor: "#38bdf8", shape: "star" },
-  { name: "hyper_void_dominion", label: "Dominion du Néant Absolu", rarity: "legendary", bg: "#0f0728", accent: "#c084fc", emblemColor: "#f43f5e", shape: "hex" },
-  { name: "celestial_valkyries", label: "Légion Céleste", rarity: "legendary", bg: "#1e1b4b", accent: "#fde047", emblemColor: "#ffffff", shape: "eagle" },
-  { name: "solar_sovereignty", label: "Souveraineté Phénix", rarity: "legendary", bg: "#431407", accent: "#ea580c", emblemColor: "#fde047", shape: "sun" },
-  { name: "quantum_vanguard", label: "Avant-Garde Quantique", rarity: "legendary", bg: "#022c22", accent: "#22d3ee", emblemColor: "#34d399", shape: "diamond" },
-  { name: "apocalypse_legion", label: "Légion de l'Apocalypse", rarity: "legendary", bg: "#260505", accent: "#f43f5e", emblemColor: "#ffffff", shape: "cross" },
-  { name: "archangel_crusade", label: "Croisade des Archanges", rarity: "legendary", bg: "#1c1917", accent: "#fbbf24", emblemColor: "#e0f2fe", shape: "shield" },
-  { name: "cyber_dynasty", label: "Dynastie Cybernétique", rarity: "legendary", bg: "#030712", accent: "#06b6d4", emblemColor: "#ec4899", shape: "chevron" },
-  { name: "abyssal_leviathan", label: "Pacte du Léviathan", rarity: "legendary", bg: "#021c24", accent: "#14b8a6", emblemColor: "#67e8f9", shape: "hex" },
-  { name: "omega_order", label: "Ordre Souverain Oméga", rarity: "legendary", bg: "#090d16", accent: "#f59e0b", emblemColor: "#a855f7", shape: "star" },
-  { name: "vulcan_syndicate", label: "Syndicat de Vulcain", rarity: "epic", bg: "#2a0a05", accent: "#f97316", emblemColor: "#fde047", shape: "hex" },
-  { name: "aurora_covenant", label: "Pacte Boréal", rarity: "epic", bg: "#082f49", accent: "#38bdf8", emblemColor: "#a7f3d0", shape: "diamond" },
-  { name: "crimson_vanguard", label: "Avant-Garde Pourpre", rarity: "epic", bg: "#3f0713", accent: "#f43f5e", emblemColor: "#fecdd3", shape: "chevron" },
-  { name: "storm_federation", label: "Fédération des Tempêtes", rarity: "epic", bg: "#0f172a", accent: "#60a5fa", emblemColor: "#ffffff", shape: "cross" },
-  { name: "emerald_dominion", label: "Dominion d'Émeraude", rarity: "epic", bg: "#064e3b", accent: "#10b981", emblemColor: "#d1fae5", shape: "shield" },
-  { name: "obsidian_phantom", label: "Ordre de l'Obsidienne", rarity: "epic", bg: "#09090b", accent: "#71717a", emblemColor: "#e4e4e7", shape: "eagle" },
-  { name: "desert_nomads", label: "Union des Nomades", rarity: "rare", bg: "#451a03", accent: "#d97706", emblemColor: "#fef3c7", shape: "sun" },
-  { name: "glacier_front", label: "Front des Glaciers", rarity: "rare", bg: "#0c4a6e", accent: "#0284c7", emblemColor: "#e0f2fe", shape: "shield" },
-  { name: "toxic_rebellion", label: "Front Bio-Rebelle", rarity: "rare", bg: "#14532d", accent: "#84cc16", emblemColor: "#d9f99d", shape: "diamond" },
-  { name: "plasma_syndicate", label: "Syndicat Plasma", rarity: "rare", bg: "#4c0519", accent: "#db2777", emblemColor: "#fbcfe8", shape: "chevron" },
-  { name: "iron_coalition", label: "Coalition du Fer", rarity: "rare", bg: "#1e293b", accent: "#64748b", emblemColor: "#f1f5f9", shape: "cross" },
-  { name: "frontier_scouts", label: "Éclaireurs de Frontière", rarity: "uncommon", bg: "#1c1917", accent: "#78716c", emblemColor: "#e7e5e4", shape: "chevron" },
-  { name: "coastal_guard", label: "Garde Côtière", rarity: "uncommon", bg: "#172554", accent: "#3b82f6", emblemColor: "#bfdbfe", shape: "shield" },
-  { name: "militia_corps", label: "Corps des Milices", rarity: "uncommon", bg: "#1e1b4b", accent: "#6366f1", emblemColor: "#c7d2fe", shape: "diamond" },
-  { name: "dust_patrol", label: "Patrouille des Sables", rarity: "uncommon", bg: "#292524", accent: "#b45309", emblemColor: "#fed7aa", shape: "star" }
+  {
+    name: "hexafront_command",
+    label: "Commandement BorderConflict",
+    rarity: "epic",
+    bg: "#090d16",
+    accent: "#22d3ee",
+    emblemColor: "#6366f1",
+    shape: "hex",
+  },
+  {
+    name: "imperial_phoenix",
+    label: "Phénix Impérial",
+    rarity: "legendary",
+    bg: "#450a0a",
+    accent: "#fbbf24",
+    emblemColor: "#f43f5e",
+    shape: "eagle",
+  },
+  {
+    name: "cyber_syndicate",
+    label: "Syndicat Cybernétique",
+    rarity: "rare",
+    bg: "#022c22",
+    accent: "#10b981",
+    emblemColor: "#34d399",
+    shape: "diamond",
+  },
+  {
+    name: "aegis_coalition",
+    label: "Coalition Aegis",
+    rarity: "common",
+    bg: "#172554",
+    accent: "#60a5fa",
+    emblemColor: "#ffffff",
+    shape: "shield",
+  },
+  {
+    name: "iron_vanguard",
+    label: "Avant-Garde de Fer",
+    rarity: "common",
+    bg: "#1e293b",
+    accent: "#94a3b8",
+    emblemColor: "#f8fafc",
+    shape: "chevron",
+  },
+  {
+    name: "crimson_legion",
+    label: "Légion Écarlate",
+    rarity: "uncommon",
+    bg: "#3f0713",
+    accent: "#f43f5e",
+    emblemColor: "#fecdd3",
+    shape: "cross",
+  },
+  {
+    name: "emerald_republic",
+    label: "République d'Émeraude",
+    rarity: "uncommon",
+    bg: "#064e3b",
+    accent: "#34d399",
+    emblemColor: "#fef08a",
+    shape: "star",
+  },
+  {
+    name: "solar_imperium",
+    label: "Impérium Solaire",
+    rarity: "rare",
+    bg: "#431407",
+    accent: "#fb923c",
+    emblemColor: "#fde047",
+    shape: "sun",
+  },
+  {
+    name: "arctic_directorate",
+    label: "Directoire Arctique",
+    rarity: "rare",
+    bg: "#0f172a",
+    accent: "#38bdf8",
+    emblemColor: "#e0f2fe",
+    shape: "hex",
+  },
+  {
+    name: "void_covenant",
+    label: "Pacte du Néant",
+    rarity: "epic",
+    bg: "#1e1035",
+    accent: "#c084fc",
+    emblemColor: "#f472b6",
+    shape: "diamond",
+  },
+  {
+    name: "toxic_brotherhood",
+    label: "Confrérie Rad-Toxique",
+    rarity: "rare",
+    bg: "#1a2e05",
+    accent: "#a3e635",
+    emblemColor: "#ecfccb",
+    shape: "sun",
+  },
+  {
+    name: "golden_hegemony",
+    label: "Hégémonie Dorée",
+    rarity: "legendary",
+    bg: "#1e1b4b",
+    accent: "#fbbf24",
+    emblemColor: "#ffffff",
+    shape: "star",
+  },
+  {
+    name: "obsidian_ops",
+    label: "Division Obsidienne",
+    rarity: "uncommon",
+    bg: "#050505",
+    accent: "#475569",
+    emblemColor: "#22d3ee",
+    shape: "chevron",
+  },
+  {
+    name: "sakura_shogunate",
+    label: "Shogunat Sakura",
+    rarity: "epic",
+    bg: "#3b0764",
+    accent: "#f472b6",
+    emblemColor: "#fdf2f8",
+    shape: "sun",
+  },
+  {
+    name: "desert_scorpions",
+    label: "Scorpions du Désert",
+    rarity: "common",
+    bg: "#422006",
+    accent: "#f59e0b",
+    emblemColor: "#fef9c3",
+    shape: "shield",
+  },
+  {
+    name: "abyssal_armada",
+    label: "Armada Abyssale",
+    rarity: "rare",
+    bg: "#042f2e",
+    accent: "#2dd4bf",
+    emblemColor: "#ccfbf1",
+    shape: "chevron",
+  },
+  {
+    name: "magma_forge",
+    label: "Forge Magmatique",
+    rarity: "epic",
+    bg: "#270905",
+    accent: "#f97316",
+    emblemColor: "#fde047",
+    shape: "hex",
+  },
+  {
+    name: "starlight_federation",
+    label: "Fédération Stellaire",
+    rarity: "epic",
+    bg: "#090d16",
+    accent: "#818cf8",
+    emblemColor: "#e0e7ff",
+    shape: "star",
+  },
+  {
+    name: "valkyrie_order",
+    label: "Ordre des Valkyries",
+    rarity: "legendary",
+    bg: "#31102f",
+    accent: "#fcd34d",
+    emblemColor: "#f43f5e",
+    shape: "eagle",
+  },
+  {
+    name: "omega_sovereignty",
+    label: "Souveraineté Oméga",
+    rarity: "legendary",
+    bg: "#020617",
+    accent: "#22d3ee",
+    emblemColor: "#fbbf24",
+    shape: "hex",
+  },
+  {
+    name: "stellar_imperium",
+    label: "Imperium Stellaire",
+    rarity: "legendary",
+    bg: "#030712",
+    accent: "#fbbf24",
+    emblemColor: "#38bdf8",
+    shape: "star",
+  },
+  {
+    name: "hyper_void_dominion",
+    label: "Dominion du Néant Absolu",
+    rarity: "legendary",
+    bg: "#0f0728",
+    accent: "#c084fc",
+    emblemColor: "#f43f5e",
+    shape: "hex",
+  },
+  {
+    name: "celestial_valkyries",
+    label: "Légion Céleste",
+    rarity: "legendary",
+    bg: "#1e1b4b",
+    accent: "#fde047",
+    emblemColor: "#ffffff",
+    shape: "eagle",
+  },
+  {
+    name: "solar_sovereignty",
+    label: "Souveraineté Phénix",
+    rarity: "legendary",
+    bg: "#431407",
+    accent: "#ea580c",
+    emblemColor: "#fde047",
+    shape: "sun",
+  },
+  {
+    name: "quantum_vanguard",
+    label: "Avant-Garde Quantique",
+    rarity: "legendary",
+    bg: "#022c22",
+    accent: "#22d3ee",
+    emblemColor: "#34d399",
+    shape: "diamond",
+  },
+  {
+    name: "apocalypse_legion",
+    label: "Légion de l'Apocalypse",
+    rarity: "legendary",
+    bg: "#260505",
+    accent: "#f43f5e",
+    emblemColor: "#ffffff",
+    shape: "cross",
+  },
+  {
+    name: "archangel_crusade",
+    label: "Croisade des Archanges",
+    rarity: "legendary",
+    bg: "#1c1917",
+    accent: "#fbbf24",
+    emblemColor: "#e0f2fe",
+    shape: "shield",
+  },
+  {
+    name: "cyber_dynasty",
+    label: "Dynastie Cybernétique",
+    rarity: "legendary",
+    bg: "#030712",
+    accent: "#06b6d4",
+    emblemColor: "#ec4899",
+    shape: "chevron",
+  },
+  {
+    name: "abyssal_leviathan",
+    label: "Pacte du Léviathan",
+    rarity: "legendary",
+    bg: "#021c24",
+    accent: "#14b8a6",
+    emblemColor: "#67e8f9",
+    shape: "hex",
+  },
+  {
+    name: "omega_order",
+    label: "Ordre Souverain Oméga",
+    rarity: "legendary",
+    bg: "#090d16",
+    accent: "#f59e0b",
+    emblemColor: "#a855f7",
+    shape: "star",
+  },
+  {
+    name: "vulcan_syndicate",
+    label: "Syndicat de Vulcain",
+    rarity: "epic",
+    bg: "#2a0a05",
+    accent: "#f97316",
+    emblemColor: "#fde047",
+    shape: "hex",
+  },
+  {
+    name: "aurora_covenant",
+    label: "Pacte Boréal",
+    rarity: "epic",
+    bg: "#082f49",
+    accent: "#38bdf8",
+    emblemColor: "#a7f3d0",
+    shape: "diamond",
+  },
+  {
+    name: "crimson_vanguard",
+    label: "Avant-Garde Pourpre",
+    rarity: "epic",
+    bg: "#3f0713",
+    accent: "#f43f5e",
+    emblemColor: "#fecdd3",
+    shape: "chevron",
+  },
+  {
+    name: "storm_federation",
+    label: "Fédération des Tempêtes",
+    rarity: "epic",
+    bg: "#0f172a",
+    accent: "#60a5fa",
+    emblemColor: "#ffffff",
+    shape: "cross",
+  },
+  {
+    name: "emerald_dominion",
+    label: "Dominion d'Émeraude",
+    rarity: "epic",
+    bg: "#064e3b",
+    accent: "#10b981",
+    emblemColor: "#d1fae5",
+    shape: "shield",
+  },
+  {
+    name: "obsidian_phantom",
+    label: "Ordre de l'Obsidienne",
+    rarity: "epic",
+    bg: "#09090b",
+    accent: "#71717a",
+    emblemColor: "#e4e4e7",
+    shape: "eagle",
+  },
+  {
+    name: "desert_nomads",
+    label: "Union des Nomades",
+    rarity: "rare",
+    bg: "#451a03",
+    accent: "#d97706",
+    emblemColor: "#fef3c7",
+    shape: "sun",
+  },
+  {
+    name: "glacier_front",
+    label: "Front des Glaciers",
+    rarity: "rare",
+    bg: "#0c4a6e",
+    accent: "#0284c7",
+    emblemColor: "#e0f2fe",
+    shape: "shield",
+  },
+  {
+    name: "toxic_rebellion",
+    label: "Front Bio-Rebelle",
+    rarity: "rare",
+    bg: "#14532d",
+    accent: "#84cc16",
+    emblemColor: "#d9f99d",
+    shape: "diamond",
+  },
+  {
+    name: "plasma_syndicate",
+    label: "Syndicat Plasma",
+    rarity: "rare",
+    bg: "#4c0519",
+    accent: "#db2777",
+    emblemColor: "#fbcfe8",
+    shape: "chevron",
+  },
+  {
+    name: "iron_coalition",
+    label: "Coalition du Fer",
+    rarity: "rare",
+    bg: "#1e293b",
+    accent: "#64748b",
+    emblemColor: "#f1f5f9",
+    shape: "cross",
+  },
+  {
+    name: "frontier_scouts",
+    label: "Éclaireurs de Frontière",
+    rarity: "uncommon",
+    bg: "#1c1917",
+    accent: "#78716c",
+    emblemColor: "#e7e5e4",
+    shape: "chevron",
+  },
+  {
+    name: "coastal_guard",
+    label: "Garde Côtière",
+    rarity: "uncommon",
+    bg: "#172554",
+    accent: "#3b82f6",
+    emblemColor: "#bfdbfe",
+    shape: "shield",
+  },
+  {
+    name: "militia_corps",
+    label: "Corps des Milices",
+    rarity: "uncommon",
+    bg: "#1e1b4b",
+    accent: "#6366f1",
+    emblemColor: "#c7d2fe",
+    shape: "diamond",
+  },
+  {
+    name: "dust_patrol",
+    label: "Patrouille des Sables",
+    rarity: "uncommon",
+    bg: "#292524",
+    accent: "#b45309",
+    emblemColor: "#fed7aa",
+    shape: "star",
+  },
 ];
 
 function renderFactionFlagSvg(spec: FlagSpec): string {
@@ -3453,8 +3992,16 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 240,
       rarity: "common",
       items: [
-        { type: "pattern", name: "hazard_stripes", colorPalette: "emerald_matrix" },
-        { type: "pattern", name: "tank_treads", colorPalette: "stealth_obsidian" },
+        {
+          type: "pattern",
+          name: "hazard_stripes",
+          colorPalette: "emerald_matrix",
+        },
+        {
+          type: "pattern",
+          name: "tank_treads",
+          colorPalette: "stealth_obsidian",
+        },
         { type: "crown", name: "iron_circlet" },
         { type: "effect", name: "emerald_foam" },
         { type: "effect", name: "golden_imperial_rails" },
@@ -3468,8 +4015,16 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 380,
       rarity: "uncommon",
       items: [
-        { type: "pattern", name: "bunker_weave", colorPalette: "titanium_ghost" },
-        { type: "pattern", name: "industrial_gears", colorPalette: "copper_automaton" },
+        {
+          type: "pattern",
+          name: "bunker_weave",
+          colorPalette: "titanium_ghost",
+        },
+        {
+          type: "pattern",
+          name: "industrial_gears",
+          colorPalette: "copper_automaton",
+        },
         { type: "crown", name: "steel_battlement" },
         { type: "effect", name: "emerald_matrix_structures" },
         { type: "effect", name: "emerald_supply_train" },
@@ -3483,7 +4038,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 620,
       rarity: "rare",
       items: [
-        { type: "pattern", name: "cryo_crystals", colorPalette: "arctic_frost" },
+        {
+          type: "pattern",
+          name: "cryo_crystals",
+          colorPalette: "arctic_frost",
+        },
         { type: "crown", name: "frost_monarch" },
         { type: "flag", name: "arctic_directorate" },
         { type: "effect", name: "arctic_wolf_warship" },
@@ -3514,7 +4073,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       rarity: "rare",
       items: [
         { type: "pattern", name: "biohazard_seal", colorPalette: "toxic_rad" },
-        { type: "pattern", name: "radiation_trefoil", colorPalette: "bio_luminescence" },
+        {
+          type: "pattern",
+          name: "radiation_trefoil",
+          colorPalette: "bio_luminescence",
+        },
         { type: "crown", name: "toxic_overlord" },
         { type: "flag", name: "toxic_brotherhood" },
         { type: "effect", name: "uranium_helix_trail" },
@@ -3529,8 +4092,16 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 750,
       rarity: "rare",
       items: [
-        { type: "pattern", name: "spartan_lambda", colorPalette: "crimson_empire" },
-        { type: "pattern", name: "templar_shield", colorPalette: "golden_sovereign" },
+        {
+          type: "pattern",
+          name: "spartan_lambda",
+          colorPalette: "crimson_empire",
+        },
+        {
+          type: "pattern",
+          name: "templar_shield",
+          colorPalette: "golden_sovereign",
+        },
         { type: "crown", name: "imperial_laurel" },
         { type: "flag", name: "crimson_legion" },
         { type: "effect", name: "crimson_nova_atom" },
@@ -3545,7 +4116,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       rarity: "epic",
       items: [
         { type: "pattern", name: "shogun_crest", colorPalette: "sakura_ronin" },
-        { type: "pattern", name: "synth_perspective", colorPalette: "synthwave_sunset" },
+        {
+          type: "pattern",
+          name: "synth_perspective",
+          colorPalette: "synthwave_sunset",
+        },
         { type: "crown", name: "plasma_valkyrie" },
         { type: "flag", name: "sakura_shogunate" },
         { type: "effect", name: "synthwave_beam_trail" },
@@ -3560,7 +4135,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       rarity: "epic",
       items: [
         { type: "pattern", name: "cyber_circuit", colorPalette: "cyber_neon" },
-        { type: "pattern", name: "quantum_qubits", colorPalette: "starlight_aegis" },
+        {
+          type: "pattern",
+          name: "quantum_qubits",
+          colorPalette: "starlight_aegis",
+        },
         { type: "effect", name: "neon_hologram_structures" },
         { type: "effect", name: "neon_energy_rails" },
         { type: "effect", name: "cyber_sparkles_atom" },
@@ -3575,8 +4154,16 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 1280,
       rarity: "epic",
       items: [
-        { type: "pattern", name: "radar_waves", colorPalette: "crimson_empire" },
-        { type: "pattern", name: "iron_eagle_wings", colorPalette: "blood_moon" },
+        {
+          type: "pattern",
+          name: "radar_waves",
+          colorPalette: "crimson_empire",
+        },
+        {
+          type: "pattern",
+          name: "iron_eagle_wings",
+          colorPalette: "blood_moon",
+        },
         { type: "effect", name: "apocalypse_helix_red" },
         { type: "effect", name: "crimson_fleet_warship" },
         { type: "effect", name: "crimson_cataclysm_hydro" },
@@ -3592,7 +4179,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       rarity: "epic",
       items: [
         { type: "pattern", name: "pharaoh_ankh", colorPalette: "solar_flare" },
-        { type: "pattern", name: "celestial_sunburst", colorPalette: "desert_storm" },
+        {
+          type: "pattern",
+          name: "celestial_sunburst",
+          colorPalette: "desert_storm",
+        },
         { type: "crown", name: "solar_pharaoh" },
         { type: "flag", name: "solar_imperium" },
         { type: "effect", name: "solar_monarch_hydro" },
@@ -3607,8 +4198,16 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 1680,
       rarity: "legendary",
       items: [
-        { type: "pattern", name: "black_hole_vortex", colorPalette: "void_amethyst" },
-        { type: "pattern", name: "hypercube_tesseract", colorPalette: "plasma_violet" },
+        {
+          type: "pattern",
+          name: "black_hole_vortex",
+          colorPalette: "void_amethyst",
+        },
+        {
+          type: "pattern",
+          name: "hypercube_tesseract",
+          colorPalette: "plasma_violet",
+        },
         { type: "crown", name: "void_archon" },
         { type: "flag", name: "void_covenant" },
         { type: "effect", name: "void_dreadnought_warship" },
@@ -3623,8 +4222,16 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 1900,
       rarity: "legendary",
       items: [
-        { type: "pattern", name: "dragon_scales_mythic", colorPalette: "magma_core" },
-        { type: "pattern", name: "phoenix_ascension", colorPalette: "crimson_empire" },
+        {
+          type: "pattern",
+          name: "dragon_scales_mythic",
+          colorPalette: "magma_core",
+        },
+        {
+          type: "pattern",
+          name: "phoenix_ascension",
+          colorPalette: "crimson_empire",
+        },
         { type: "crown", name: "dragon_sovereign" },
         { type: "flag", name: "magma_forge" },
         { type: "effect", name: "golden_rain_mirv" },
@@ -3638,8 +4245,16 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 2100,
       rarity: "legendary",
       items: [
-        { type: "pattern", name: "nova_star", colorPalette: "golden_sovereign" },
-        { type: "pattern", name: "sovereign_labyrinth", colorPalette: "royal_velvet" },
+        {
+          type: "pattern",
+          name: "nova_star",
+          colorPalette: "golden_sovereign",
+        },
+        {
+          type: "pattern",
+          name: "sovereign_labyrinth",
+          colorPalette: "royal_velvet",
+        },
         { type: "effect", name: "imperial_gold_structures" },
         { type: "effect", name: "golden_armada_warship" },
         { type: "effect", name: "golden_sovereign_train" },
@@ -3655,7 +4270,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 2450,
       rarity: "legendary",
       items: [
-        { type: "pattern", name: "quantum_maze", colorPalette: "void_amethyst" },
+        {
+          type: "pattern",
+          name: "quantum_maze",
+          colorPalette: "void_amethyst",
+        },
         { type: "pattern", name: "galaxy_spiral", colorPalette: "cyber_neon" },
         { type: "effect", name: "quantum_spiral_cyan" },
         { type: "effect", name: "supernova_shockwave_hydro" },
@@ -3671,8 +4290,16 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
       priceHard: 2900,
       rarity: "legendary",
       items: [
-        { type: "pattern", name: "hexafront_apotheosis", colorPalette: "cyber_neon" },
-        { type: "pattern", name: "sacred_mandala", colorPalette: "golden_sovereign" },
+        {
+          type: "pattern",
+          name: "hexafront_apotheosis",
+          colorPalette: "cyber_neon",
+        },
+        {
+          type: "pattern",
+          name: "sacred_mandala",
+          colorPalette: "golden_sovereign",
+        },
         { type: "crown", name: "hexafront_supreme_crown" },
         { type: "flag", name: "omega_sovereignty" },
         { type: "effect", name: "omega_astral_structures" },
@@ -3683,7 +4310,7 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     },
   };
 
-    // ==========================================================================
+  // ==========================================================================
   // 25 EXPANDED NEW SPECIAL EFFECTS
   // ==========================================================================
   addEffect("Sillage Nova Lumineux", {
@@ -3694,16 +4321,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 5800,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#fbbf24",
-            "#f43f5e",
-            "#a855f7",
-            "#ffffff"
-      ],
-      "colorSize": 4,
-      "movementSpeed": 16
-} as any,
+      type: "gradient",
+      colors: ["#fbbf24", "#f43f5e", "#a855f7", "#ffffff"],
+      colorSize: 4,
+      movementSpeed: 16,
+    } as any,
   });
 
   addEffect("Sillage Tempête IEM", {
@@ -3714,15 +4336,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3500,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#38bdf8",
-            "#818cf8",
-            "#c084fc"
-      ],
-      "colorSize": 5,
-      "movementSpeed": 14
-} as any,
+      type: "gradient",
+      colors: ["#38bdf8", "#818cf8", "#c084fc"],
+      colorSize: 5,
+      movementSpeed: 14,
+    } as any,
   });
 
   addEffect("Sillage Brasier Magmatique", {
@@ -3733,15 +4351,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3200,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#ea580c",
-            "#dc2626",
-            "#fef08a"
-      ],
-      "colorSize": 5,
-      "movementSpeed": 11
-} as any,
+      type: "gradient",
+      colors: ["#ea580c", "#dc2626", "#fef08a"],
+      colorSize: 5,
+      movementSpeed: 11,
+    } as any,
   });
 
   addEffect("Sillage Bio-Corrosion", {
@@ -3752,14 +4366,10 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 2400,
     product: null,
     attributes: {
-      "type": "transition",
-      "colors": [
-            "#84cc16",
-            "#15803d",
-            "#a3e635"
-      ],
-      "frequency": 3.5
-} as any,
+      type: "transition",
+      colors: ["#84cc16", "#15803d", "#a3e635"],
+      frequency: 3.5,
+    } as any,
   });
 
   addEffect("Sillage Furtif Ombre", {
@@ -3770,15 +4380,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 2200,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#0f172a",
-            "#334155",
-            "#64748b"
-      ],
-      "colorSize": 6,
-      "movementSpeed": 8
-} as any,
+      type: "gradient",
+      colors: ["#0f172a", "#334155", "#64748b"],
+      colorSize: 6,
+      movementSpeed: 8,
+    } as any,
   });
 
   addEffect("Traînée Rayonnement Oméga", {
@@ -3789,16 +4395,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 5800,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#fbbf24",
-            "#22d3ee",
-            "#c084fc",
-            "#ffffff"
-      ],
-      "colorSize": 3,
-      "movementSpeed": 18
-} as any,
+      type: "gradient",
+      colors: ["#fbbf24", "#22d3ee", "#c084fc", "#ffffff"],
+      colorSize: 3,
+      movementSpeed: 18,
+    } as any,
   });
 
   addEffect("Traînée Feu de l'Enfer", {
@@ -3809,15 +4410,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3600,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#dc2626",
-            "#f97316",
-            "#fef08a"
-      ],
-      "colorSize": 4,
-      "movementSpeed": 15
-} as any,
+      type: "gradient",
+      colors: ["#dc2626", "#f97316", "#fef08a"],
+      colorSize: 4,
+      movementSpeed: 15,
+    } as any,
   });
 
   addEffect("Traînée Foudre d'Arc", {
@@ -3828,14 +4425,10 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3400,
     product: null,
     attributes: {
-      "type": "transition",
-      "colors": [
-            "#38bdf8",
-            "#e0f2fe",
-            "#818cf8"
-      ],
-      "frequency": 5
-} as any,
+      type: "transition",
+      colors: ["#38bdf8", "#e0f2fe", "#818cf8"],
+      frequency: 5,
+    } as any,
   });
 
   addEffect("Traînée Émeraude Fission", {
@@ -3846,15 +4439,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 2500,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#10b981",
-            "#059669",
-            "#6ee7b7"
-      ],
-      "colorSize": 5,
-      "movementSpeed": 12
-} as any,
+      type: "gradient",
+      colors: ["#10b981", "#059669", "#6ee7b7"],
+      colorSize: 5,
+      movementSpeed: 12,
+    } as any,
   });
 
   addEffect("Traînée Cryo-Comète", {
@@ -3865,15 +4454,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 2500,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#0284c7",
-            "#38bdf8",
-            "#ffffff"
-      ],
-      "colorSize": 5,
-      "movementSpeed": 12
-} as any,
+      type: "gradient",
+      colors: ["#0284c7", "#38bdf8", "#ffffff"],
+      colorSize: 5,
+      movementSpeed: 12,
+    } as any,
   });
 
   addEffect("Dôme Anti-Matière", {
@@ -3884,19 +4469,14 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 6500,
     product: null,
     attributes: {
-      "type": "shockwave",
-      "nukeType": "hydro",
-      "colors": [
-            "#a855f7",
-            "#ec4899",
-            "#22d3ee",
-            "#ffffff"
-      ],
-      "size": 45,
-      "speed": 50,
-      "thickness": 4,
-      "transitionSpeed": 4
-} as any,
+      type: "shockwave",
+      nukeType: "hydro",
+      colors: ["#a855f7", "#ec4899", "#22d3ee", "#ffffff"],
+      size: 45,
+      speed: 50,
+      thickness: 4,
+      transitionSpeed: 4,
+    } as any,
   });
 
   addEffect("Éruption Stellaire Dorée", {
@@ -3907,19 +4487,15 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 6500,
     product: null,
     attributes: {
-      "type": "sparkles",
-      "nukeType": "atom",
-      "colors": [
-            "#f59e0b",
-            "#fde047",
-            "#ffffff"
-      ],
-      "size": 42,
-      "speed": 48,
-      "thickness": 3.5,
-      "transitionSpeed": 4,
-      "density": 95
-} as any,
+      type: "sparkles",
+      nukeType: "atom",
+      colors: ["#f59e0b", "#fde047", "#ffffff"],
+      size: 42,
+      speed: 48,
+      thickness: 3.5,
+      transitionSpeed: 4,
+      density: 95,
+    } as any,
   });
 
   addEffect("Cataclysme Toxique", {
@@ -3930,18 +4506,14 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3900,
     product: null,
     attributes: {
-      "type": "shockwave",
-      "nukeType": "atom",
-      "colors": [
-            "#65a30d",
-            "#14532d",
-            "#d9f99d"
-      ],
-      "size": 36,
-      "speed": 40,
-      "thickness": 3,
-      "transitionSpeed": 3
-} as any,
+      type: "shockwave",
+      nukeType: "atom",
+      colors: ["#65a30d", "#14532d", "#d9f99d"],
+      size: 36,
+      speed: 40,
+      thickness: 3,
+      transitionSpeed: 3,
+    } as any,
   });
 
   addEffect("Souffle Cyan IEM", {
@@ -3952,19 +4524,15 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3900,
     product: null,
     attributes: {
-      "type": "sparkles",
-      "nukeType": "mirvWarhead",
-      "colors": [
-            "#06b6d4",
-            "#082f49",
-            "#67e8f9"
-      ],
-      "size": 38,
-      "speed": 42,
-      "thickness": 3.5,
-      "transitionSpeed": 4,
-      "density": 80
-} as any,
+      type: "sparkles",
+      nukeType: "mirvWarhead",
+      colors: ["#06b6d4", "#082f49", "#67e8f9"],
+      size: 38,
+      speed: 42,
+      thickness: 3.5,
+      transitionSpeed: 4,
+      density: 80,
+    } as any,
   });
 
   addEffect("Vague Cryo-Fractale", {
@@ -3975,18 +4543,14 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 2800,
     product: null,
     attributes: {
-      "type": "shockwave",
-      "nukeType": "atom",
-      "colors": [
-            "#e0f2fe",
-            "#38bdf8",
-            "#0284c7"
-      ],
-      "size": 32,
-      "speed": 38,
-      "thickness": 2.8,
-      "transitionSpeed": 3
-} as any,
+      type: "shockwave",
+      nukeType: "atom",
+      colors: ["#e0f2fe", "#38bdf8", "#0284c7"],
+      size: 32,
+      speed: 38,
+      thickness: 2.8,
+      transitionSpeed: 3,
+    } as any,
   });
 
   addEffect("Aura Suprême BorderConflict", {
@@ -3997,16 +4561,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 6200,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#22d3ee",
-            "#fbbf24",
-            "#f43f5e",
-            "#a855f7"
-      ],
-      "colorSize": 3,
-      "movementSpeed": 12
-} as any,
+      type: "gradient",
+      colors: ["#22d3ee", "#fbbf24", "#f43f5e", "#a855f7"],
+      colorSize: 3,
+      movementSpeed: 12,
+    } as any,
   });
 
   addEffect("Blindage Électro-Magnétique", {
@@ -4017,15 +4576,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3600,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#60a5fa",
-            "#3b82f6",
-            "#93c5fd"
-      ],
-      "colorSize": 4,
-      "movementSpeed": 10
-} as any,
+      type: "gradient",
+      colors: ["#60a5fa", "#3b82f6", "#93c5fd"],
+      colorSize: 4,
+      movementSpeed: 10,
+    } as any,
   });
 
   addEffect("Dôme de Force Magma", {
@@ -4036,15 +4591,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3400,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#ea580c",
-            "#dc2626",
-            "#fef08a"
-      ],
-      "colorSize": 4,
-      "movementSpeed": 9
-} as any,
+      type: "gradient",
+      colors: ["#ea580c", "#dc2626", "#fef08a"],
+      colorSize: 4,
+      movementSpeed: 9,
+    } as any,
   });
 
   addEffect("Réseau Sentinelle Émeraude", {
@@ -4055,14 +4606,10 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 2400,
     product: null,
     attributes: {
-      "type": "transition",
-      "colors": [
-            "#10b981",
-            "#34d399",
-            "#059669"
-      ],
-      "frequency": 3
-} as any,
+      type: "transition",
+      colors: ["#10b981", "#34d399", "#059669"],
+      frequency: 3,
+    } as any,
   });
 
   addEffect("Défense Cryo-Renforcée", {
@@ -4073,15 +4620,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 2400,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#0284c7",
-            "#e0f2fe",
-            "#38bdf8"
-      ],
-      "colorSize": 5,
-      "movementSpeed": 8
-} as any,
+      type: "gradient",
+      colors: ["#0284c7", "#e0f2fe", "#38bdf8"],
+      colorSize: 5,
+      movementSpeed: 8,
+    } as any,
   });
 
   addEffect("Blindage Flotte Céleste", {
@@ -4092,15 +4635,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 5800,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#fbbf24",
-            "#38bdf8",
-            "#ffffff"
-      ],
-      "colorSize": 3,
-      "movementSpeed": 14
-} as any,
+      type: "gradient",
+      colors: ["#fbbf24", "#38bdf8", "#ffffff"],
+      colorSize: 3,
+      movementSpeed: 14,
+    } as any,
   });
 
   addEffect("Cuirassé du Néant", {
@@ -4111,15 +4650,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3600,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#2e1065",
-            "#c084fc",
-            "#f472b6"
-      ],
-      "colorSize": 4,
-      "movementSpeed": 10
-} as any,
+      type: "gradient",
+      colors: ["#2e1065", "#c084fc", "#f472b6"],
+      colorSize: 4,
+      movementSpeed: 10,
+    } as any,
   });
 
   addEffect("Coque Cyber-Plasma", {
@@ -4130,15 +4665,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 3500,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#06b6d4",
-            "#22d3ee",
-            "#818cf8"
-      ],
-      "colorSize": 4,
-      "movementSpeed": 11
-} as any,
+      type: "gradient",
+      colors: ["#06b6d4", "#22d3ee", "#818cf8"],
+      colorSize: 4,
+      movementSpeed: 11,
+    } as any,
   });
 
   addEffect("Cuirasse Sang de Dragon", {
@@ -4149,15 +4680,11 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 2400,
     product: null,
     attributes: {
-      "type": "gradient",
-      "colors": [
-            "#991b1b",
-            "#ef4444",
-            "#fca5a5"
-      ],
-      "colorSize": 5,
-      "movementSpeed": 9
-} as any,
+      type: "gradient",
+      colors: ["#991b1b", "#ef4444", "#fca5a5"],
+      colorSize: 5,
+      movementSpeed: 9,
+    } as any,
   });
 
   addEffect("Camouflage Furtif Naval", {
@@ -4168,14 +4695,10 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     priceSoft: 2200,
     product: null,
     attributes: {
-      "type": "transition",
-      "colors": [
-            "#1e293b",
-            "#334155",
-            "#475569"
-      ],
-      "frequency": 2
-} as any,
+      type: "transition",
+      colors: ["#1e293b", "#334155", "#475569"],
+      frequency: 2,
+    } as any,
   });
 
   cachedCatalog = {
@@ -4189,4 +4712,3 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
 
   return cachedCatalog;
 }
-

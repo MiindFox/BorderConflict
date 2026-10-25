@@ -50,7 +50,7 @@ export class SettingNumber extends LitElement {
         <input
           type="number"
           id="setting-number-input"
-          class="shrink-0 w-[100px] py-2 px-3 border border-white/20 rounded-lg bg-black/60 text-white font-mono text-center focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+          class="shrink-0 w-[100px] py-2 px-3 border border-[#2b3a2d] rounded-lg bg-[#0d140e] text-white font-mono text-center focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all"
           .value=${String(this.value ?? 0)}
           min=${this.min}
           max=${this.max}

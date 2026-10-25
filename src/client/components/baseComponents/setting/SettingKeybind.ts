@@ -42,9 +42,9 @@ export class SettingKeybind extends LitElement {
 
         <div class="flex items-center gap-3 shrink-0">
           <div
-            class="relative h-12 min-w-[80px] px-4 flex items-center justify-center bg-black/60 border border-white/20 rounded-lg text-xl font-bold font-mono shadow-inner hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer select-none text-white
+            class="relative h-12 min-w-[80px] px-4 flex items-center justify-center bg-[#0d140e] border border-[#2b3a2d] rounded-lg text-lg font-pixel shadow-inner hover:border-amber-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/50 transition-all cursor-pointer select-none text-white
             ${this.listening
-              ? "border-blue-500 text-blue-400 ring-2 ring-blue-500/50"
+              ? "border-amber-400 text-amber-300 ring-2 ring-amber-400/50"
               : ""}"
             role="button"
             aria-label="${translateText("user_setting.press_a_key")}"

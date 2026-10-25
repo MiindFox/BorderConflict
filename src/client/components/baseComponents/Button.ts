@@ -25,23 +25,23 @@ export class OButton extends LitElement {
   }
 
   private readonly BASE =
-    "font-bold tracking-wider rounded-xl border " +
-    "transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 " +
-    "outline-none text-center whitespace-normal break-words leading-tight overflow-hidden relative " +
-    "disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:opacity-60";
+    "font-retro font-bold tracking-wide rounded-lg border " +
+    "transition-all duration-150 transform active:translate-y-0.5 " +
+    "outline-none text-center whitespace-normal break-words leading-tight overflow-hidden relative cursor-pointer " +
+    "disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:opacity-50";
 
   private variantClasses(): string {
     switch (this.variant) {
       case "primary":
-        return "bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 border-cyan-400/30 shadow-[0_4px_16px_rgba(6,182,212,0.28)] hover:shadow-[0_6px_22px_rgba(6,182,212,0.45)] text-white disabled:from-slate-700 disabled:to-slate-800 disabled:border-white/10 disabled:shadow-none disabled:text-slate-400";
+        return "bg-gradient-to-b from-[#dc2626] via-[#b91c1c] to-[#881337] hover:from-[#ef4444] hover:to-[#991b1b] border-t-2 border-l-2 border-r-2 border-b-2 border-t-[#f87171] border-l-[#ef4444] border-r-[#450a0a] border-b-[#280505] shadow-[0_0_16px_rgba(220,38,38,0.45)] text-white";
       case "secondary":
-        return "bg-slate-800/85 hover:bg-slate-700/90 border-white/15 hover:border-cyan-400/40 text-slate-100 shadow-sm disabled:bg-slate-900 disabled:border-white/5 disabled:text-slate-500";
+        return "bg-gradient-to-b from-[#3d4b3f] via-[#29342b] to-[#1a221b] hover:from-[#4d5e50] hover:to-[#222c23] border-t-2 border-l-2 border-r-2 border-b-2 border-t-[#617464] border-l-[#4d5d50] border-r-[#101611] border-b-[#0b0e0c] shadow-[0_2px_4px_rgba(0,0,0,0.6)] text-[#e2e8f0] hover:text-white";
       case "danger":
-        return "bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 border-rose-400/30 shadow-[0_4px_14px_rgba(244,63,94,0.28)] text-white disabled:from-red-950 disabled:to-red-900 disabled:text-slate-400";
+        return "bg-gradient-to-b from-[#b91c1c] to-[#7f1d1d] hover:from-[#dc2626] hover:to-[#991b1b] border-t-2 border-l-2 border-r-2 border-b-2 border-t-[#f87171] border-l-[#ef4444] border-r-[#450a0a] border-b-[#280505] text-white shadow-md";
       case "warning":
-        return "bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 border-amber-300/40 shadow-[0_4px_14px_rgba(245,158,11,0.28)] text-slate-950 disabled:from-yellow-950 disabled:to-amber-950 disabled:text-slate-400";
+        return "bg-gradient-to-b from-[#d97706] to-[#92400e] hover:from-[#f59e0b] hover:to-[#b45309] border-t-2 border-l-2 border-r-2 border-b-2 border-t-[#fde68a] border-l-[#fbbf24] border-r-[#78350f] border-b-[#451a03] text-stone-900 shadow-md";
       case "ghost":
-        return "bg-transparent hover:bg-cyan-500/10 border-transparent hover:border-cyan-400/25 text-cyan-400 hover:text-cyan-300 disabled:text-slate-600 disabled:hover:bg-transparent";
+        return "bg-transparent hover:bg-[#22c55e]/15 border-transparent hover:border-[#22c55e]/40 text-[#4ade80] hover:text-[#86efac]";
     }
   }
 

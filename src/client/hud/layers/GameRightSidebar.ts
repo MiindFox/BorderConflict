@@ -363,7 +363,7 @@ export class GameRightSidebar extends LitElement implements Controller {
         }
       </style>
       <aside
-        class=${`w-fit flex flex-row items-center gap-2.5 py-2 px-3.5 bg-slate-950/90 backdrop-blur-xl border-b border-l border-cyan-500/25 shadow-[0_12px_36px_rgba(0,0,0,0.75)] rounded-bl-xl transition-transform duration-300 ease-out transform text-white ${shouldFlashSidebar ? "game-end-timer-sidebar-flash" : ""} ${
+        class=${`w-fit flex flex-row items-center gap-2 py-1.5 px-3 bg-[#121813]/95 border-b-2 border-l-2 border-[#2b3a2d] shadow-[0_8px_25px_rgba(0,0,0,0.85)] rounded-bl-xl transition-transform duration-300 ease-out transform text-white ${shouldFlashSidebar ? "game-end-timer-sidebar-flash" : ""} ${
           this._isVisible ? "translate-x-0" : "translate-x-full"
         }`}
         @contextmenu=${(e: Event) => e.preventDefault()}
@@ -371,7 +371,7 @@ export class GameRightSidebar extends LitElement implements Controller {
         <!-- In-game time -->
         <div
           data-game-timer
-          class="${timerClass} px-2 py-0.5 rounded-md bg-slate-900/90 border border-cyan-500/25 font-mono font-extrabold text-cyan-200 tracking-wider"
+          class="${timerClass} px-2.5 py-1 rounded-md bg-[#0a0f0b] border-2 border-[#2b3a2d] font-mono font-bold text-emerald-400 text-sm tracking-widest shadow-inner"
         >
           ${this.secondsToHms(this.timer)}
         </div>
@@ -380,7 +380,7 @@ export class GameRightSidebar extends LitElement implements Controller {
         ${this.maybeRenderReplayButtons()}
 
         <div
-          class="cursor-pointer p-1.5 rounded-lg bg-slate-900/80 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/50 transition-all"
+          class="cursor-pointer p-1.5 rounded-lg bg-[#18231a] hover:bg-[#223024] border-2 border-[#2b3a2d] hover:border-amber-400/60 transition-all text-amber-200"
           @click=${this.onSettingsButtonClick}
         >
           <img src=${settingsIcon} alt="settings" width="18" height="18" />
@@ -388,7 +388,7 @@ export class GameRightSidebar extends LitElement implements Controller {
 
         ${document.fullscreenEnabled && !this.hideFullscreenButton
           ? html`<div
-              class="cursor-pointer p-1.5 rounded-lg bg-slate-900/80 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/50 transition-all"
+              class="cursor-pointer p-1.5 rounded-lg bg-[#18231a] hover:bg-[#223024] border-2 border-[#2b3a2d] hover:border-amber-400/60 transition-all text-amber-200"
               @click=${this.onFullscreenButtonClick}
             >
               <img
@@ -403,7 +403,7 @@ export class GameRightSidebar extends LitElement implements Controller {
           : ""}
 
         <div
-          class="cursor-pointer p-1.5 rounded-lg bg-slate-900/80 hover:bg-rose-500/25 border border-white/10 hover:border-rose-400/50 transition-all"
+          class="cursor-pointer p-1.5 rounded-lg bg-[#18231a] hover:bg-rose-950/60 border-2 border-[#2b3a2d] hover:border-rose-500/80 transition-all text-rose-300"
           @click=${this.onExitButtonClick}
         >
           <img src=${exitIcon} alt="exit" width="18" height="18" />
@@ -436,7 +436,7 @@ export class GameRightSidebar extends LitElement implements Controller {
       ${isReplayOrSingleplayer
         ? html`
             <div
-              class="cursor-pointer p-1.5 rounded-lg bg-slate-900/80 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/50 transition-all"
+              class="cursor-pointer p-1.5 rounded-lg bg-[#18231a] hover:bg-[#223024] border-2 border-[#2b3a2d] hover:border-amber-400/60 transition-all text-amber-200"
               @click=${this.toggleReplayPanel}
             >
               <img
@@ -451,7 +451,7 @@ export class GameRightSidebar extends LitElement implements Controller {
       ${showPauseButton
         ? html`
             <div
-              class="cursor-pointer p-1.5 rounded-lg bg-slate-900/80 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/50 transition-all"
+              class="cursor-pointer p-1.5 rounded-lg bg-[#18231a] hover:bg-[#223024] border-2 border-[#2b3a2d] hover:border-amber-400/60 transition-all text-amber-200"
               @click=${this.onPauseButtonClick}
             >
               <img
@@ -466,7 +466,7 @@ export class GameRightSidebar extends LitElement implements Controller {
       ${showNewLobbyButton
         ? html`
             <div
-              class="cursor-pointer p-1.5 rounded-lg bg-slate-900/80 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/50 transition-all ${this
+              class="cursor-pointer p-1.5 rounded-lg bg-[#18231a] hover:bg-[#223024] border-2 border-[#2b3a2d] hover:border-amber-400/60 transition-all text-amber-200 ${this
                 .newLobbyRequested
                 ? "opacity-50 pointer-events-none"
                 : ""}"

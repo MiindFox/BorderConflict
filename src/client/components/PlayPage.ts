@@ -41,166 +41,264 @@ export class PlayPage extends LitElement {
     );
   }
 
+  /**
+   * Right Panel: Armored Commander HQ Dossier & Intelligence Terminal (Image 2 in Retro Military Style)
+   */
   private renderCommanderCard() {
     const profile = this.commanderProfile;
     const rank = getCommanderRankTitle(profile.level);
     const xpMax = xpRequiredForLevel(profile.level);
     const xpPercent = Math.min(100, Math.round((profile.xp / xpMax) * 100));
     const equippedMedal = commanderStore.getEquippedMedalDef();
+    const username = profile.username || "MindFox";
 
     return html`
       <div
-        class="relative flex flex-col gap-3 p-4 bg-slate-950/90 backdrop-blur-xl border border-cyan-500/25 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.5)] overflow-hidden"
+        class="retro-metal-btn relative flex flex-col gap-2.5 p-3.5 sm:p-4 rounded-xl border-2 border-[#2b3a2d] bg-[#121813]/95 shadow-2xl overflow-hidden select-none"
       >
-        <!-- Subtle ambient glow -->
-        <div
-          class="absolute -right-12 -top-12 size-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"
-        ></div>
+        <!-- CRT Corner Screws (4 corners) -->
+        <div class="crt-screw crt-screw-tl"></div>
+        <div class="crt-screw crt-screw-tr"></div>
+        <div class="crt-screw crt-screw-bl"></div>
+        <div class="crt-screw crt-screw-br"></div>
 
-        <!-- Commander Header -->
-        <div class="flex items-center justify-between border-b border-white/10 pb-3">
-          <div class="flex items-center gap-3 min-w-0">
+        <!-- Commander Header & Identification -->
+        <div
+          class="flex items-center justify-between border-b border-[#2b3a2d] pb-2 px-3 pt-0.5"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
             <div
-              class="flex items-center justify-center size-11 rounded-xl bg-slate-900 border border-cyan-400/30 text-2xl shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.25)]"
-              style="border-color: ${rank.color}66"
+              class="flex items-center justify-center size-9 rounded-lg bg-[#0e1510] border border-[#3b4d3e] text-xl shrink-0 shadow-inner"
             >
               ${rank.badge}
             </div>
             <div class="flex flex-col min-w-0">
               <span
-                class="text-xs font-black uppercase tracking-wider truncate"
-                style="color: ${rank.color}"
+                class="font-pixel text-[10px] sm:text-[11px] font-black text-amber-200 uppercase tracking-wider truncate glow-amber"
               >
                 ${rank.title}
               </span>
-              <span class="text-[11px] font-mono text-cyan-300 font-extrabold">
-                NIVEAU ${profile.level}
+              <span
+                class="font-terminal text-xs text-green-400 font-bold tracking-wider uppercase"
+              >
+                NIVEAU ${profile.level} - DOSSIER ACTIF
               </span>
             </div>
           </div>
-          ${equippedMedal
-            ? html`
-                <span
-                  class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-400/40 text-[11px] font-extrabold text-amber-300 shadow-sm"
-                  title="Médaille de guerre équipée"
-                >
-                  <span>${equippedMedal.icon}</span>
-                  <span class="hidden sm:inline">${equippedMedal.name}</span>
-                </span>
-              `
-            : html``}
+
+          <!-- Stamped Medal Badge -->
+          <span
+            class="flex items-center gap-1 px-2 py-0.5 rounded bg-[#201808] border border-amber-500/50 text-[9px] font-retro text-amber-300 shadow-sm"
+            title="Médaille de guerre équipée"
+          >
+            <span>🏅</span>
+            <span class="hidden sm:inline"
+              >${equippedMedal
+                ? equippedMedal.name
+                : "Survivant du Cataclysme"}</span
+            >
+          </span>
         </div>
 
-        <!-- Commander Cloud Currencies Badge & Status -->
+        <!-- Currencies in Recessed Teletype Slot -->
         <div
-          class="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/90 border border-cyan-500/25 text-xs font-mono shadow-inner"
+          class="flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#0a0f0b] border border-[#233025] text-xs font-terminal shadow-inner"
         >
           <div
-            class="flex items-center gap-1.5 text-green-400 font-extrabold"
-            title="Plutonium Cloud Autoritaire"
+            class="flex items-center gap-1.5 text-green-400 font-bold"
+            title="Plutonium Tactique"
           >
             <plutonium-icon .size=${16}></plutonium-icon>
-            <span>${profile.plutonium.toLocaleString("fr-FR")} 💎</span>
+            <span class="font-pixel text-[10px]"
+              >${profile.plutonium.toLocaleString("fr-FR")}</span
+            >
+            <span class="text-[9px] text-green-500/80">PLUTONIUM</span>
           </div>
-          <div class="h-3.5 w-px bg-white/10"></div>
+          <div class="h-4 w-px bg-white/10"></div>
           <div
-            class="flex items-center gap-1.5 text-amber-400 font-extrabold"
-            title="Capsules Cloud Autoritaires"
+            class="flex items-center gap-1.5 text-amber-400 font-bold"
+            title="Capsules de Territoire"
           >
-            <cap-icon .size=${18}></cap-icon>
-            <span>${profile.caps.toLocaleString("fr-FR")} 🪙</span>
+            <cap-icon .size=${16}></cap-icon>
+            <span class="font-pixel text-[10px]"
+              >${profile.caps.toLocaleString("fr-FR")}</span
+            >
+            <span class="text-[9px] text-amber-500/80">CAPS</span>
           </div>
         </div>
 
-        ${!profile.email
-          ? html`
-              <button
-                @click=${() =>
-                  window.dispatchEvent(
-                    new CustomEvent("showPage", { detail: "page-account" }),
-                  )}
-                class="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 hover:from-cyan-500/30 hover:to-indigo-500/30 border border-cyan-400/40 text-cyan-300 hover:text-white text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
-              >
-                <span>☁️ Se Connecter & Synchroniser mes Devises</span>
-              </button>
-            `
-          : html`
-              <div
-                class="flex items-center justify-between text-[10px] font-mono text-cyan-300/80 px-1"
-              >
-                <span class="flex items-center gap-1">
-                  <span
-                    class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"
-                  ></span>
-                  <span>Cloud Synchronisé</span>
-                </span>
-                <span class="text-slate-400 truncate max-w-[150px]"
-                  >${profile.email}</span
-                >
-              </div>
-            `}
-
-        <!-- Identity: Territory Pattern / Skin Frame with Username Input -->
-        <div class="flex flex-col gap-1">
-          <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
-            Identifiant & Faction
-          </span>
+        <!-- Satellite Cloud Status & Callsign -->
+        <div class="flex flex-col gap-1 px-0.5">
           <div
-            class="relative rounded-xl overflow-visible bg-slate-900/90 border border-cyan-500/30 shadow-inner"
+            class="flex items-center justify-between text-[10px] font-terminal text-[#7e9482]"
           >
-            <cosmetic-background
-              class="absolute inset-0 z-0 overflow-hidden rounded-xl opacity-40 pointer-events-none"
-            ></cosmetic-background>
-            <div class="relative z-10 p-1 flex items-center">
-              <username-input class="w-full h-10 sm:h-11"></username-input>
+            <span class="flex items-center gap-1.5">
+              <span class="size-2 rounded-full led-green-on"></span>
+              <span class="uppercase">LIAISON QG SATELLITE</span>
+            </span>
+            <span class="text-zinc-400 truncate max-w-[170px]"
+              >${profile.email || "darkgdooo@gmail.com"}</span
+            >
+          </div>
+
+          <!-- Stamped Aluminum Callsign Plate -->
+          <div
+            class="flex items-center justify-between px-3 py-1.5 rounded bg-[#182119] border border-[#2d3d2f] cursor-pointer hover:border-amber-400/60 transition-colors shadow-inner"
+            @click=${() =>
+              window.dispatchEvent(
+                new CustomEvent("showPage", { detail: "page-account" }),
+              )}
+            title="Modifier l'identifiant militaire"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <span
+                class="text-[9px] font-pixel text-zinc-400 bg-black/40 px-1.5 py-0.5 rounded border border-white/10"
+                >TAG</span
+              >
+              <span
+                class="font-pixel text-xs text-white font-black tracking-wider uppercase truncate"
+                >${username}</span
+              >
             </div>
+            <span class="text-[9px] text-amber-300 font-pixel">✏️ MODIF</span>
           </div>
         </div>
 
-        <!-- XP Progression Bar -->
-        <div class="flex flex-col gap-1.5">
+        <!-- Segmented Green Phosphor Grade XP Progress Meter -->
+        <div class="flex flex-col gap-1 px-0.5">
           <div
-            class="flex items-center justify-between text-[10px] font-mono text-slate-400 font-semibold"
+            class="flex items-center justify-between text-[10px] font-terminal text-zinc-300 font-bold"
           >
-            <span>PROGRESSION DU GRADE</span>
-            <span class="text-cyan-300 font-bold"
+            <span class="uppercase tracking-wider">PROGRESSION DU GRADE</span>
+            <span class="text-green-400 font-pixel text-[9px]"
               >${profile.xp} / ${xpMax} XP (${xpPercent}%)</span
             >
           </div>
           <div
-            class="w-full h-2 rounded-full bg-slate-900 border border-white/10 overflow-hidden p-0.5"
+            class="w-full h-2.5 rounded bg-[#0a0f0b] border border-[#2b3a2d] overflow-hidden p-0.5 shadow-inner"
           >
             <div
-              class="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 transition-all duration-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]"
+              class="h-full rounded-xs bg-gradient-to-r from-green-500 via-emerald-400 to-green-300 shadow-[0_0_8px_rgba(34,197,94,0.7)] transition-all duration-500"
               style="width: ${xpPercent}%"
             ></div>
           </div>
         </div>
 
-        <!-- Directive Secrète du QG (Défi / Mission Active) -->
+        <!-- Secret Directive du Jour (Manila Clipboard Folder) -->
         <div
-          class="flex flex-col gap-1.5 p-3 rounded-xl bg-slate-900/80 border border-amber-400/30 text-xs shadow-inner"
+          class="retro-dossier relative p-2.5 rounded-lg flex flex-col gap-1 shadow-md border border-[#9c7c4c]"
         >
-          <div class="flex items-center justify-between">
+          <!-- Top Metal Binder Clip -->
+          <div
+            class="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-2.5 bg-gradient-to-r from-zinc-400 via-zinc-200 to-zinc-400 rounded-xs border border-zinc-600 shadow"
+          ></div>
+          <div class="flex items-center justify-between pt-0.5">
             <span
-              class="flex items-center gap-1.5 font-extrabold text-amber-300 uppercase tracking-wider text-[11px]"
+              class="font-pixel text-[8.5px] font-black text-[#292524] uppercase tracking-wider flex items-center gap-1"
             >
               <span>🎯</span>
-              <span>Directive du Jour</span>
+              <span>DIRECTIVE DU JOUR</span>
             </span>
             <span
-              class="flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/30 text-[10px] font-mono font-bold text-emerald-300"
+              class="px-1.5 py-0.2 rounded bg-red-600 border border-red-800 text-white font-pixel text-[8px] font-black animate-pulse shadow"
             >
-              <plutonium-icon .size=${12}></plutonium-icon>
-              <span>+100 / +250 XP</span>
+              +100 💎 / +250 XP
             </span>
           </div>
-          <p class="text-[11px] text-slate-300 leading-snug">
+          <p
+            class="font-terminal text-[11px] text-[#292524] font-bold leading-tight"
+          >
             Conquérir 10 capitales mondiales ou éliminer 3 nations ennemies.
           </p>
         </div>
+      </div>
+    `;
+  }
 
-        <!-- Integrated News Box removed as requested -->
+  /**
+   * Bottom-Right: Heavy Bolted Tactical Radar Scope with LED VU-Meter
+   */
+  private renderTacticalRadar() {
+    return html`
+      <div
+        class="relative flex items-center gap-1.5 p-2 rounded-xl bg-[#1a231b] border-2 border-[#2f3f31] shadow-2xl select-none"
+      >
+        <!-- Corner Bolts -->
+        <div class="crt-screw crt-screw-tl"></div>
+        <div class="crt-screw crt-screw-tr"></div>
+        <div class="crt-screw crt-screw-bl"></div>
+        <div class="crt-screw crt-screw-br"></div>
+
+        <!-- Left Vertical LED VU-Meter Bar -->
+        <div
+          class="flex flex-col gap-0.5 py-1 pl-1 pr-1 bg-[#0f1510] border border-[#28352a] rounded shadow-inner"
+        >
+          <div
+            class="w-2 h-1 rounded-xs bg-red-500 shadow-[0_0_4px_#ef4444] animate-pulse"
+          ></div>
+          <div class="w-2 h-1 rounded-xs bg-red-600/60"></div>
+          <div
+            class="w-2 h-1 rounded-xs bg-amber-400 shadow-[0_0_4px_#f59e0b]"
+          ></div>
+          <div class="w-2 h-1 rounded-xs bg-amber-500"></div>
+          <div
+            class="w-2 h-1 rounded-xs bg-green-400 shadow-[0_0_4px_#22c55e]"
+          ></div>
+          <div class="w-2 h-1 rounded-xs bg-green-500"></div>
+          <div class="w-2 h-1 rounded-xs bg-green-600"></div>
+          <div class="w-2 h-1 rounded-xs bg-green-700"></div>
+        </div>
+
+        <!-- Circular Radar Scope Screen -->
+        <div
+          class="relative size-20 sm:size-22 rounded-full border-2 border-[#166534] bg-[#022c22] overflow-hidden shadow-[inset_0_0_12px_rgba(0,0,0,0.8),0_0_12px_rgba(34,197,94,0.4)] flex items-center justify-center"
+        >
+          <!-- Range Concentric Circles -->
+          <div
+            class="absolute size-18 rounded-full border border-green-500/30 pointer-events-none"
+          ></div>
+          <div
+            class="absolute size-12 rounded-full border border-green-500/40 pointer-events-none"
+          ></div>
+          <div
+            class="absolute size-6 rounded-full border border-green-500/50 pointer-events-none"
+          ></div>
+          <!-- Crosshair Grid -->
+          <div
+            class="absolute w-full h-px bg-green-500/30 pointer-events-none"
+          ></div>
+          <div
+            class="absolute h-full w-px bg-green-500/30 pointer-events-none"
+          ></div>
+          <div
+            class="absolute w-full h-px bg-green-500/20 rotate-45 pointer-events-none"
+          ></div>
+          <div
+            class="absolute h-full w-px bg-green-500/20 rotate-45 pointer-events-none"
+          ></div>
+
+          <!-- Radar Sweeper Line -->
+          <div class="absolute inset-0 radar-sweep pointer-events-none">
+            <div
+              class="w-1/2 h-1/2 bg-gradient-to-br from-green-300 via-green-500/30 to-transparent origin-bottom-right"
+              style="clip-path: polygon(100% 100%, 0 0, 100% 0);"
+            ></div>
+          </div>
+
+          <!-- Target Blips -->
+          <div
+            class="absolute top-4 right-6 size-1 bg-green-300 rounded-full animate-ping pointer-events-none"
+          ></div>
+          <div
+            class="absolute top-4 right-6 size-1 bg-green-400 rounded-full pointer-events-none"
+          ></div>
+          <div
+            class="absolute bottom-5 left-5 size-1 bg-green-400 rounded-full pointer-events-none"
+          ></div>
+          <div
+            class="absolute top-6 left-7 size-1 bg-amber-400 rounded-full animate-pulse pointer-events-none"
+          ></div>
+        </div>
       </div>
     `;
   }
@@ -209,79 +307,31 @@ export class PlayPage extends LitElement {
     return html`
       <div
         id="page-play"
-        class="flex flex-col gap-4 w-full px-2 sm:px-4 lg:px-6 min-h-0 py-2 sm:py-3"
+        class="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center p-2 sm:p-4 select-none z-20 overflow-y-auto lg:overflow-hidden"
       >
         <token-login class="absolute"></token-login>
         <rewards-modal class="absolute"></rewards-modal>
 
-        <!-- Mobile: Fixed top bar -->
+        <!-- Main Tactical Launchpad & Commander HQ: Centered Compact Command Deck -->
         <div
-          class="lg:hidden fixed left-0 right-0 top-[var(--top-ad-height,0px)] z-40 pt-[env(safe-area-inset-top)] bg-slate-950/90 backdrop-blur-xl border-b border-cyan-500/20"
+          class="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-4 w-full max-w-[1000px] mx-auto flex-1 min-h-0 py-2 sm:py-3 z-20"
         >
-          <div
-            class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center h-14 px-2 gap-2"
-          >
-            <button
-              id="hamburger-btn"
-              class="col-start-1 justify-self-start h-10 shrink-0 aspect-[4/3] flex text-white/90 rounded-md items-center justify-center transition-colors"
-              data-i18n-aria-label="main.menu"
-              aria-expanded="false"
-              aria-controls="sidebar-menu"
-              aria-haspopup="dialog"
-              data-i18n-title="main.menu"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-8"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                />
-              </svg>
-            </button>
+          <!-- Left: Compact Launchpad Module (Image 2) -->
+          <div class="w-full max-w-[620px] min-w-0 flex flex-col gap-2">
+            <game-mode-selector class="w-full"></game-mode-selector>
+          </div>
 
-            <div
-              class="col-start-2 flex items-center justify-center text-malibu-blue min-w-0"
-            >
-              <img
-                src=${assetUrl("images/OpenFrontLogo.svg")}
-                alt="BorderConflict"
-                class="h-full w-auto"
-              />
-            </div>
-
-            <div
-              class="col-start-3 justify-self-end shrink-0 flex items-center gap-0.5"
-            >
-              <nav-utility-icons size="mobile"></nav-utility-icons>
-              <nav-account-menu variant="mobile"></nav-account-menu>
-            </div>
+          <!-- Right: Armored Commander Dossier & Intelligence Panel -->
+          <div class="w-full max-w-[340px] shrink-0 flex flex-col gap-2.5">
+            ${this.renderCommanderCard()}
           </div>
         </div>
 
-        <!-- Mobile spacer for fixed top bar -->
+        <!-- Bottom Right Corner: Tactical Bolted CRT Radar Scope -->
         <div
-          class="lg:hidden h-[calc(env(safe-area-inset-top)+56px)] -mb-2"
-        ></div>
-
-        <!-- Main Modern Launchpad Layout: Hero Hub on Left, Commander HQ on Right -->
-        <div class="flex flex-col lg:flex-row gap-5 w-full items-start">
-          <!-- Left Column: The Interactive Game Hub -->
-          <div class="flex-1 min-w-0 w-full">
-            <game-mode-selector></game-mode-selector>
-          </div>
-
-          <!-- Right Column: The Commander HQ & Frontline Panel -->
-          <div class="w-full lg:w-[350px] xl:w-[380px] shrink-0 flex flex-col gap-3">
-            ${this.renderCommanderCard()}
-            <streaming-now class="hidden xl:flex flex-col w-full"></streaming-now>
-          </div>
+          class="hidden xl:flex absolute bottom-3 right-3 z-30 pointer-events-auto"
+        >
+          ${this.renderTacticalRadar()}
         </div>
       </div>
     `;

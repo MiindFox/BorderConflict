@@ -804,10 +804,13 @@ export class ClanModal extends BaseModal {
 
     if (!hasClans && !hasRequests) {
       return html`
-        <div class="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto">
+        <div
+          class="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto"
+        >
           <span class="text-4xl mb-2">🛡️</span>
           <p class="text-white/60 text-sm mb-4 leading-relaxed">
-            Vous ne faites partie d'aucun Clan pour le moment. Parcourez les clans existants ou fondez votre propre organisation militaire !
+            Vous ne faites partie d'aucun Clan pour le moment. Parcourez les
+            clans existants ou fondez votre propre organisation militaire !
           </p>
           <div class="flex flex-wrap items-center justify-center gap-3">
             <button
@@ -830,7 +833,10 @@ export class ClanModal extends BaseModal {
     return html`
       <div class="space-y-4">
         <div class="flex items-center justify-between px-1">
-          <span class="text-xs uppercase tracking-wider font-extrabold text-white/50">Mes Organisations Tactiques</span>
+          <span
+            class="text-xs uppercase tracking-wider font-extrabold text-white/50"
+            >Mes Organisations Tactiques</span
+          >
           <button
             @click=${() => this.openCreateClanPrompt()}
             class="px-3.5 py-1.5 text-xs font-black text-white uppercase tracking-wider bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl shadow transition-all cursor-pointer flex items-center gap-1.5"
@@ -854,15 +860,23 @@ export class ClanModal extends BaseModal {
   }
 
   private async openCreateClanPrompt(): Promise<void> {
-    const tag = window.prompt("Tag du Clan (2 à 5 lettres/chiffres, ex: FOX) :")?.trim().toUpperCase();
+    const tag = window
+      .prompt("Tag du Clan (2 à 5 lettres/chiffres, ex: FOX) :")
+      ?.trim()
+      .toUpperCase();
     if (!tag) return;
-    const name = window.prompt("Nom officiel du Clan (ex: Force Tactique Fox) :")?.trim();
+    const name = window
+      .prompt("Nom officiel du Clan (ex: Force Tactique Fox) :")
+      ?.trim();
     if (!name) return;
-    const desc = window.prompt("Description / Devise du Clan :")?.trim() || "Clan officiel de BorderConflict.";
+    const desc =
+      window.prompt("Description / Devise du Clan :")?.trim() ||
+      "Clan officiel de BorderConflict.";
 
     const userMe = await getUserMe();
     const publicId = userMe ? userMe.player.publicId : "cmd-leader";
-    const username = (userMe && userMe.player.username) ? userMe.player.username : "Commandant";
+    const username =
+      userMe && userMe.player.username ? userMe.player.username : "Commandant";
 
     try {
       const res = await fetch("/api/clans/create", {
@@ -882,7 +896,9 @@ export class ClanModal extends BaseModal {
         alert(data.error || "Erreur lors de la création du clan.");
         return;
       }
-      alert(`Félicitations ! Le Clan [${tag}] ${name} a été créé avec succès !`);
+      alert(
+        `Félicitations ! Le Clan [${tag}] ${name} a été créé avec succès !`,
+      );
       this.openDetail(tag);
     } catch (e) {
       alert("Erreur de connexion au serveur.");

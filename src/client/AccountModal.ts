@@ -20,10 +20,7 @@ import {
   reauthAfterPortalChange,
   sendMagicLink,
 } from "./Auth";
-import {
-  commanderStore,
-  getCommanderRankTitle,
-} from "./CommanderStore";
+import { commanderStore, getCommanderRankTitle } from "./CommanderStore";
 import "./components/baseComponents/stats/DiscordUserHeader";
 import "./components/baseComponents/stats/PlayerGameHistoryView";
 import type { PlayerGameHistoryCache } from "./components/baseComponents/stats/PlayerGameHistoryView";
@@ -270,15 +267,15 @@ export class AccountModal extends BaseModal {
       );
     }
     if (!this.isLinkedAccount()) {
-      return html`<div class="custom-scrollbar mr-1">
+      return html`<div class="custom-scrollbar">
         ${gamePortal.isOnGamePortal()
           ? this.renderPortalSignIn()
           : this.renderLoginOptions()}
       </div>`;
     }
     return html`
-      <div class="custom-scrollbar mr-1">
-        <div class="p-6">${this.renderTab(tab)}</div>
+      <div class="custom-scrollbar">
+        <div class="p-4 sm:p-6">${this.renderTab(tab)}</div>
       </div>
       <prestige-flow
         .publicId=${this.userMeResponse?.player?.publicId ?? ""}
@@ -344,7 +341,10 @@ export class AccountModal extends BaseModal {
   }
 
   private renderAccountTab(): TemplateResult {
-    const emailAddress = this.userMeResponse?.user?.email ?? commanderStore.getEmail() ?? "commandant@borderconflict.io";
+    const emailAddress =
+      this.userMeResponse?.user?.email ??
+      commanderStore.getEmail() ??
+      "commandant@borderconflict.io";
     const profile = commanderStore.getProfile();
     const rank = getCommanderRankTitle(profile.level);
 
@@ -492,32 +492,68 @@ export class AccountModal extends BaseModal {
       ${this.renderProfileCard("full")}
       <div class="mt-4 flex flex-col gap-4">
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="rounded-xl border border-cyan-500/20 bg-slate-900/80 p-4 text-center">
-            <span class="text-xs uppercase text-slate-400 font-bold block mb-1">Parties Jouées</span>
-            <span class="text-2xl font-black text-cyan-300 font-mono">${totalGames}</span>
+          <div
+            class="rounded-xl border border-cyan-500/20 bg-slate-900/80 p-4 text-center"
+          >
+            <span class="text-xs uppercase text-slate-400 font-bold block mb-1"
+              >Parties Jouées</span
+            >
+            <span class="text-2xl font-black text-cyan-300 font-mono"
+              >${totalGames}</span
+            >
           </div>
-          <div class="rounded-xl border border-emerald-500/20 bg-slate-900/80 p-4 text-center">
-            <span class="text-xs uppercase text-slate-400 font-bold block mb-1">Victoires</span>
-            <span class="text-2xl font-black text-emerald-400 font-mono">${wins}</span>
+          <div
+            class="rounded-xl border border-emerald-500/20 bg-slate-900/80 p-4 text-center"
+          >
+            <span class="text-xs uppercase text-slate-400 font-bold block mb-1"
+              >Victoires</span
+            >
+            <span class="text-2xl font-black text-emerald-400 font-mono"
+              >${wins}</span
+            >
           </div>
-          <div class="rounded-xl border border-rose-500/20 bg-slate-900/80 p-4 text-center">
-            <span class="text-xs uppercase text-slate-400 font-bold block mb-1">Défaites</span>
-            <span class="text-2xl font-black text-rose-400 font-mono">${losses}</span>
+          <div
+            class="rounded-xl border border-rose-500/20 bg-slate-900/80 p-4 text-center"
+          >
+            <span class="text-xs uppercase text-slate-400 font-bold block mb-1"
+              >Défaites</span
+            >
+            <span class="text-2xl font-black text-rose-400 font-mono"
+              >${losses}</span
+            >
           </div>
-          <div class="rounded-xl border border-amber-500/20 bg-slate-900/80 p-4 text-center">
-            <span class="text-xs uppercase text-slate-400 font-bold block mb-1">Taux de Victoire</span>
-            <span class="text-2xl font-black text-amber-400 font-mono">${winRate}%</span>
+          <div
+            class="rounded-xl border border-amber-500/20 bg-slate-900/80 p-4 text-center"
+          >
+            <span class="text-xs uppercase text-slate-400 font-bold block mb-1"
+              >Taux de Victoire</span
+            >
+            <span class="text-2xl font-black text-amber-400 font-mono"
+              >${winRate}%</span
+            >
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="rounded-xl border border-purple-500/20 bg-slate-900/80 p-4 flex items-center justify-between">
-            <span class="text-xs uppercase text-slate-300 font-bold">Événements Mondiaux Survécus</span>
-            <span class="text-lg font-black text-purple-400 font-mono">${profile.worldEventsSurvived || 0}</span>
+          <div
+            class="rounded-xl border border-purple-500/20 bg-slate-900/80 p-4 flex items-center justify-between"
+          >
+            <span class="text-xs uppercase text-slate-300 font-bold"
+              >Événements Mondiaux Survécus</span
+            >
+            <span class="text-lg font-black text-purple-400 font-mono"
+              >${profile.worldEventsSurvived || 0}</span
+            >
           </div>
-          <div class="rounded-xl border border-blue-500/20 bg-slate-900/80 p-4 flex items-center justify-between">
-            <span class="text-xs uppercase text-slate-300 font-bold">Directives QG Accomplies</span>
-            <span class="text-lg font-black text-blue-400 font-mono">${profile.directivesCompleted || 0}</span>
+          <div
+            class="rounded-xl border border-blue-500/20 bg-slate-900/80 p-4 flex items-center justify-between"
+          >
+            <span class="text-xs uppercase text-slate-300 font-bold"
+              >Directives QG Accomplies</span
+            >
+            <span class="text-lg font-black text-blue-400 font-mono"
+              >${profile.directivesCompleted || 0}</span
+            >
           </div>
         </div>
 
@@ -1070,13 +1106,14 @@ export class AccountModal extends BaseModal {
                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-extrabold text-white tracking-wide uppercase">
-              ${isRegister
-                ? "Créer un Compte E-mail"
-                : "Connexion par E-mail"}
+            <h3
+              class="text-lg font-extrabold text-white tracking-wide uppercase"
+            >
+              ${isRegister ? "Créer un Compte E-mail" : "Connexion par E-mail"}
             </h3>
             <p class="text-slate-400 text-xs font-medium mt-1">
-              Sauvegardez votre progression Commandant, vos Doctrines et vos Cosmétiques avec votre adresse e-mail.
+              Sauvegardez votre progression Commandant, vos Doctrines et vos
+              Cosmétiques avec votre adresse e-mail.
             </p>
           </div>
 

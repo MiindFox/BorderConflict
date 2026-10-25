@@ -8,37 +8,39 @@
 
 @theme {
   --default-ring-width: 3px;
-  --default-ring-color: var(--color-malibu-blue);
-  --font-display: "OpenFront", Inter, Arial, sans-serif;
+  --default-ring-color: #22c55e;
+  --font-display: "Silkscreen", "Share Tech Mono", monospace, sans-serif;
+  --font-mono: "Share Tech Mono", monospace;
 
-  /* HexaFront Modern Tactical Palette */
-  --color-malibu-blue: #06b6d4;
-  --color-aquarius: #22d3ee;
+  /* Retro Military CRT Tactical Palette */
+  --color-malibu-blue: #22c55e;
+  --color-aquarius: #4ade80;
   --color-dawn-blue: #cbd5e1;
   --color-bright-white: #ffffff;
-  --color-bright-blue: #38bdf8;
+  --color-bright-blue: #86efac;
 
   /* Accent sub-brand */
   --color-cyber-yellow: #f59e0b;
-  --color-limestone: #94a3b8;
+  --color-limestone: #8fa382;
 
-  /* Background & decorative — not for standalone UI use */
-  --color-deep-navy: #090e1a;
-  --color-hex-cyan: #22d3ee;
-  --color-frame-orange: #f97316;
+  /* Background & decorative */
+  --color-deep-navy: #0e1510;
+  --color-hex-cyan: #22c55e;
+  --color-frame-orange: #f59e0b;
 
   /* App-specific surface colors */
-  --color-surface: #0b1120;
+  --color-surface: #121813;
 
-  --shadow-malibu-blue: 0 0 20px rgba(6, 182, 212, 0.25);
-  --shadow-malibu-blue-soft: 0 0 14px rgba(6, 182, 212, 0.2);
-  --shadow-malibu-blue-strong: 0 0 22px rgba(6, 182, 212, 0.35);
-  --shadow-malibu-blue-pill: 0 0 8px rgba(6, 182, 212, 0.4);
-  --shadow-malibu-blue-ring-sm: 0 0 0 4px rgba(6, 182, 212, 0.25);
-  --shadow-malibu-blue-ring-lg: 0 0 0 6px rgba(6, 182, 212, 0.35);
-  --shadow-lobby-card-hover: 0 0 0 2px #06b6d4, 0 0 24px rgba(6, 182, 212, 0.45);
+  --shadow-malibu-blue: 0 0 20px rgba(34, 197, 94, 0.25);
+  --shadow-malibu-blue-soft: 0 0 14px rgba(34, 197, 94, 0.2);
+  --shadow-malibu-blue-strong: 0 0 22px rgba(34, 197, 94, 0.35);
+  --shadow-malibu-blue-pill: 0 0 8px rgba(34, 197, 94, 0.4);
+  --shadow-malibu-blue-ring-sm: 0 0 0 4px rgba(34, 197, 94, 0.25);
+  --shadow-malibu-blue-ring-lg: 0 0 0 6px rgba(34, 197, 94, 0.35);
+  --shadow-lobby-card-hover:
+    0 0 0 2px #22c55e, 0 0 24px rgba(34, 197, 94, 0.45);
   --shadow-action-card-hover:
-    0 0 0 1px #22d3ee, 0 0 16px rgba(6, 182, 212, 0.35);
+    0 0 0 1px #4ade80, 0 0 16px rgba(34, 197, 94, 0.35);
 }
 
 @layer base {
@@ -111,15 +113,27 @@ body.in-game .bg-gray-800\/92:not(.game-end-timer-sidebar-flash) {
 }
 
 body.in-game .stats-table .bg-gray-800\/85 {
-  background-color: rgb(
-    from var(--color-gray-800) r g b / calc(0.85 * var(--hud-opacity, 1))
-  );
+  background-color: #121813 !important;
+  border: 2px solid #2b3a2d !important;
 }
 
 body.in-game .stats-table .bg-gray-700\/95 {
-  background-color: rgb(
-    from var(--color-gray-700) r g b / calc(0.95 * var(--hud-opacity, 1))
-  );
+  background-color: #1a251c !important;
+  border-bottom: 2px solid #2b3a2d !important;
+}
+
+/* In-game HUD Attacks Display styling */
+body.in-game attacks-display .bg-gray-800\/92 {
+  background-color: #141d16 !important;
+  border: 1.5px solid #2b3a2d !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* In-game Chat Display */
+body.in-game chat-display .bg-black\/60 {
+  background-color: rgba(18, 24, 19, 0.92) !important;
+  border: 2px solid #2b3a2d !important;
+  font-family: "Share Tech Mono", monospace !important;
 }
 
 /* An inline page (store, settings, leaderboard, ...) is a modal rendered in
@@ -778,4 +792,682 @@ unit-display .tutorial-highlight::after {
 
 .remove-player-btn:hover {
   background: #ef4444;
+}
+
+/* ==========================================================================
+   RETRO MILITARY CRT COMMAND CONSOLE THEME (90s Wargames / C&C Style)
+   ========================================================================== */
+
+.font-pixel {
+  font-family: "Press Start 2P", "Silkscreen", monospace;
+}
+
+.font-retro {
+  font-family: "Silkscreen", "Press Start 2P", monospace;
+}
+
+.font-terminal {
+  font-family: "VT323", "Share Tech Mono", monospace;
+}
+
+.font-tech {
+  font-family: "Share Tech Mono", monospace;
+}
+
+/* CRT Monitor Chassis & Bezel */
+.crt-chassis {
+  background-color: #1e261f;
+  border: 8px solid #141c15;
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 16px rgba(0, 0, 0, 0.95),
+    0 8px 30px rgba(0, 0, 0, 0.95);
+  position: relative;
+}
+
+.crt-screw {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #94a3b8, #475569 60%, #1e293b);
+  border: 1px solid #0f172a;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.8);
+  position: absolute !important;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.crt-screw::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: #0f172a;
+  transform: translateY(-50%) rotate(38deg);
+}
+
+.crt-screw-tl {
+  top: 6px !important;
+  left: 6px !important;
+  bottom: auto !important;
+  right: auto !important;
+}
+
+.crt-screw-tr {
+  top: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  left: auto !important;
+}
+
+.crt-screw-bl {
+  bottom: 6px !important;
+  left: 6px !important;
+  top: auto !important;
+  right: auto !important;
+}
+
+.crt-screw-br {
+  bottom: 6px !important;
+  right: 6px !important;
+  top: auto !important;
+  left: auto !important;
+}
+
+.crt-screen-container {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 35px rgba(0, 0, 0, 0.9),
+    inset 0 0 70px rgba(0, 0, 0, 0.7);
+  background-color: #060b08;
+}
+
+.crt-scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0px,
+    rgba(255, 255, 255, 0) 2px,
+    rgba(0, 0, 0, 0.3) 3px,
+    rgba(0, 0, 0, 0.3) 4px
+  );
+  pointer-events: none;
+}
+
+/* Animated Silo Hangar Atmospheric Effects (100% GPU Compositor, Zero-Lag) */
+.hangar-bg-live {
+  animation: live-hangar-breathe 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes live-hangar-breathe {
+  0% {
+    transform: scale(1.01) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.035) translate(-0.3%, -0.2%);
+  }
+  100% {
+    transform: scale(1.02) translate(0.3%, -0.3%);
+  }
+}
+
+.hangar-welding-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 46% 41%,
+      rgba(254, 240, 138, 0.42) 0%,
+      rgba(245, 158, 11, 0.16) 7%,
+      transparent 16%
+    ),
+    radial-gradient(
+      circle at 53.5% 41.5%,
+      rgba(254, 240, 138, 0.38) 0%,
+      rgba(245, 158, 11, 0.14) 6%,
+      transparent 15%
+    );
+  animation: welding-sparks-flicker 2.8s steps(1) infinite;
+  mix-blend-mode: screen;
+  will-change: opacity;
+  z-index: 5;
+}
+
+@keyframes welding-sparks-flicker {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  7% {
+    opacity: 0.85;
+  }
+  11% {
+    opacity: 0.25;
+  }
+  23% {
+    opacity: 0.95;
+  }
+  27% {
+    opacity: 0.12;
+  }
+  39% {
+    opacity: 0.75;
+  }
+  43% {
+    opacity: 0.2;
+  }
+  63% {
+    opacity: 0.9;
+  }
+  67% {
+    opacity: 0.18;
+  }
+  81% {
+    opacity: 0.82;
+  }
+  85% {
+    opacity: 0.22;
+  }
+}
+
+.hangar-siren-beacon {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 86% 58%,
+    rgba(239, 68, 68, 0.35) 0%,
+    rgba(220, 38, 38, 0.12) 8%,
+    transparent 18%
+  );
+  animation: siren-slow-pulse 3.6s ease-in-out infinite;
+  mix-blend-mode: screen;
+  will-change: opacity;
+  z-index: 5;
+}
+
+@keyframes siren-slow-pulse {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.hangar-steam-mist {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 40%,
+    rgba(203, 213, 225, 0.05) 58%,
+    rgba(148, 163, 184, 0.09) 72%,
+    transparent 88%
+  );
+  animation: steam-haze-drift 14s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+  will-change: opacity, transform;
+  z-index: 6;
+}
+
+@keyframes steam-haze-drift {
+  0% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0.55;
+    transform: translateY(-6px);
+  }
+}
+
+/* Tactile 3D Military Push-Buttons */
+.retro-metal-btn {
+  background: linear-gradient(180deg, #445346 0%, #2e3a30 50%, #202922 100%);
+  border-top: 2px solid #6b7e6e;
+  border-left: 2px solid #576759;
+  border-right: 2px solid #141b15;
+  border-bottom: 2px solid #0d120e;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.25),
+    0 4px 6px rgba(0, 0, 0, 0.6);
+  transition: all 0.1s ease-out;
+}
+
+.retro-metal-btn:hover {
+  background: linear-gradient(180deg, #516253 0%, #37453a 50%, #273229 100%);
+  border-top-color: #839786;
+  border-left-color: #6b7e6e;
+}
+
+.retro-metal-btn:active {
+  background: linear-gradient(180deg, #1c241e 0%, #263128 100%);
+  border-top-color: #0d120e;
+  border-left-color: #141b15;
+  border-right-color: #576759;
+  border-bottom-color: #6b7e6e;
+  transform: translateY(1px);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.retro-red-btn {
+  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 50%, #881337 100%);
+  border-top: 2px solid #f87171;
+  border-left: 2px solid #ef4444;
+  border-right: 2px solid #450a0a;
+  border-bottom: 2px solid #280505;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 16px rgba(220, 38, 38, 0.45),
+    0 4px 6px rgba(0, 0, 0, 0.7);
+  transition: all 0.1s ease-out;
+}
+
+.retro-red-btn:hover {
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 50%, #991b1b 100%);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 24px rgba(239, 68, 68, 0.65),
+    0 4px 8px rgba(0, 0, 0, 0.7);
+}
+
+.retro-red-btn:active {
+  background: linear-gradient(180deg, #580c0c 0%, #7f1d1d 100%);
+  border-top-color: #280505;
+  border-left-color: #450a0a;
+  border-right-color: #ef4444;
+  border-bottom-color: #f87171;
+  transform: translateY(1px);
+}
+
+/* Hazard Warning Stripes */
+.hazard-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    #eab308,
+    #eab308 12px,
+    #18181b 12px,
+    #18181b 24px
+  );
+}
+
+/* Military Stamped Aluminum Dog Tag */
+.retro-dogtag {
+  background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 45%, #6b7280 100%);
+  border: 2px solid #4b5563;
+  box-shadow:
+    inset 1px 1px 2px rgba(255, 255, 255, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.6);
+  color: #111827;
+  text-shadow:
+    1px 1px 0 rgba(255, 255, 255, 0.5),
+    -1px -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Manila Mission Dossier Folder */
+.retro-dossier {
+  background: #d4b98b;
+  border: 2px solid #9c7c4c;
+  box-shadow:
+    inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+    3px 5px 12px rgba(0, 0, 0, 0.7);
+  color: #1c1917;
+}
+
+/* Phosphor Glows */
+.glow-red {
+  text-shadow:
+    0 0 6px #ef4444,
+    0 0 12px rgba(239, 68, 68, 0.7);
+}
+
+.glow-green {
+  text-shadow:
+    0 0 6px #22c55e,
+    0 0 12px rgba(34, 197, 94, 0.7);
+}
+
+.glow-amber {
+  text-shadow:
+    0 0 6px #f59e0b,
+    0 0 12px rgba(245, 158, 11, 0.7);
+}
+
+/* Radar Sweep Animation */
+@keyframes radarSweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.radar-sweep {
+  animation: radarSweep 3s linear infinite;
+  transform-origin: center center;
+}
+
+/* Blinking LED Lights */
+.led-green-on {
+  background-color: #22c55e;
+  box-shadow:
+    0 0 8px #22c55e,
+    0 0 14px rgba(34, 197, 94, 0.8);
+}
+
+.led-red-on {
+  background-color: #ef4444;
+  box-shadow:
+    0 0 8px #ef4444,
+    0 0 14px rgba(239, 68, 68, 0.8);
+}
+
+.led-amber-on {
+  background-color: #f59e0b;
+  box-shadow:
+    0 0 8px #f59e0b,
+    0 0 14px rgba(245, 158, 11, 0.8);
+}
+
+.led-off {
+  background-color: #1f2937;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ============================================================
+   SUB-MENUS & MODALS: RETRO MILITARY CRT BUNKER THEME
+   ============================================================ */
+
+/* All modal page contents and wrappers */
+.page-content,
+[id^="page-"],
+o-modal,
+.modal-content {
+  color: #8fa382;
+  font-family: "Share Tech Mono", monospace;
+}
+
+/* Modal and sub-menu containers override */
+.page-content .bg-slate-900,
+.page-content .bg-slate-950,
+o-modal .bg-slate-900,
+o-modal .bg-slate-950,
+[id^="page-"] .bg-slate-900,
+[id^="page-"] .bg-slate-950 {
+  background-color: #121813 !important;
+  border-color: #2b3a2d !important;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Retro Military Modal Inputs & Form Controls */
+.page-content input[type="text"],
+.page-content input[type="number"],
+.page-content input[type="password"],
+.page-content select,
+.page-content textarea,
+o-modal input,
+o-modal select,
+o-modal textarea {
+  background-color: #0c120e !important;
+  border: 1.5px solid #2d3e30 !important;
+  color: #4ade80 !important;
+  font-family: "Share Tech Mono", monospace !important;
+  border-radius: 4px !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.page-content input:focus,
+.page-content select:focus,
+.page-content textarea:focus,
+o-modal input:focus,
+o-modal select:focus,
+o-modal textarea:focus {
+  border-color: #22c55e !important;
+  box-shadow:
+    0 0 8px rgba(34, 197, 94, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+  outline: none !important;
+}
+
+/* Modals Tables & Lists (Leaderboard, Stats, Inventory, Store) */
+.page-content table,
+o-modal table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.page-content th,
+o-modal th {
+  background-color: #172119 !important;
+  color: #f59e0b !important;
+  font-family: "Silkscreen", monospace !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  border-bottom: 2px solid #2d3d2f !important;
+  padding: 8px 12px !important;
+}
+
+.page-content td,
+o-modal td {
+  border-bottom: 1px solid #1a241b !important;
+  color: #cbd5e1 !important;
+  font-family: "Share Tech Mono", monospace !important;
+  padding: 8px 12px !important;
+}
+
+.page-content tr:hover td,
+o-modal tr:hover td {
+  background-color: rgba(34, 197, 94, 0.08) !important;
+  color: #4ade80 !important;
+}
+
+/* Item store & Inventory cards */
+.store-item-card,
+.inventory-item-card {
+  background: #141c15 !important;
+  border: 2px solid #2e3e30 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  transition: all 0.15s ease-out !important;
+}
+
+.store-item-card:hover,
+.inventory-item-card:hover {
+  border-color: #4ade80 !important;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Modal and Sub-Menu Buttons & Launchpad Controls */
+o-button[variant="primary"] button,
+.page-content o-button[variant="primary"] button,
+o-modal o-button[variant="primary"] button {
+  background: linear-gradient(
+    180deg,
+    #dc2626 0%,
+    #b91c1c 50%,
+    #881337 100%
+  ) !important;
+  border-top: 2px solid #f87171 !important;
+  border-left: 2px solid #ef4444 !important;
+  border-right: 2px solid #450a0a !important;
+  border-bottom: 2px solid #280505 !important;
+  box-shadow:
+    0 0 16px rgba(220, 38, 38, 0.45),
+    0 4px 6px rgba(0, 0, 0, 0.7) !important;
+  color: #ffffff !important;
+  font-family: "Silkscreen", "Press Start 2P", monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 0.04em !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+}
+
+o-button[variant="primary"] button:hover:not(:disabled),
+.page-content o-button[variant="primary"] button:hover:not(:disabled),
+o-modal o-button[variant="primary"] button:hover:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    #ef4444 0%,
+    #dc2626 50%,
+    #991b1b 100%
+  ) !important;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.65) !important;
+}
+
+o-button[variant="secondary"] button,
+.page-content o-button[variant="secondary"] button,
+o-modal o-button[variant="secondary"] button {
+  background: linear-gradient(
+    180deg,
+    #445346 0%,
+    #2e3a30 50%,
+    #202922 100%
+  ) !important;
+  border-top: 2px solid #6b7e6e !important;
+  border-left: 2px solid #576759 !important;
+  border-right: 2px solid #141b15 !important;
+  border-bottom: 2px solid #0d120e !important;
+  color: #e2e8f0 !important;
+  font-family: "Silkscreen", "Press Start 2P", monospace !important;
+  font-size: 10px !important;
+  letter-spacing: 0.04em !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+}
+
+o-button[variant="warning"] button,
+.page-content o-button[variant="warning"] button,
+o-modal o-button[variant="warning"] button {
+  background: linear-gradient(
+    180deg,
+    #f59e0b 0%,
+    #d97706 50%,
+    #b45309 100%
+  ) !important;
+  border-top: 2px solid #fde68a !important;
+  border-left: 2px solid #fbbf24 !important;
+  border-right: 2px solid #78350f !important;
+  border-bottom: 2px solid #451a03 !important;
+  color: #1c1917 !important;
+  font-family: "Press Start 2P", "Silkscreen", monospace !important;
+  font-size: 10px !important;
+  letter-spacing: 0.08em !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+}
+
+/* Modals & Sub-menus custom scrollbars */
+.custom-scrollbar::-webkit-scrollbar,
+[data-modal-scroll]::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+[data-modal-scroll]::-webkit-scrollbar-track {
+  background: #0a0f0b;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+[data-modal-scroll]::-webkit-scrollbar-thumb {
+  background: #2b3a2d;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+[data-modal-scroll]::-webkit-scrollbar-thumb:hover {
+  background: #3e5241;
+}
+
+/* -------------------------------------------------------------
+   RETRO MILITARY CRT THEME OVERRIDES FOR MODALS & SUB-MENUS
+   Ensures 100% cohesion: no blue/cyan panels leak through
+   ------------------------------------------------------------- */
+o-modal,
+.page-content,
+[id^="page-"] {
+  --color-blue-500: #22c55e;
+  --color-blue-600: #16a34a;
+  --color-cyan-400: #4ade80;
+  --color-cyan-500: #22c55e;
+  --color-indigo-500: #22c55e;
+  --color-indigo-600: #16a34a;
+}
+
+/* Purge any modern blue/cyan/indigo panel backgrounds */
+o-modal [class*="bg-cyan-"],
+o-modal [class*="bg-sky-"],
+o-modal [class*="bg-blue-"],
+o-modal [class*="bg-indigo-"],
+.page-content [class*="bg-cyan-"],
+.page-content [class*="bg-sky-"],
+.page-content [class*="bg-blue-"],
+.page-content [class*="bg-indigo-"] {
+  background-color: #141d16 !important;
+}
+
+/* Purge modern borders */
+o-modal [class*="border-cyan-"],
+o-modal [class*="border-sky-"],
+o-modal [class*="border-blue-"],
+o-modal [class*="border-indigo-"],
+.page-content [class*="border-cyan-"],
+.page-content [class*="border-sky-"],
+.page-content [class*="border-blue-"],
+.page-content [class*="border-indigo-"] {
+  border-color: #2b3a2d !important;
+}
+
+/* Replace text cyan/blue/sky with phosphor green */
+o-modal [class*="text-cyan-"],
+o-modal [class*="text-sky-"],
+o-modal [class*="text-blue-"],
+o-modal [class*="text-indigo-"],
+.page-content [class*="text-cyan-"],
+.page-content [class*="text-sky-"],
+.page-content [class*="text-blue-"],
+.page-content [class*="text-indigo-"] {
+  color: #4ade80 !important;
+}
+
+/* Modals background panels safety: turn slate into dark CRT olive/steel */
+o-modal .bg-slate-900,
+o-modal [class*="bg-slate-900\/"],
+o-modal .bg-slate-950,
+o-modal [class*="bg-slate-950\/"],
+o-modal .bg-slate-800,
+o-modal [class*="bg-slate-800\/"],
+.page-content .bg-slate-900,
+.page-content [class*="bg-slate-900\/"],
+.page-content .bg-slate-950,
+.page-content [class*="bg-slate-950\/"],
+.page-content .bg-slate-800,
+.page-content [class*="bg-slate-800\/"] {
+  background-color: #121813 !important;
+  border-color: #2b3a2d !important;
+}
+
+/* Make headings in modals retro amber/white */
+o-modal h1:not([class*="font-"]),
+o-modal h2:not([class*="font-"]),
+o-modal h3:not([class*="font-"]),
+.page-content h1:not([class*="font-"]),
+.page-content h2:not([class*="font-"]),
+.page-content h3:not([class*="font-"]) {
+  font-family: "Share Tech Mono", "Silkscreen", monospace;
+  letter-spacing: 0.04em;
 }

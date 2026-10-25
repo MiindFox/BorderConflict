@@ -5,12 +5,12 @@ import {
 } from "@openfront/engine-api/game/GameTypes";
 import { GameUpdateType } from "@openfront/engine-api/game/GameUpdates";
 import type { AllPlayersStats, Winner } from "@openfront/engine-api/Schemas";
-import { renderNumber } from "@openfront/engine-lib/Format";
 import {
   getActiveMegastructures,
   MedalDefinition,
   PlayerStructureCounts,
 } from "@openfront/engine-lib/configuration/HexaFrontSystems";
+import { renderNumber } from "@openfront/engine-lib/Format";
 import type { GameXpEligible, Progress } from "@openfront/shared/ApiSchemas";
 import { Pattern } from "@openfront/shared/CosmeticSchemas";
 import { EventBus } from "@openfront/shared/EventBus";
@@ -27,18 +27,18 @@ import {
 } from "../../../client/Utils";
 import { fetchUserMeUncached, getUserMe, invalidateUserMe } from "../../Api";
 import "../../components/CosmeticCard";
-import { cosmeticSelectionLabel } from "../../components/CosmeticPresentation";
-import type { GameXpPanelState } from "../../components/GameXpPanel";
-import type { LegendCeremony } from "../../components/LegendCeremony";
-import "../../components/ProfileShare";
-import "../../components/PurchaseButton";
-import "../../components/SteamWishlist";
-import { Controller } from "../../Controller";
 import {
   commanderStore,
   getCommanderRankTitle,
   xpRequiredForLevel,
 } from "../../CommanderStore";
+import { cosmeticSelectionLabel } from "../../components/CosmeticPresentation";
+import type { GameXpPanelState } from "../../components/GameXpPanel";
+import "../../components/ProfileShare";
+import "../../components/PurchaseButton";
+import "../../components/SteamWishlist";
+import type { LegendCeremony } from "../../components/LegendCeremony";
+import { Controller } from "../../Controller";
 import {
   fetchCosmetics,
   purchaseCosmetic,
@@ -227,7 +227,9 @@ export class WinModal extends LitElement implements Controller {
           >
             📊 RAPPORT DE DÉBRIEFING TACTIQUE · DURÉE ${mins}m ${secs}s
           </span>
-          <h2 class="m-0 text-2xl sm:text-3xl font-black text-center text-white tracking-wide">
+          <h2
+            class="m-0 text-2xl sm:text-3xl font-black text-center text-white tracking-wide"
+          >
             ${this._title || ""}
           </h2>
         </div>
@@ -238,7 +240,9 @@ export class WinModal extends LitElement implements Controller {
                 <div
                   class="rounded-xl border border-cyan-400/35 bg-slate-900/90 p-3.5 space-y-2.5 shadow-inner"
                 >
-                  <div class="flex items-center justify-between gap-3 flex-wrap">
+                  <div
+                    class="flex items-center justify-between gap-3 flex-wrap"
+                  >
                     <div class="flex items-center gap-3">
                       <div
                         class="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-950 border border-cyan-400/40 text-2xl"
@@ -269,7 +273,9 @@ export class WinModal extends LitElement implements Controller {
                   </div>
 
                   <div>
-                    <div class="flex justify-between text-[11px] font-mono text-slate-300 mb-1">
+                    <div
+                      class="flex justify-between text-[11px] font-mono text-slate-300 mb-1"
+                    >
                       <span>Progression Niveau ${profile.level}</span>
                       <span class="text-cyan-300 font-bold"
                         >${profile.xp} / ${xpMax} XP (${xpPct}%)</span
@@ -290,48 +296,74 @@ export class WinModal extends LitElement implements Controller {
 
           <!-- TACTICAL PERFORMANCE METRICS GRID -->
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <div class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div
+              class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5"
+            >
+              <div
+                class="text-[10px] font-bold uppercase tracking-wider text-slate-400"
+              >
                 🗺️ Apogée Territoriale
               </div>
               <div class="text-base font-black text-cyan-300 mt-0.5">
                 ${renderNumber(this.peakCounts.tilesOwned)} cases
               </div>
             </div>
-            <div class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div
+              class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5"
+            >
+              <div
+                class="text-[10px] font-bold uppercase tracking-wider text-slate-400"
+              >
                 💰 Pic de Trésorerie
               </div>
               <div class="text-base font-black text-amber-300 mt-0.5">
                 ${renderNumber(this.peakCounts.gold)} Or
               </div>
             </div>
-            <div class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div
+              class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5"
+            >
+              <div
+                class="text-[10px] font-bold uppercase tracking-wider text-slate-400"
+              >
                 🏙️ Centres Urbains
               </div>
               <div class="text-base font-black text-white mt-0.5">
                 ${this.peakCounts.cities} Niv. de Villes
               </div>
             </div>
-            <div class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div
+              class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5"
+            >
+              <div
+                class="text-[10px] font-bold uppercase tracking-wider text-slate-400"
+              >
                 ⚓ Réseau Éco & Naval
               </div>
               <div class="text-base font-black text-indigo-300 mt-0.5">
-                ${this.peakCounts.ports} Ports · ${this.peakCounts.factories} Usines
+                ${this.peakCounts.ports} Ports · ${this.peakCounts.factories}
+                Usines
               </div>
             </div>
-            <div class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div
+              class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5"
+            >
+              <div
+                class="text-[10px] font-bold uppercase tracking-wider text-slate-400"
+              >
                 🛡️ Défense & Atome
               </div>
               <div class="text-base font-black text-rose-300 mt-0.5">
-                ${this.peakCounts.defensesAndSam} Déf/SAM · ${this.peakCounts.silos} Silos
+                ${this.peakCounts.defensesAndSam} Déf/SAM ·
+                ${this.peakCounts.silos} Silos
               </div>
             </div>
-            <div class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div
+              class="rounded-xl border border-white/10 bg-slate-900/80 p-2.5"
+            >
+              <div
+                class="text-[10px] font-bold uppercase tracking-wider text-slate-400"
+              >
                 🏛️ Mégastructures
               </div>
               <div class="text-base font-black text-emerald-300 mt-0.5">
@@ -345,7 +377,9 @@ export class WinModal extends LitElement implements Controller {
                 <div
                   class="rounded-xl border border-amber-400/50 bg-amber-500/10 p-3 space-y-2"
                 >
-                  <div class="text-xs font-black uppercase tracking-wider text-amber-300">
+                  <div
+                    class="text-xs font-black uppercase tracking-wider text-amber-300"
+                  >
                     🎖️ Nouvelles Médailles de Guerre Débloquées !
                   </div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">

@@ -20,18 +20,18 @@ import { translateText } from "../client/Utils";
 import { responseHasLinkedIdentity } from "./AccountIdentity";
 import "./components/baseComponents/Button";
 import "./components/baseComponents/Modal";
-import { BaseModal } from "./components/BaseModal";
+import { commanderStore } from "./CommanderStore";
 import "./components/GameConfigSettings";
 import "./components/SavedGamesPanel";
+import { BaseModal } from "./components/BaseModal";
 import { MEDAL_ORDER, medalIcon } from "./components/map/Medals";
+import "./components/ToggleInputCard";
 import {
   type LoadSavedGameDetail,
   savedGameIdFrom,
 } from "./components/SavedGamesPanel";
-import "./components/ToggleInputCard";
 import { modalHeader } from "./components/ui/ModalHeader";
 import { getPlayerCosmetics, prewarmCosmetics } from "./Cosmetics";
-import { commanderStore } from "./CommanderStore";
 import { gamePortal } from "./GamePortal";
 import { GameStartingModal } from "./GameStartingModal";
 import { showInGameAlert } from "./InGameModal";
@@ -311,7 +311,7 @@ export class SinglePlayerModal extends BaseModal {
       return html``;
     }
     return html`<button
-      class="px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors duration-200 rounded-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 whitespace-nowrap shrink-0 cursor-pointer hover:bg-yellow-500/30"
+      class="retro-metal-btn px-3 py-1.5 text-[9px] font-pixel font-bold uppercase tracking-wider rounded border border-amber-500/50 text-amber-300 shrink-0 cursor-pointer shadow hover:text-white transition-all"
       @click=${() => {
         this.close();
         window.showPage?.("page-account");
@@ -509,7 +509,7 @@ export class SinglePlayerModal extends BaseModal {
     return html`
       <div class="flex flex-col h-full">
         <div
-          class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-6 pt-4 pb-6 mr-1 mx-auto w-full max-w-5xl"
+          class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 sm:px-6 pt-3 pb-6 mx-auto w-full max-w-4xl"
         >
           <saved-games-panel
             class="block mb-6"
@@ -610,25 +610,29 @@ export class SinglePlayerModal extends BaseModal {
         </div>
 
         <!-- Footer Action -->
-        <div class="p-6 border-t border-white/10 bg-black/20 shrink-0">
+        <div
+          class="p-3 sm:p-4 border-t-2 border-[#2b3a2d] bg-[#121813] shrink-0"
+        >
           ${responseHasLinkedIdentity(this.userMeResponse) &&
           this.hasOptionsChanged()
             ? html`<div
-                class="mb-4 px-4 py-3 rounded-xl bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-bold uppercase tracking-wider text-center"
+                class="mb-3 px-4 py-2 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 font-pixel text-[9px] uppercase tracking-wider text-center max-w-md mx-auto"
               >
                 ${translateText("single_modal.options_changed_no_achievements")}
               </div>`
             : null}
-          <o-button
-            variant="primary"
-            width="block"
-            size="lg"
-            translationKey=${this.starting
-              ? "game_settings.starting"
-              : "game_settings.start"}
-            .disable=${this.starting}
-            @click=${this.startGame}
-          ></o-button>
+          <div class="max-w-md mx-auto w-full">
+            <o-button
+              variant="primary"
+              width="block"
+              size="md"
+              translationKey=${this.starting
+                ? "game_settings.starting"
+                : "game_settings.start"}
+              .disable=${this.starting}
+              @click=${this.startGame}
+            ></o-button>
+          </div>
         </div>
       </div>
     `;

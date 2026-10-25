@@ -4,13 +4,11 @@ import { customElement } from "lit/decorators.js";
 import { NavNotificationsController } from "./NavNotificationsController";
 
 const MOBILE_ITEM =
-  "nav-menu-item block w-full text-left font-bold uppercase tracking-[0.05em] " +
-  "text-white/70 transition-all duration-200 cursor-pointer " +
-  "hover:text-cyan-400 hover:translate-x-2.5 " +
-  "hover:drop-shadow-[0_0_20px_rgba(34,211,238,0.5)] " +
-  "[&.active]:text-cyan-400 [&.active]:translate-x-2.5 " +
-  "[&.active]:drop-shadow-[0_0_20px_rgba(34,211,238,0.5)] " +
-  "text-[clamp(18px,2.8vh,32px)] py-[clamp(0.2rem,0.8vh,0.75rem)]";
+  "nav-menu-item block w-full text-left font-retro uppercase tracking-wider " +
+  "text-[#8fa382] transition-all duration-150 cursor-pointer " +
+  "hover:text-[#4ade80] hover:bg-[#1a261c] hover:translate-x-1 " +
+  "[&.active]:text-[#4ade80] [&.active]:bg-[#182a1d] [&.active]:border-l-4 [&.active]:border-[#22c55e] " +
+  "text-[13px] sm:text-[14px] py-2 px-3 border border-transparent hover:border-[#2d4231] rounded-xs";
 
 @customElement("mobile-nav-bar")
 export class MobileNavBar extends LitElement {
@@ -82,19 +80,22 @@ export class MobileNavBar extends LitElement {
       >
         <!-- Logo + Menu -->
         <div
-          class="flex flex-col text-malibu-blue mb-4 ml-[clamp(0.2rem,0.4vw,0.4vh)]"
+          class="flex flex-col items-center gap-1.5 pb-4 mb-2 border-b border-[#2d3a2c]"
         >
-          <div class="flex flex-col items-center gap-1">
-            <img
-              src=${assetUrl("images/OpenFrontLogo.svg")}
-              alt="BorderConflict"
-              class="w-auto h-auto max-w-[220px] max-h-[4.5rem]"
-            />
-            <div
-              id="game-version"
-              class="l-header__highlightText text-center text-[11px] tracking-wider text-cyan-400/70 font-mono mt-0.5"
-            ></div>
+          <div
+            class="text-[#ff3b30] font-pixel text-xs sm:text-sm tracking-wider font-bold glow-red"
+          >
+            BORDERCONFLICT
           </div>
+          <div
+            class="text-[9px] font-retro text-[#7a8c78] tracking-widest uppercase"
+          >
+            TERMINAL TACTIQUE EMBARQUÉ
+          </div>
+          <div
+            id="game-version"
+            class="text-center text-[10px] text-[#4ade80]/70 font-mono"
+          ></div>
         </div>
         <!-- Mobile Navigation Menu Items (same order as the desktop bar) -->
         <button
@@ -105,7 +106,7 @@ export class MobileNavBar extends LitElement {
         <button
           class="${MOBILE_ITEM} ${currentPage === "page-doctrines"
             ? "active"
-            : ""} text-cyan-300"
+            : ""} text-amber-200 font-pixel text-xs"
           data-page="page-doctrines"
         >
           ⚡ Doctrines & Talents

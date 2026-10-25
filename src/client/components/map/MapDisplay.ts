@@ -129,20 +129,20 @@ export class MapDisplay extends LitElement {
         aria-selected="${this.selected}"
         aria-label="${this.translation ?? this.mapName ?? this.mapKey}"
         @keydown="${this.handleKeydown}"
-        class="w-full h-full p-3 flex flex-col items-center justify-between rounded-xl border cursor-pointer transition-all duration-200 active:scale-95 gap-3 group ${this
+        class="w-full h-full p-2.5 flex flex-col items-center justify-between rounded-xl border-2 cursor-pointer transition-all duration-150 active:scale-95 gap-2 group ${this
           .selected
-          ? "bg-malibu-blue/20 border-malibu-blue/50 shadow-[var(--shadow-malibu-blue-strong)]"
-          : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-105"}"
+          ? "bg-[#1f2d22] border-amber-400 text-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.5)]"
+          : "bg-[#101611] border-[#2b3a2d] hover:border-[#3e5241] hover:bg-[#162018] text-[#8fa382]"}"
       >
         ${this.isLoading
           ? html`<div
-              class="w-full aspect-[2/1] text-white/40 transition-transform duration-200 rounded-lg bg-black/20 text-xs font-bold uppercase tracking-wider flex items-center justify-center animate-pulse"
+              class="w-full aspect-[2/1] text-zinc-500 rounded-lg bg-black/40 text-[9px] font-pixel uppercase tracking-wider flex items-center justify-center animate-pulse"
             >
               ${translateText("common.loading")}
             </div>`
           : this.mapWebpPath
             ? html`<div
-                class="w-full aspect-[2/1] relative overflow-hidden rounded-lg bg-black/20"
+                class="w-full aspect-[2/1] relative overflow-hidden rounded-lg bg-black/40 border border-[#223024]"
               >
                 <img
                   src="${this.mapWebpPath}"
@@ -156,7 +156,7 @@ export class MapDisplay extends LitElement {
                 ${this.renderFavoriteButton()}
               </div>`
             : html`<div
-                class="w-full aspect-[2/1] text-red-400 transition-transform duration-200 rounded-lg bg-red-500/10 text-xs font-bold uppercase tracking-wider flex items-center justify-center"
+                class="w-full aspect-[2/1] text-red-400 rounded-lg bg-red-950/40 border border-red-800 text-[9px] font-pixel uppercase tracking-wider flex items-center justify-center"
               >
                 ${translateText("map_component.error")}
               </div>`}
@@ -166,7 +166,10 @@ export class MapDisplay extends LitElement {
             </div>`
           : null}
         <div
-          class="text-xs font-bold text-white uppercase tracking-wider text-center leading-tight break-words hyphens-auto"
+          class="text-[9.5px] sm:text-[10px] font-retro font-bold uppercase tracking-tight text-center leading-tight break-words hyphens-auto w-full ${this
+            .selected
+            ? "text-amber-200 glow-amber"
+            : "text-zinc-300"}"
         >
           ${this.translation || this.mapName}
         </div>

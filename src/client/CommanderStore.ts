@@ -101,7 +101,11 @@ export function getCommanderRankTitle(level: number): {
     return { title: "Stratège Suprême", badge: "👑", color: "#f43f5e" };
   }
   if (level >= 22) {
-    return { title: "Maréchal de BorderConflict", badge: "🌟", color: "#a855f7" };
+    return {
+      title: "Maréchal de BorderConflict",
+      badge: "🌟",
+      color: "#a855f7",
+    };
   }
   if (level >= 15) {
     return { title: "Général de Division", badge: "🎖️", color: "#f59e0b" };
@@ -126,7 +130,9 @@ class CommanderStore {
     if (typeof window !== "undefined") {
       setTimeout(() => this.syncWithServerInBackground(), 10);
       window.addEventListener("focus", () => this.syncWithServerInBackground());
-      window.addEventListener("online", () => this.syncWithServerInBackground());
+      window.addEventListener("online", () =>
+        this.syncWithServerInBackground(),
+      );
     }
   }
 
@@ -158,12 +164,22 @@ class CommanderStore {
           ? parsed.ownedFlares
           : [],
         isVip: !!parsed.isVip,
-        vipUntil: typeof parsed.vipUntil === "number" ? parsed.vipUntil : undefined,
+        vipUntil:
+          typeof parsed.vipUntil === "number" ? parsed.vipUntil : undefined,
         hasBattlePass: !!parsed.hasBattlePass,
-        battlePassSeason: typeof parsed.battlePassSeason === "number" ? parsed.battlePassSeason : undefined,
+        battlePassSeason:
+          typeof parsed.battlePassSeason === "number"
+            ? parsed.battlePassSeason
+            : undefined,
         hasCustomSkinUnlocked: !!parsed.hasCustomSkinUnlocked,
-        customSkinUrl: typeof parsed.customSkinUrl === "string" ? parsed.customSkinUrl : undefined,
-        customSkinName: typeof parsed.customSkinName === "string" ? parsed.customSkinName : undefined,
+        customSkinUrl:
+          typeof parsed.customSkinUrl === "string"
+            ? parsed.customSkinUrl
+            : undefined,
+        customSkinName:
+          typeof parsed.customSkinName === "string"
+            ? parsed.customSkinName
+            : undefined,
       };
     } catch {
       return { ...DEFAULT_PROFILE };
@@ -452,7 +468,10 @@ class CommanderStore {
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        return { ok: false, error: data.error || "Erreur lors de la création du compte." };
+        return {
+          ok: false,
+          error: data.error || "Erreur lors de la création du compte.",
+        };
       }
       if (data.profile) {
         this.profile = { ...data.profile };
@@ -515,8 +534,7 @@ class CommanderStore {
             typeof data.profile.plutonium === "number"
               ? data.profile.plutonium
               : 0,
-          caps:
-            typeof data.profile.caps === "number" ? data.profile.caps : 0,
+          caps: typeof data.profile.caps === "number" ? data.profile.caps : 0,
           ownedFlares: Array.from(
             new Set([...STARTER_FLARES, ...(data.profile.ownedFlares ?? [])]),
           ),
@@ -620,7 +638,9 @@ class CommanderStore {
     this.save();
   }
 
-  applyPresetBranch(branch: "assault" | "fortress" | "economy" | "apocalypse"): void {
+  applyPresetBranch(
+    branch: "assault" | "fortress" | "economy" | "apocalypse",
+  ): void {
     this.profile.doctrineMask = 0;
     const branchTalents = TALENT_DEFINITIONS.filter((t) => t.branch === branch);
     for (const talent of branchTalents) {
@@ -696,7 +716,10 @@ class CommanderStore {
     );
   }
 
-  recordMatchPlayed(won: boolean, durationSeconds: number): {
+  recordMatchPlayed(
+    won: boolean,
+    durationSeconds: number,
+  ): {
     xpGained: number;
     leveledUp: boolean;
   } {
@@ -704,7 +727,7 @@ class CommanderStore {
     if (won) this.profile.victories++;
     const isVip = this.isVipActive();
     // Hard grind rewards: 0 plutonium on loss, 1 on victory. Very scarce caps. VIP gets +25% caps & +2 bonus XP
-    const capsGained = won ? (isVip ? 7 : 5) : (isVip ? 2 : 1);
+    const capsGained = won ? (isVip ? 7 : 5) : isVip ? 2 : 1;
     const puGained = won ? 1 : 0;
     this.profile.plutonium += puGained;
     this.profile.caps += capsGained;
@@ -736,7 +759,11 @@ class CommanderStore {
     this.checkCareerMedals();
   }
 
-  addCurrency(plutonium: number, caps: number, reason: string = "gameplay"): void {
+  addCurrency(
+    plutonium: number,
+    caps: number,
+    reason: string = "gameplay",
+  ): void {
     this.profile.plutonium = Math.max(0, this.profile.plutonium + plutonium);
     this.profile.caps = Math.max(0, this.profile.caps + caps);
     this.saveLocalAndBroadcast();
@@ -844,8 +871,7 @@ class CommanderStore {
       const flare = `flag:${fKey}`;
       if (!this.profile.ownedFlares.includes(flare)) {
         const fLabel =
-          HEXAFRONT_COSMETIC_LABELS[`flags.${fKey}`] ??
-          fKey.replace(/_/g, " ");
+          HEXAFRONT_COSMETIC_LABELS[`flags.${fKey}`] ?? fKey.replace(/_/g, " ");
         pool.push({
           flare,
           label: `Bannière ${fLabel}`,
@@ -927,8 +953,7 @@ class CommanderStore {
           level: this.profile.level,
           xpInLevel: this.profile.xp,
           xpForNext: xpMax,
-          lifetimeXp:
-            (this.profile.level - 1) * 450 + this.profile.xp,
+          lifetimeXp: (this.profile.level - 1) * 450 + this.profile.xp,
           legend: this.profile.level >= MAX_COMMANDER_LEVEL,
           canPrestige: false,
         },

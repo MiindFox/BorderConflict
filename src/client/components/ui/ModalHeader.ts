@@ -13,16 +13,15 @@ export interface ModalHeaderProps {
   showDivider?: boolean;
 }
 
-const DEFAULT_WRAPPER_CLASS = "flex flex-wrap items-center gap-2 shrink-0";
-const DEFAULT_DIVIDER_CLASS = "border-b border-white/10 bg-slate-900/40";
-const DEFAULT_PADDING_CLASS = "p-4 lg:p-6";
-const DEFAULT_LEFT_CLASS = "flex items-center gap-4 flex-1";
+const DEFAULT_WRAPPER_CLASS =
+  "flex flex-wrap items-center gap-2 shrink-0 bg-[#162017] select-none";
+const DEFAULT_DIVIDER_CLASS = "border-b-2 border-[#2b3a2d]";
+const DEFAULT_PADDING_CLASS = "px-4 py-3 sm:px-5 sm:py-3.5";
+const DEFAULT_LEFT_CLASS = "flex items-center gap-3 flex-1 min-w-0";
 const DEFAULT_BUTTON_CLASS =
-  "group flex items-center justify-center w-10 h-10 rounded-xl shrink-0 " +
-  "bg-slate-900/80 hover:bg-cyan-500/15 transition-all border border-white/10 hover:border-cyan-400/40 shadow-sm";
+  "retro-metal-btn group flex items-center justify-center size-9 rounded-lg shrink-0 cursor-pointer text-amber-200 hover:text-white transition-all shadow-md";
 export const DEFAULT_TITLE_CLASS =
-  "text-white text-xl lg:text-2xl font-extrabold uppercase " +
-  "tracking-widest break-words hyphens-auto";
+  "text-amber-200 text-sm sm:text-base font-pixel uppercase tracking-widest break-words hyphens-auto glow-amber";
 
 const withClasses = (...classes: Array<string | undefined>) =>
   classes.filter(Boolean).join(" ");

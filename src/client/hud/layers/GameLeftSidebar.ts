@@ -112,14 +112,17 @@ export class GameLeftSidebar extends LitElement implements Controller {
   render() {
     return html`
       <aside
-        class=${`fixed top-0 left-0 z-900 flex flex-col max-h-[calc(100vh-80px)] overflow-y-auto p-2.5 bg-slate-950/90 backdrop-blur-xl border-b border-r border-cyan-500/25 shadow-[0_12px_36px_rgba(0,0,0,0.75)] rounded-br-xl ${this.isPlayerStatsShown || this.isTeamStatsShown ? "max-[400px]:w-full max-[400px]:rounded-none" : ""} transition-all duration-300 ease-out transform ${
+        class=${`fixed top-0 left-0 z-900 flex flex-col max-h-[calc(100vh-80px)] overflow-y-auto p-2.5 bg-[#121813]/95 border-b-2 border-r-2 border-[#2b3a2d] shadow-[0_8px_25px_rgba(0,0,0,0.85)] rounded-br-xl ${this.isPlayerStatsShown || this.isTeamStatsShown ? "max-[400px]:w-full max-[400px]:rounded-none" : ""} transition-all duration-300 ease-out transform ${
           this.isVisible ? "translate-x-0" : "hidden"
         }`}
         style="margin-top: ${this.barOffset}px;"
       >
         <div class="flex items-center gap-2.5 xl:gap-4 text-white">
           <div
-            class="cursor-pointer p-1.5 bg-slate-900/90 hover:bg-cyan-500/20 border rounded-lg ${this.isPlayerStatsShown ? "border-cyan-400/60 bg-cyan-500/15 shadow-[0_0_12px_rgba(34,211,238,0.25)]" : "border-white/15 hover:border-cyan-400/50"} transition-all"
+            class="cursor-pointer p-1.5 bg-[#18231a] hover:bg-[#223024] border-2 rounded-lg ${this
+              .isPlayerStatsShown
+              ? "border-green-400/80 bg-[#1e3825] shadow-[0_0_12px_rgba(34,197,94,0.3)] text-white"
+              : "border-[#2b3a2d] hover:border-amber-400/60 text-[#8fa382]"} transition-all"
             @click=${this.togglePlayerStats}
             role="button"
             tabindex="0"
@@ -143,7 +146,10 @@ export class GameLeftSidebar extends LitElement implements Controller {
           ${this.isTeamGame
             ? html`
                 <div
-                  class="cursor-pointer p-1.5 bg-slate-900/90 hover:bg-cyan-500/20 border rounded-lg ${this.isTeamStatsShown ? "border-cyan-400/60 bg-cyan-500/15 shadow-[0_0_12px_rgba(34,211,238,0.25)]" : "border-white/15 hover:border-cyan-400/50"} transition-all"
+                  class="cursor-pointer p-1.5 bg-[#18231a] hover:bg-[#223024] border-2 rounded-lg ${this
+                    .isTeamStatsShown
+                    ? "border-green-400/80 bg-[#1e3825] shadow-[0_0_12px_rgba(34,211,238,0.25)] text-white"
+                    : "border-[#2b3a2d] hover:border-amber-400/60 text-[#8fa382]"} transition-all"
                   @click=${this.toggleTeamStats}
                   role="button"
                   tabindex="0"

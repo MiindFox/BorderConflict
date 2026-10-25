@@ -32,42 +32,39 @@ export class Footer extends LitElement {
   render() {
     return html`
       <footer
-        class="[.in-game_&]:hidden bg-slate-950/80 backdrop-blur-xl flex flex-col items-center justify-center gap-1 pt-2 pb-3 text-white/50 w-full border-t border-white/[0.08] shrink-0 relative z-50 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-center lg:gap-0"
+        class="[.in-game_&]:hidden bg-[#161d17] border-t-2 border-[#0e130f] py-2 px-4 text-zinc-400 font-terminal text-[13px] w-full shrink-0 relative z-50 flex flex-wrap items-center justify-between gap-2 select-none"
       >
-        <div
-          class="flex w-full flex-col items-center gap-1 lg:col-start-2 lg:w-auto"
-        >
-          <!-- The nav bar shows the game version alone so it reads the same
-               across web and Steam; the full string, shell version included,
-               lives down here where a player can quote it in a bug report. -->
-          <div class="footer-version text-xs mt-1 text-center px-4">
-            ${this.versionLabel}
-          </div>
-          <div
-            class="text-xs mt-1 flex items-center justify-center gap-4 px-4"
+        <div class="flex items-center gap-2">
+          <span class="size-2 rounded-full led-green-on"></span>
+          <span class="text-green-400 font-bold tracking-wider uppercase"
+            >LIAISON QG : OPÉRATIONNELLE</span
           >
-            <a
-              href="/terms-of-service.html"
-              data-i18n="main.terms_of_service"
-              target="_blank"
-              class="hover:text-white transition-colors"
-            ></a>
-            <span data-i18n="main.copyright"></span>
-            <a
-              href="/privacy-policy.html"
-              data-i18n="main.privacy_policy"
-              target="_blank"
-              class="hover:text-white transition-colors"
-            ></a>
-          </div>
+          <span class="text-zinc-600">|</span>
+          <span class="footer-version text-zinc-400">
+            ${this.versionLabel}
+          </span>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs font-retro">
+          <a
+            href="/terms-of-service.html"
+            data-i18n="main.terms_of_service"
+            target="_blank"
+            class="hover:text-amber-300 transition-colors uppercase text-[10px]"
+          ></a>
+          <span class="text-zinc-600">•</span>
+          <a
+            href="/privacy-policy.html"
+            data-i18n="main.privacy_policy"
+            target="_blank"
+            class="hover:text-amber-300 transition-colors uppercase text-[10px]"
+          ></a>
         </div>
 
         <!-- Single instance: translateText() resolves the active language via
              document.querySelector("lang-selector"), so a second one would
              shadow it. -->
-        <lang-selector
-          class="absolute right-4 top-3 lg:top-1/2 lg:-translate-y-1/2"
-        ></lang-selector>
+        <lang-selector class="relative right-0"></lang-selector>
       </footer>
     `;
   }

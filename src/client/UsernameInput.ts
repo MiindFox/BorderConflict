@@ -1014,9 +1014,7 @@ export class UsernameInput extends LitElement {
 
   // Name field.
   private renderNameControl() {
-    return html`
-      ${this.renderNameInput()}
-    `;
+    return html` ${this.renderNameInput()} `;
   }
 
   private renderVerifiedChip() {

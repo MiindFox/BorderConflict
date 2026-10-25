@@ -37,7 +37,8 @@ export class RankedModal extends BaseModal {
     return (
       responseHasLinkedIdentity(this.userMeResponse) ||
       this.portalSignedIn ||
-      (this.userMeResponse !== false && Boolean(this.userMeResponse.user?.email))
+      (this.userMeResponse !== false &&
+        Boolean(this.userMeResponse.user?.email))
     );
   }
 

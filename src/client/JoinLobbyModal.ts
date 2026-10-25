@@ -303,7 +303,9 @@ export class JoinLobbyModal extends BaseModal {
 
   private renderJoinForm() {
     return html`
-      <div class="custom-scrollbar p-6 space-y-4 mr-1">
+      <div
+        class="custom-scrollbar p-4 sm:p-6 space-y-4 max-w-lg mx-auto w-full"
+      >
         <form @submit=${this.joinLobbyFromInput}>
           <div class="flex flex-col gap-3">
             <div class="flex gap-2">

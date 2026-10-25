@@ -107,10 +107,10 @@ export class DoctrinesModal extends BaseModal {
     const spentPoints = commanderStore.getSpentPoints();
 
     return html`
-      <div class="p-4 sm:p-6 space-y-6 text-slate-100">
+      <div class="p-4 sm:p-6 space-y-6 text-[#cbd5e1]">
         <!-- COMMANDER PROFILE HEADER CARD -->
         <div
-          class="relative overflow-hidden rounded-2xl border border-cyan-400/25 bg-slate-900/90 p-5 shadow-xl"
+          class="relative overflow-hidden rounded-xl border-2 border-[#2b3a2d] bg-[#121813] p-4 sm:p-5 shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
         >
           <div
             class="flex flex-col lg:flex-row lg:items-center justify-between gap-4"
@@ -118,41 +118,44 @@ export class DoctrinesModal extends BaseModal {
             <!-- Left: Rank & Level -->
             <div class="flex items-center gap-4">
               <div
-                class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/40 bg-cyan-500/10 text-3xl shadow-inner"
+                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border-2 border-[#3b4e3e] bg-[#18231a] text-3xl shadow-inner"
               >
                 ${rankInfo.badge}
               </div>
               <div>
                 <div class="flex items-center gap-2 flex-wrap">
                   <span
-                    class="rounded-full bg-cyan-500/20 border border-cyan-400/40 px-2.5 py-0.5 text-xs font-extrabold uppercase tracking-wider text-cyan-300"
+                    class="rounded bg-[#1a291d] border border-[#4ade80]/40 px-2 py-0.5 text-xs font-mono font-bold uppercase tracking-wider text-[#4ade80]"
                   >
                     NIVEAU ${this.profile.level}
                   </span>
                   <span
-                    class="text-sm font-bold uppercase tracking-widest"
-                    style="color: ${rankInfo.color}"
+                    class="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-amber-300"
                   >
                     ${rankInfo.title}
                   </span>
                 </div>
-                <h2 class="mt-1 text-xl font-black tracking-tight text-white">
-                  Quartier Général de Commandement BorderConflict
+                <h2
+                  class="mt-1 text-base sm:text-lg font-mono font-bold tracking-tight text-white"
+                >
+                  QUARTIER GÉNÉRAL DES DOCTRINES
                 </h2>
                 <div class="mt-2 w-full max-w-md">
-                  <div class="flex justify-between text-xs text-slate-300 mb-1">
+                  <div
+                    class="flex justify-between text-xs font-mono text-[#8fa382] mb-1"
+                  >
                     <span
-                      >Expérience de Compte :
-                      <strong class="text-cyan-300">${this.profile.xp}</strong>
+                      >XP :
+                      <strong class="text-amber-300">${this.profile.xp}</strong>
                       / ${xpNeeded} XP</span
                     >
-                    <span class="font-bold text-cyan-400">${xpPct}%</span>
+                    <span class="font-bold text-[#4ade80]">${xpPct}%</span>
                   </div>
                   <div
-                    class="h-2.5 w-full overflow-hidden rounded-full bg-slate-800 border border-white/10"
+                    class="h-2.5 w-full overflow-hidden rounded bg-[#0b100c] border border-[#2b3a2d]"
                   >
                     <div
-                      class="h-full bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 transition-all duration-300"
+                      class="h-full bg-gradient-to-r from-[#166534] via-[#22c55e] to-[#4ade80] transition-all duration-300"
                       style="width: ${xpPct}%"
                     ></div>
                   </div>
@@ -163,19 +166,21 @@ export class DoctrinesModal extends BaseModal {
             <!-- Right: Doctrine Points & Actions -->
             <div class="flex flex-wrap items-center gap-3">
               <div
-                class="flex items-center gap-3 rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-2.5"
+                class="flex items-center gap-3 rounded-lg border-2 border-amber-500/40 bg-[#211a0a] px-3.5 py-2 shadow-inner"
               >
-                <span class="text-2xl">💠</span>
+                <span class="text-2xl">⚡</span>
                 <div>
                   <div
-                    class="text-[11px] font-bold uppercase tracking-wider text-amber-300/90"
+                    class="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400"
                   >
-                    Points de Doctrine
+                    POINTS DE DOCTRINE
                   </div>
-                  <div class="text-lg font-black text-white">
-                    <span class="text-amber-400">${availablePoints}</span>
-                    disponibles
-                    <span class="text-xs font-normal text-slate-400"
+                  <div class="text-base font-mono font-bold text-white">
+                    <span class="text-amber-300">${availablePoints}</span>
+                    <span class="text-xs font-normal text-amber-200/70"
+                      >DISPONIBLES</span
+                    >
+                    <span class="text-[10px] font-normal text-[#8fa382]"
                       >(${spentPoints} investis)</span
                     >
                   </div>
@@ -186,61 +191,66 @@ export class DoctrinesModal extends BaseModal {
                 type="button"
                 @click=${this.handleResetTalents}
                 ?disabled=${spentPoints === 0}
-                class="cursor-pointer rounded-xl border border-rose-400/30 bg-rose-500/15 hover:bg-rose-500/25 disabled:opacity-40 px-3.5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-rose-200 transition-all active:scale-95"
+                class="retro-metal-btn cursor-pointer rounded border border-[#ef4444]/40 hover:border-[#ef4444] disabled:opacity-40 px-3 py-2 text-[11px] font-mono font-bold uppercase tracking-wider text-rose-300 transition-all active:scale-95"
               >
-                🔄 Réinitialiser
+                🔄 RÉINITIALISER
               </button>
             </div>
           </div>
         </div>
 
         <!-- NAVIGATION TABS -->
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+        <div
+          class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-[#2b3a2d] pb-3"
+        >
           <div class="flex flex-wrap gap-2">
             <button
               type="button"
               @click=${() => (this.currentView = "doctrines")}
-              class="cursor-pointer rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider transition-all ${this
+              class="retro-metal-btn cursor-pointer rounded px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-tight whitespace-nowrap transition-all ${this
                 .currentView === "doctrines"
-                ? "bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/25"
-                : "bg-slate-800/80 text-slate-300 hover:bg-slate-700/80"}"
+                ? "ring-2 ring-amber-400 text-amber-200 brightness-110 shadow-[0_0_10px_rgba(245,158,11,0.4)]"
+                : "text-[#8fa382] hover:text-white"}"
             >
-              🌳 Arbre de Talents (${spentPoints}/${this.profile.level})
+              🌳 ARBRE TALENTS (${spentPoints}/${this.profile.level})
             </button>
             <button
               type="button"
               @click=${() => (this.currentView = "events")}
-              class="cursor-pointer rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider transition-all ${this
+              class="retro-metal-btn cursor-pointer rounded px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-tight whitespace-nowrap transition-all ${this
                 .currentView === "events"
-                ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/25"
-                : "bg-slate-800/80 text-slate-300 hover:bg-slate-700/80"}"
+                ? "ring-2 ring-amber-400 text-amber-200 brightness-110 shadow-[0_0_10px_rgba(245,158,11,0.4)]"
+                : "text-[#8fa382] hover:text-white"}"
             >
-              🌍 Événements Mondiaux (${WORLD_EVENTS_CATALOG.length})
+              🌍 ÉVÉNEMENTS (${WORLD_EVENTS_CATALOG.length})
             </button>
             <button
               type="button"
               @click=${() => (this.currentView = "medals")}
-              class="cursor-pointer rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider transition-all ${this
+              class="retro-metal-btn cursor-pointer rounded px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-tight whitespace-nowrap transition-all ${this
                 .currentView === "medals"
-                ? "bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25"
-                : "bg-slate-800/80 text-slate-300 hover:bg-slate-700/80"}"
+                ? "ring-2 ring-amber-400 text-amber-200 brightness-110 shadow-[0_0_10px_rgba(245,158,11,0.4)]"
+                : "text-[#8fa382] hover:text-white"}"
             >
-              🎖️ Médailles & Mégastructures (${this.profile.unlockedMedals.length}/${MEDAL_DEFINITIONS.length})
+              🎖️ MÉDAILLES & MEGASTRUCTURES
+              (${this.profile.unlockedMedals
+                .length}/${MEDAL_DEFINITIONS.length})
             </button>
           </div>
 
           ${this.currentView === "doctrines"
             ? html`
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="text-xs text-slate-400 mr-1 font-semibold"
-                    >Presets rapides :</span
+                  <span
+                    class="text-[11px] font-mono text-[#8fa382] mr-1 uppercase"
+                    >Presets :</span
                   >
                   ${DOCTRINE_BRANCHES.map(
                     (b) => html`
                       <button
                         type="button"
                         @click=${() => this.handlePreset(b.id)}
-                        class="cursor-pointer rounded-lg border border-white/10 bg-slate-800/90 hover:bg-slate-700 px-2.5 py-1 text-xs font-bold text-slate-200 transition-colors"
+                        class="retro-metal-btn cursor-pointer rounded px-2 py-1 text-[11px] font-mono font-bold text-amber-200/90 hover:text-amber-100 transition-colors whitespace-nowrap"
                       >
                         ${b.icon} ${b.name}
                       </button>
@@ -264,8 +274,8 @@ export class DoctrinesModal extends BaseModal {
     const mods = commanderStore.getActiveModifiers();
 
     return html`
-      <!-- 4-BRANCH TALENT GRID -->
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <!-- 2x2 BRANCH TALENT GRID (Spacious 2 Columns) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         ${DOCTRINE_BRANCHES.map((branch) => {
           const talents = TALENT_DEFINITIONS.filter(
             (t) => t.branch === branch.id,
@@ -278,29 +288,30 @@ export class DoctrinesModal extends BaseModal {
 
           return html`
             <div
-              class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/75 p-4 shadow-lg"
-              style="border-top: 3px solid ${branch.accentHex}"
+              class="flex flex-col rounded-xl border-2 border-[#2b3a2d] bg-[#141d16] p-4 shadow-xl"
+              style="border-top: 4px solid ${branch.accentHex}"
             >
               <!-- Branch Header -->
-              <div class="mb-4 flex items-start justify-between">
-                <div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-2xl">${branch.icon}</span>
-                    <h3 class="text-base font-black uppercase tracking-wide text-white">
-                      ${branch.name}
-                    </h3>
-                  </div>
-                  <p class="mt-1 text-xs text-slate-400 leading-snug">
-                    ${branch.subtitle}
-                  </p>
+              <div
+                class="mb-2 flex items-center justify-between gap-3 border-b border-[#2b3a2d] pb-2.5"
+              >
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span class="text-2xl shrink-0">${branch.icon}</span>
+                  <h3
+                    class="text-sm sm:text-base font-bold uppercase tracking-wider text-white font-mono whitespace-nowrap"
+                  >
+                    ${branch.name}
+                  </h3>
                 </div>
                 <span
-                  class="rounded-lg bg-white/5 border border-white/10 px-2 py-0.5 text-xs font-extrabold"
-                  style="color: ${branch.accentHex}"
+                  class="shrink-0 rounded bg-[#0c120d] border border-[#3b4c3d] px-2.5 py-1 text-xs font-mono font-bold text-amber-300 shadow-inner"
                 >
-                  ${branchPoints}/9
+                  ${branchPoints} / 9
                 </span>
               </div>
+              <p class="mb-3.5 text-xs text-[#8fa382] font-mono leading-snug">
+                ${branch.subtitle}
+              </p>
 
               <!-- Branch Talents (Tiers 1 -> 2 -> 3) -->
               <div class="space-y-3 flex-1">
@@ -317,54 +328,59 @@ export class DoctrinesModal extends BaseModal {
                           <div class="flex justify-center -my-1">
                             <div
                               class="h-3 w-0.5 ${unlocked
-                                ? "bg-cyan-400"
-                                : "bg-slate-700"}"
+                                ? "bg-[#22c55e]"
+                                : "bg-[#2b3a2d]"}"
                             ></div>
                           </div>
                         `
                       : nothing}
                     <div
-                      class="relative rounded-xl border p-3.5 transition-all ${isMaxed
-                        ? "border-amber-400/50 bg-amber-500/10"
+                      class="relative rounded-lg border-2 p-3 transition-all ${isMaxed
+                        ? "border-amber-400/60 bg-[#242111]"
                         : rank > 0
-                          ? "border-cyan-400/50 bg-cyan-500/10"
+                          ? "border-[#22c55e]/60 bg-[#162519]"
                           : unlocked
-                            ? "border-white/15 bg-slate-800/75 hover:border-white/30"
-                            : "border-white/5 bg-slate-950/60 opacity-55"}"
+                            ? "border-[#2b3a2d] bg-[#18231a] hover:border-[#3d5240]"
+                            : "border-[#1e271f] bg-[#0f1510] opacity-50"}"
                     >
                       <div class="flex items-start justify-between gap-2">
-                        <div class="flex items-center gap-2.5">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
                           <div
-                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-slate-900 text-xl"
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-[#2b3a2d] bg-[#0c120d] text-lg"
                           >
                             ${talent.icon}
                           </div>
-                          <div>
-                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                              Palier ${talent.tier}
+                          <div class="min-w-0 flex-1">
+                            <div
+                              class="text-[9.5px] font-mono font-bold uppercase tracking-wider text-[#8fa382]"
+                            >
+                              PALIER ${talent.tier}
                             </div>
-                            <div class="text-sm font-extrabold text-white">
+                            <div
+                              class="text-[12px] sm:text-[13px] font-mono font-bold text-white leading-tight break-words"
+                            >
                               ${talent.name}
                             </div>
                           </div>
                         </div>
 
                         <!-- Rank Pips -->
-                        <div class="flex items-center gap-1">
+                        <div class="flex items-center gap-1 shrink-0 pt-1">
                           ${[1, 2, 3].map(
                             (pip) => html`
                               <span
-                                class="h-2.5 w-2.5 rounded-full border ${rank >=
-                                pip
-                                  ? "bg-cyan-400 border-cyan-200 shadow-sm shadow-cyan-400"
-                                  : "bg-slate-800 border-slate-600"}"
+                                class="h-2 w-2 rounded-full border ${rank >= pip
+                                  ? "bg-[#22c55e] border-[#86efac] shadow-[0_0_6px_rgba(34,197,94,0.8)]"
+                                  : "bg-[#141d16] border-[#2b3a2d]"}"
                               ></span>
                             `,
                           )}
                         </div>
                       </div>
 
-                      <p class="mt-2 text-xs text-slate-300 leading-relaxed">
+                      <p
+                        class="mt-2 text-[11px] font-mono text-[#cbd5e1] leading-relaxed"
+                      >
                         ${rank > 0
                           ? talent.rankDescriptions[rank - 1]
                           : talent.shortDesc}
@@ -372,22 +388,28 @@ export class DoctrinesModal extends BaseModal {
 
                       ${rank > 0 && rank < 3
                         ? html`
-                            <div class="mt-1 text-[11px] text-cyan-300/90">
-                              Prochain rang : ${talent.rankDescriptions[rank]}
+                            <div
+                              class="mt-1.5 text-[10.5px] font-mono font-bold text-[#4ade80] leading-snug"
+                            >
+                              SUIVANT : ${talent.rankDescriptions[rank]}
                             </div>
                           `
                         : nothing}
 
-                      <div class="mt-3 flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-slate-400">
-                          Rang ${rank} / ${talent.maxRank}
+                      <div
+                        class="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-[#202c22]"
+                      >
+                        <span
+                          class="text-[10.5px] font-mono font-bold text-[#8fa382]"
+                        >
+                          RANG ${rank} / ${talent.maxRank}
                         </span>
                         ${isMaxed
                           ? html`
                               <span
-                                class="rounded-lg bg-amber-500/20 border border-amber-400/40 px-2.5 py-1 text-[11px] font-extrabold uppercase text-amber-300"
+                                class="rounded bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 text-[10px] font-mono font-bold uppercase text-amber-300"
                               >
-                                ★ Maîtrisé
+                                ★ MAÎTRISÉ
                               </span>
                             `
                           : html`
@@ -395,15 +417,15 @@ export class DoctrinesModal extends BaseModal {
                                 type="button"
                                 ?disabled=${!canUpgrade}
                                 @click=${() => this.handleUpgradeTalent(talent)}
-                                class="cursor-pointer rounded-lg px-3 py-1 text-xs font-extrabold uppercase tracking-wider transition-all ${canUpgrade
-                                  ? "bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-md shadow-cyan-500/20"
-                                  : "bg-slate-800 text-slate-500 cursor-not-allowed"}"
+                                class="retro-metal-btn cursor-pointer rounded px-2.5 py-1 text-[10.5px] font-mono font-bold uppercase tracking-wider transition-all ${canUpgrade
+                                  ? "text-amber-300 hover:text-white border-amber-400/50"
+                                  : "text-[#556758] border-[#202b22] opacity-50 cursor-not-allowed"}"
                               >
                                 ${!unlocked
-                                  ? "🔒 Verrouillé"
+                                  ? "🔒 BLOQUÉ"
                                   : availablePoints <= 0
-                                    ? "0 Point"
-                                    : "+ Améliorer"}
+                                    ? "0 POINT"
+                                    : "+ AMÉLIORER"}
                               </button>
                             `}
                       </div>
@@ -418,46 +440,72 @@ export class DoctrinesModal extends BaseModal {
 
       <!-- ACTIVE DOCTRINE SUMMARY BAR -->
       <div
-        class="rounded-2xl border border-white/10 bg-slate-900/90 p-4 flex flex-wrap items-center justify-between gap-3"
+        class="rounded-xl border-2 border-[#2b3a2d] bg-[#121813] p-3.5 flex flex-wrap items-center justify-between gap-3 shadow-lg"
       >
-        <div class="text-xs font-extrabold uppercase tracking-wider text-cyan-400">
-          ⚡ Micro-Bonus Tactiques Actifs (Équilibrés Compétitif) :
+        <div
+          class="text-xs font-mono font-bold uppercase tracking-wider text-amber-300"
+        >
+          ⚡ BONUS TACTIQUES ACTIFS (COMMANDEMENT) :
         </div>
         <div class="flex flex-wrap gap-2 text-xs">
-          <span class="rounded-lg bg-slate-800 px-2.5 py-1 text-slate-200">
-            ⚔️ Vitesse d'attaque :
-            <strong class="text-cyan-300"
-              >+${Number(((mods.attackSpeedMult - 1) * 100).toFixed(1))}%</strong
+          <span
+            class="rounded border border-[#2b3a2d] bg-[#18231a] px-2.5 py-1 text-[#cbd5e1] font-mono"
+          >
+            ⚔️ ATTAQUE :
+            <strong class="text-[#4ade80]"
+              >+${Number(
+                ((mods.attackSpeedMult - 1) * 100).toFixed(1),
+              )}%</strong
             >
           </span>
-          <span class="rounded-lg bg-slate-800 px-2.5 py-1 text-slate-200">
-            🚩 Troupes départ :
-            <strong class="text-cyan-300"
-              >+${Number(((mods.startManpowerMult - 1) * 100).toFixed(1))}%</strong
+          <span
+            class="rounded border border-[#2b3a2d] bg-[#18231a] px-2.5 py-1 text-[#cbd5e1] font-mono"
+          >
+            🚩 DÉPART :
+            <strong class="text-[#4ade80]"
+              >+${Number(
+                ((mods.startManpowerMult - 1) * 100).toFixed(1),
+              )}%</strong
             >
           </span>
-          <span class="rounded-lg bg-slate-800 px-2.5 py-1 text-slate-200">
-            🏰 Puissance Défense :
-            <strong class="text-cyan-300"
-              >+${Number(((mods.defensePostStrengthMult - 1) * 100).toFixed(1))}%</strong
+          <span
+            class="rounded border border-[#2b3a2d] bg-[#18231a] px-2.5 py-1 text-[#cbd5e1] font-mono"
+          >
+            🏰 DÉFENSE :
+            <strong class="text-[#4ade80]"
+              >+${Number(
+                ((mods.defensePostStrengthMult - 1) * 100).toFixed(1),
+              )}%</strong
             >
           </span>
-          <span class="rounded-lg bg-slate-800 px-2.5 py-1 text-slate-200">
-            🚢 Or Commercial :
+          <span
+            class="rounded border border-[#2b3a2d] bg-[#18231a] px-2.5 py-1 text-[#cbd5e1] font-mono"
+          >
+            🚢 COMMERCE :
             <strong class="text-amber-300"
-              >+${Number(((mods.tradeAndTrainGoldMult - 1) * 100).toFixed(1))}%</strong
+              >+${Number(
+                ((mods.tradeAndTrainGoldMult - 1) * 100).toFixed(1),
+              )}%</strong
             >
           </span>
-          <span class="rounded-lg bg-slate-800 px-2.5 py-1 text-slate-200">
-            🏙️ Capacité Villes :
+          <span
+            class="rounded border border-[#2b3a2d] bg-[#18231a] px-2.5 py-1 text-[#cbd5e1] font-mono"
+          >
+            🏙️ CAPACITÉ :
             <strong class="text-amber-300"
-              >+${Number(((mods.cityCapacityMult - 1) * 100).toFixed(1))}%</strong
+              >+${Number(
+                ((mods.cityCapacityMult - 1) * 100).toFixed(1),
+              )}%</strong
             >
           </span>
-          <span class="rounded-lg bg-slate-800 px-2.5 py-1 text-slate-200">
-            ☢️ Coût Silos/Bombes :
+          <span
+            class="rounded border border-[#2b3a2d] bg-[#18231a] px-2.5 py-1 text-[#cbd5e1] font-mono"
+          >
+            ☢️ SILOS/BOMBES :
             <strong class="text-purple-300"
-              >-${Number(((1 - mods.nukeAndSiloCostMult) * 100).toFixed(1))}%</strong
+              >-${Number(
+                ((1 - mods.nukeAndSiloCostMult) * 100).toFixed(1),
+              )}%</strong
             >
           </span>
         </div>
@@ -469,13 +517,14 @@ export class DoctrinesModal extends BaseModal {
     return html`
       <div class="space-y-4">
         <div
-          class="rounded-2xl border border-indigo-400/30 bg-indigo-950/30 p-4 text-xs sm:text-sm text-indigo-100 leading-relaxed"
+          class="rounded-xl border-2 border-[#2b3a2d] bg-[#141d16] p-4 text-xs font-mono text-[#cbd5e1] leading-relaxed shadow-lg"
         >
-          <strong class="text-indigo-300 uppercase tracking-wider"
-            >🌍 Système d'Événements Mondiaux Dynamiques :</strong
+          <strong
+            class="text-amber-300 font-mono font-bold uppercase tracking-wider block mb-1"
+            >🌍 SYSTÈME D'ÉVÉNEMENTS MONDIAUX DYNAMIQUES :</strong
           >
-          Au cours de chaque partie, le monde de BorderConflict traverse des crises
-          géopolitiques, économiques et climatiques déterministes. Un
+          Au cours de chaque partie, le monde traverse des crises géopolitiques,
+          économiques et climatiques déterministes. Un
           <strong>radar prévisionnel vous avertit 10 secondes avant</strong>
           chaque événement, et l'intensité augmente avec le
           <strong>Niveau de Tension Mondiale (I → II → III)</strong> !
@@ -485,33 +534,37 @@ export class DoctrinesModal extends BaseModal {
           ${WORLD_EVENTS_CATALOG.map(
             (ev) => html`
               <div
-                class="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-md flex flex-col justify-between"
+                class="rounded-xl border-2 border-[#2b3a2d] bg-[#141d16] p-4 shadow-md flex flex-col justify-between"
                 style="border-left: 4px solid ${ev.accentColor}"
               >
                 <div>
                   <div class="flex items-start justify-between gap-2">
-                    <div class="flex items-center gap-2.5">
-                      <span class="text-2xl">${ev.icon}</span>
-                      <div>
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                      <span class="text-2xl shrink-0">${ev.icon}</span>
+                      <div class="min-w-0 flex-1">
                         <span
-                          class="text-[10px] font-extrabold uppercase tracking-widest"
+                          class="text-[10px] font-mono font-bold uppercase tracking-widest"
                           style="color: ${ev.accentColor}"
                         >
                           ${ev.categoryLabel}
                         </span>
-                        <h4 class="text-base font-black text-white">
+                        <h4
+                          class="text-xs sm:text-sm font-mono font-bold text-white truncate"
+                        >
                           ${ev.name}
                         </h4>
                       </div>
                     </div>
                     <span
-                      class="rounded-md bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-bold text-slate-300"
+                      class="shrink-0 rounded bg-[#0c120d] border border-[#2b3a2d] px-2 py-0.5 text-[10px] font-mono text-[#8fa382]"
                     >
-                      Tension Min. ${ev.minEscalationTier}
+                      TENSION MIN. ${ev.minEscalationTier}
                     </span>
                   </div>
 
-                  <p class="mt-2 text-xs text-slate-300 leading-relaxed">
+                  <p
+                    class="mt-2 text-xs font-mono text-[#cbd5e1] leading-relaxed"
+                  >
                     ${ev.lore}
                   </p>
 
@@ -519,7 +572,7 @@ export class DoctrinesModal extends BaseModal {
                     ${ev.modifierBadges.map(
                       (badge) => html`
                         <span
-                          class="rounded-lg bg-slate-800 border border-white/10 px-2.5 py-1 text-[11px] font-bold text-cyan-200"
+                          class="rounded border border-[#2b3a2d] bg-[#18231a] px-2 py-0.5 text-[10.5px] font-mono font-bold text-[#4ade80]"
                         >
                           ${badge}
                         </span>
@@ -528,15 +581,17 @@ export class DoctrinesModal extends BaseModal {
                   </div>
                 </div>
 
-                <div class="mt-3 pt-2.5 border-t border-white/10 space-y-1">
+                <div class="mt-3 pt-2.5 border-t border-[#2b3a2d] space-y-1">
                   ${ev.pulseDescription
                     ? html`
-                        <div class="text-[11px] font-bold text-amber-300">
-                          ⚡ Impulsion (5s) : ${ev.pulseDescription}
+                        <div
+                          class="text-[11px] font-mono font-bold text-amber-300"
+                        >
+                          ⚡ IMPULSION (5s) : ${ev.pulseDescription}
                         </div>
                       `
                     : nothing}
-                  <div class="text-[11px] text-slate-400 italic">
+                  <div class="text-[11px] font-mono text-[#8fa382] italic">
                     💡 Conseil : ${ev.strategicTip}
                   </div>
                 </div>
@@ -549,8 +604,7 @@ export class DoctrinesModal extends BaseModal {
   }
 
   private handleEquipMedal(medalId: MedalId) {
-    const next =
-      this.profile.equippedMedal === medalId ? null : medalId;
+    const next = this.profile.equippedMedal === medalId ? null : medalId;
     commanderStore.equipMedal(next);
     if (next) {
       const def = MEDAL_DEFINITIONS.find((m) => m.id === next);
@@ -567,65 +621,104 @@ export class DoctrinesModal extends BaseModal {
       <div class="space-y-6">
         <!-- CAREER STATS STRIP -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="rounded-xl border border-cyan-500/25 bg-slate-900/90 p-3.5 text-center">
-            <div class="text-2xl font-black text-cyan-300">${p.victories}</div>
-            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              🏆 Victoires
+          <div
+            class="rounded-xl border-2 border-[#2b3a2d] bg-[#141d16] p-3 text-center"
+          >
+            <div class="text-xl sm:text-2xl font-mono font-bold text-[#4ade80]">
+              ${p.victories}
+            </div>
+            <div
+              class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-[#8fa382] mt-1"
+            >
+              🏆 VICTOIRES
             </div>
           </div>
-          <div class="rounded-xl border border-indigo-500/25 bg-slate-900/90 p-3.5 text-center">
-            <div class="text-2xl font-black text-indigo-300">${p.gamesPlayed}</div>
-            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              ⚔️ Parties Jouées
+          <div
+            class="rounded-xl border-2 border-[#2b3a2d] bg-[#141d16] p-3 text-center"
+          >
+            <div class="text-xl sm:text-2xl font-mono font-bold text-amber-300">
+              ${p.gamesPlayed}
+            </div>
+            <div
+              class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-[#8fa382] mt-1"
+            >
+              ⚔️ PARTIES JOUÉES
             </div>
           </div>
-          <div class="rounded-xl border border-emerald-500/25 bg-slate-900/90 p-3.5 text-center">
-            <div class="text-2xl font-black text-emerald-300">
+          <div
+            class="rounded-xl border-2 border-[#2b3a2d] bg-[#141d16] p-3 text-center"
+          >
+            <div class="text-xl sm:text-2xl font-mono font-bold text-[#22c55e]">
               ${p.directivesCompleted}
             </div>
-            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              🎯 Directives Accomplies
+            <div
+              class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-[#8fa382] mt-1"
+            >
+              🎯 DIRECTIVES
             </div>
           </div>
-          <div class="rounded-xl border border-amber-500/25 bg-slate-900/90 p-3.5 text-center">
-            <div class="text-2xl font-black text-amber-300">
+          <div
+            class="rounded-xl border-2 border-[#2b3a2d] bg-[#141d16] p-3 text-center"
+          >
+            <div class="text-xl sm:text-2xl font-mono font-bold text-amber-300">
               ${p.worldEventsSurvived}
             </div>
-            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              🌪️ Crises Survécues
+            <div
+              class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-[#8fa382] mt-1"
+            >
+              🌪️ CRISES SURVÉCUES
             </div>
           </div>
         </div>
 
         <!-- STRATEGIC MEGASTRUCTURES SECTION -->
         <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm sm:text-base font-black uppercase tracking-wider text-amber-300">
-              🏛️ Mégastructures de Suprématie (Actives en Partie)
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h3
+              class="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-amber-300 flex items-center gap-2"
+            >
+              <span>🏛️</span>
+              <span>MÉGASTRUCTURES DE SUPRÉMATIE</span>
             </h3>
-            <span class="text-xs text-slate-400">
-              S'activent automatiquement dès que vous atteignez le seuil de bâtiments en partie
+            <span class="text-[11px] font-mono text-[#8fa382]">
+              S'activent dès le seuil de bâtiments requis
             </span>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-3">
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3"
+          >
             ${MEGASTRUCTURE_DEFINITIONS.map(
               (m) => html`
                 <div
-                  class="rounded-xl border border-white/10 bg-slate-900/85 p-3.5 flex flex-col justify-between"
+                  class="rounded-xl border-2 border-[#2b3a2d] bg-[#141d16] p-3 flex flex-col justify-between shadow-md"
                   style="border-top: 3px solid ${m.accentColor}"
                 >
                   <div>
-                    <div class="flex items-center gap-2">
-                      <span class="text-2xl">${m.icon}</span>
-                      <div class="text-xs font-black uppercase text-white leading-tight">
-                        ${m.name}
+                    <div class="flex items-start gap-2.5">
+                      <span
+                        class="text-2xl shrink-0 p-1 rounded bg-[#0c120d] border border-[#2b3a2d]"
+                        >${m.icon}</span
+                      >
+                      <div class="min-w-0 flex-1">
+                        <div
+                          class="text-xs sm:text-[13px] font-mono font-bold uppercase text-white leading-snug break-words"
+                        >
+                          ${m.name}
+                        </div>
                       </div>
                     </div>
-                    <div class="mt-2 text-[11px] font-semibold text-slate-300">
-                      Condition : <span class="text-white">${m.requirementDesc}</span>
+                    <div
+                      class="mt-2.5 px-2 py-1.5 rounded bg-[#0c120d] border border-[#232f25] text-[11px] font-mono leading-snug text-[#8fa382]"
+                    >
+                      <span class="text-[#f59e0b] font-bold">Requis :</span>
+                      <span class="text-slate-200 ml-1 font-semibold"
+                        >${m.requirementDesc}</span
+                      >
                     </div>
                   </div>
-                  <div class="mt-2.5 pt-2 border-t border-white/10 text-[11px] font-bold text-cyan-300">
+                  <div
+                    class="mt-3 pt-2 border-t border-[#2b3a2d] text-[11.5px] font-mono font-bold text-[#4ade80] leading-snug"
+                  >
                     ⚡ ${m.effectDesc}
                   </div>
                 </div>
@@ -636,12 +729,18 @@ export class DoctrinesModal extends BaseModal {
 
         <!-- WAR MEDALS & ACHIEVEMENTS SECTION -->
         <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm sm:text-base font-black uppercase tracking-wider text-cyan-300">
-              🎖️ Médailles de Guerre & Hauts Faits (${p.unlockedMedals.length}/${MEDAL_DEFINITIONS.length})
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h3
+              class="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-[#4ade80] flex items-center gap-2"
+            >
+              <span>🎖️</span>
+              <span
+                >MÉDAILLES DE GUERRE
+                (${p.unlockedMedals.length}/${MEDAL_DEFINITIONS.length})</span
+              >
             </h3>
-            <span class="text-xs text-slate-400">
-              Cliquez sur une médaille débloquée pour l'afficher sur votre bannière d'accueil
+            <span class="text-[11px] font-mono text-[#8fa382]">
+              Cliquez pour équiper sur votre profil
             </span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -650,61 +749,67 @@ export class DoctrinesModal extends BaseModal {
               const equipped = p.equippedMedal === medal.id;
               return html`
                 <div
-                  class="rounded-xl border p-3.5 transition-all flex flex-col justify-between ${equipped
-                    ? "border-amber-400 bg-amber-500/15 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
+                  class="rounded-xl border-2 p-3 transition-all flex flex-col justify-between ${equipped
+                    ? "border-amber-400 bg-[#242111] shadow-[0_0_15px_rgba(245,158,11,0.3)]"
                     : unlocked
-                      ? "border-cyan-400/40 bg-slate-900/90 hover:border-cyan-300"
-                      : "border-white/10 bg-slate-950/70 opacity-60"}"
+                      ? "border-[#2b3a2d] bg-[#141d16] hover:border-[#4ade80]/50"
+                      : "border-[#1e271f] bg-[#0f1510] opacity-50"}"
                 >
                   <div>
                     <div class="flex items-start justify-between gap-2">
-                      <div class="flex items-center gap-2.5">
+                      <div class="flex items-center gap-2.5 min-w-0 flex-1">
                         <div
-                          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-slate-900 text-2xl"
+                          class="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[#2b3a2d] bg-[#0c120d] text-2xl"
                         >
                           ${medal.icon}
                         </div>
-                        <div>
+                        <div class="min-w-0 flex-1">
                           <span
-                            class="text-[10px] font-black uppercase tracking-wider"
+                            class="text-[10px] font-mono font-bold uppercase tracking-wider"
                             style="color: ${medal.rarityColor}"
                           >
                             ● ${medal.rarity}
                           </span>
-                          <div class="text-sm font-black text-white">
+                          <div
+                            class="text-xs sm:text-[13px] font-mono font-bold text-white break-words"
+                          >
                             ${medal.name}
                           </div>
                         </div>
                       </div>
                       <span
-                        class="rounded-md bg-cyan-500/15 border border-cyan-400/30 px-2 py-0.5 text-[10px] font-extrabold text-cyan-300"
+                        class="shrink-0 rounded bg-[#1a291d] border border-[#22c55e]/30 px-2 py-0.5 text-[10px] font-mono font-bold text-[#4ade80]"
                       >
                         +${medal.xpBonus} XP
                       </span>
                     </div>
-                    <p class="mt-2 text-xs text-slate-300 leading-relaxed">
+                    <p
+                      class="mt-2 text-xs font-mono text-[#cbd5e1] leading-relaxed"
+                    >
                       ${medal.description}
                     </p>
                   </div>
 
-                  <div class="mt-3 pt-2 border-t border-white/10 flex items-center justify-between">
+                  <div
+                    class="mt-3 pt-2 border-t border-[#2b3a2d] flex items-center justify-between"
+                  >
                     <span
-                      class="text-[11px] font-bold ${unlocked
-                        ? "text-emerald-400"
-                        : "text-slate-500"}"
+                      class="text-[10.5px] font-mono font-bold ${unlocked
+                        ? "text-[#4ade80]"
+                        : "text-[#556758]"}"
                     >
-                      ${unlocked ? "✅ Débloquée" : "🔒 Verrouillée"}
+                      ${unlocked ? "✅ DÉBLOQUÉE" : "🔒 BLOQUÉE"}
                     </span>
                     ${unlocked
                       ? html`
                           <button
                             type="button"
                             @click=${() => this.handleEquipMedal(medal.id)}
-                            class="cursor-pointer rounded-lg px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider transition-all ${equipped
-                              ? "bg-amber-400 text-slate-950"
-                              : "bg-slate-800 hover:bg-cyan-500/25 text-cyan-200 border border-cyan-400/30"}"
+                            class="retro-metal-btn cursor-pointer rounded px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider transition-all ${equipped
+                              ? "ring-1 ring-amber-400 text-amber-300"
+                              : "text-[#8fa382] hover:text-white"}"
                           >
-                            ${equipped ? "★ Équipée" : "Équiper"}
+                            ${equipped ? "★ ÉQUIPÉE" : "ÉQUIPER"}
                           </button>
                         `
                       : nothing}

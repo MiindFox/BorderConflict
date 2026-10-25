@@ -253,7 +253,11 @@ export class TacticalInteractionManager {
     }, 1000);
   }
 
-  private renderAssaultOverlay(seconds: number, targetName: string, initiatorName: string) {
+  private renderAssaultOverlay(
+    seconds: number,
+    targetName: string,
+    initiatorName: string,
+  ) {
     let overlay = document.getElementById("assault-countdown-overlay");
     if (!overlay) {
       overlay = document.createElement("div");
@@ -347,14 +351,22 @@ export class TacticalInteractionManager {
     );
   }
 
-  public isPnaActive(targetId: string): { active: boolean; remainingSec: number; formatted: string } {
+  public isPnaActive(targetId: string): {
+    active: boolean;
+    remainingSec: number;
+    formatted: string;
+  } {
     const pact = this.pacts.get(targetId);
     if (!pact) return { active: false, remainingSec: 0, formatted: "00:00" };
 
     const remainingMs = pact.expiresAt - Date.now();
     if (remainingMs <= 0) {
       this.pacts.delete(targetId);
-      showToast(`⌛ Le Pacte de Non-Agression avec ${pact.targetName} a expiré !`, "red", 4000);
+      showToast(
+        `⌛ Le Pacte de Non-Agression avec ${pact.targetName} a expiré !`,
+        "red",
+        4000,
+      );
       return { active: false, remainingSec: 0, formatted: "00:00" };
     }
 
@@ -404,7 +416,11 @@ export class TacticalInteractionManager {
         clearInterval(this.tradeIncomeInterval);
         this.tradeIncomeInterval = null;
       }
-      showToast(`🚢 Route commerciale fermée avec ${ally.displayName()}.`, "red", 3000);
+      showToast(
+        `🚢 Route commerciale fermée avec ${ally.displayName()}.`,
+        "red",
+        3000,
+      );
       return false;
     }
 
@@ -424,7 +440,11 @@ export class TacticalInteractionManager {
       this.tradeIncomeInterval = window.setInterval(() => {
         if (this.tradeRoutes.size > 0) {
           const goldBonus = 35 * this.tradeRoutes.size;
-          showToast(`🪙 Convoi commercial : +${goldBonus} Or perçu de vos routes maritimes !`, "green", 2500);
+          showToast(
+            `🪙 Convoi commercial : +${goldBonus} Or perçu de vos routes maritimes !`,
+            "green",
+            2500,
+          );
         }
       }, 35000);
     }
@@ -440,7 +460,11 @@ export class TacticalInteractionManager {
     const allyId = ally.id();
     if (this.sharedRadars.has(allyId)) {
       this.sharedRadars.delete(allyId);
-      showToast(`🛰️ Partage de radar désactivé avec ${ally.displayName()}.`, "red", 3000);
+      showToast(
+        `🛰️ Partage de radar désactivé avec ${ally.displayName()}.`,
+        "red",
+        3000,
+      );
       return false;
     }
 

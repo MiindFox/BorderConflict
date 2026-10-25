@@ -445,32 +445,42 @@ export class AttacksDisplay extends LitElement implements Controller {
   }
 
   private renderOffscreenThreatAlert() {
-    if (this.incomingAttacks.length === 0 && this.incomingBoats.length === 0) return html``;
+    if (this.incomingAttacks.length === 0 && this.incomingBoats.length === 0)
+      return html``;
 
     const mainAttack = this.incomingAttacks[0];
     const attackerName = mainAttack
-      ? (this.game.playerBySmallID(mainAttack.attackerID) as PlayerView)?.displayName() || "Ennemi"
+      ? (
+          this.game.playerBySmallID(mainAttack.attackerID) as PlayerView
+        )?.displayName() || "Ennemi"
       : "Invasion Navale";
     const troops = mainAttack ? renderTroops(mainAttack.troops) : "Navires";
 
     return html`
       <div
-        @click=${() => (mainAttack ? this.attackWarningOnClick(mainAttack) : null)}
+        @click=${() =>
+          mainAttack ? this.attackWarningOnClick(mainAttack) : null}
         class="mb-1.5 cursor-pointer select-none group flex items-center justify-between gap-2.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-950/95 via-red-900/85 to-amber-950/90 border-2 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)] backdrop-blur-md animate-pulse hover:scale-[1.01] transition-transform"
         title="Cliquer pour recentrer immédiatement la caméra sur le front menacé"
       >
         <div class="flex items-center gap-2 min-w-0">
           <span class="text-lg animate-bounce shrink-0">🚨</span>
           <div class="flex flex-col min-w-0">
-            <span class="text-[9.5px] font-mono uppercase tracking-widest text-red-400 font-black">
+            <span
+              class="text-[9.5px] font-mono uppercase tracking-widest text-red-400 font-black"
+            >
               TERRITOIRE EN DANGER !
             </span>
             <span class="text-xs font-black text-white truncate">
-              Attaque de <span class="text-yellow-300">${attackerName}</span> (${troops} ⚔️)
+              Attaque de
+              <span class="text-yellow-300">${attackerName}</span> (${troops}
+              ⚔️)
             </span>
           </div>
         </div>
-        <span class="shrink-0 px-2 py-0.5 rounded-md bg-red-600/90 text-[10px] font-black uppercase text-white tracking-wider border border-red-400 group-hover:bg-red-500">
+        <span
+          class="shrink-0 px-2 py-0.5 rounded-md bg-red-600/90 text-[10px] font-black uppercase text-white tracking-wider border border-red-400 group-hover:bg-red-500"
+        >
           VOIR LE FRONT ➔
         </span>
       </div>

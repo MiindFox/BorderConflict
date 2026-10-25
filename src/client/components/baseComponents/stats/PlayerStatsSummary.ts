@@ -148,7 +148,7 @@ const METRIC_ICONS: Record<PlayerSummaryMetricKey, UnitIconName> = {
 };
 
 const UNITS_TONE = "text-emerald-300 border-emerald-400/20";
-const NAVAL_TONE = "text-blue-300 border-blue-400/20";
+const NAVAL_TONE = "text-[#4ade80] border-[#22c55e]/30";
 const COMBAT_TONE = "text-rose-300 border-rose-400/20";
 const GOLD_TONE = "text-amber-300 border-amber-400/20";
 

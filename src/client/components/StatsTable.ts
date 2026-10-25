@@ -268,12 +268,12 @@ export abstract class StatsTable extends LitElement {
     return html`
       <div
         class="stats-table-row grid col-span-full transition-colors ${isLocalPinned
-          ? "stats-table-pinned-row bg-cyan-950/80 border-y border-cyan-400/60 shadow-[0_0_12px_rgba(6,182,212,0.25)] text-cyan-200"
+          ? "stats-table-pinned-row bg-[#183520] border-y-2 border-[#4ade80]/70 text-[#86efac] shadow-[0_0_12px_rgba(34,197,94,0.3)] font-bold"
           : isLeader
-            ? "bg-amber-500/15 border-l-2 border-l-amber-400 font-extrabold text-amber-200 hover:bg-amber-500/25"
-            : "hover:bg-slate-700/60"} ${row.emphasized ? "font-bold" : ""} ${row.onClick
-          ? "cursor-pointer"
-          : ""}"
+            ? "bg-amber-500/15 border-l-2 border-l-amber-400 font-extrabold text-amber-200 hover:bg-[#1f2c21]"
+            : "hover:bg-[#1a251c] text-slate-200"} ${row.emphasized
+          ? "font-bold text-white"
+          : ""} ${row.onClick ? "cursor-pointer" : ""}"
         style="grid-template-columns: subgrid; grid-column: 1 / -1;"
         role="row"
         @click=${row.onClick ?? nothing}
@@ -349,9 +349,9 @@ export abstract class StatsTable extends LitElement {
         : "max-h-[6rem] md:max-h-[8rem] lg:max-h-[9rem]";
 
     return html`
-      <div class="stats-table relative mt-1 text-white text-xs lg:text-sm">
+      <div class="stats-table relative mt-1 text-white text-xs lg:text-sm font-mono">
         <div
-          class="overflow-x-auto rounded-lg bg-gray-800/85"
+          class="overflow-x-auto rounded-lg bg-[#121813]/95 border-2 border-[#2b3a2d] shadow-[0_8px_25px_rgba(0,0,0,0.85)]"
           @contextmenu=${(event: Event) => event.preventDefault()}
         >
           <div
@@ -360,7 +360,7 @@ export abstract class StatsTable extends LitElement {
             role="table"
           >
             <div
-              class="stats-table-header grid col-span-full font-bold bg-gray-700/95"
+              class="stats-table-header grid col-span-full font-bold bg-[#1a251c] border-b-2 border-[#2b3a2d] text-amber-200"
               style="grid-template-columns: subgrid; grid-column: 1 / -1;"
               role="row"
             >

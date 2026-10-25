@@ -150,8 +150,8 @@ app.get(
   },
 );
 
-import { accountDb } from "./AccountDatabase";
 import Stripe from "stripe";
+import { accountDb } from "./AccountDatabase";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripeClient = stripeSecretKey
@@ -163,7 +163,9 @@ const stripeClient = stripeSecretKey
 // Stripe Checkout Session Creation for 3 Bundles
 app.post("/api/stripe/create-checkout-session", async (req, res) => {
   if (!stripeClient) {
-    return res.status(500).json({ error: "Stripe non configuré sur ce serveur." });
+    return res
+      .status(500)
+      .json({ error: "Stripe non configuré sur ce serveur." });
   }
 
   const { bundleId, email } = req.body || {};
@@ -183,26 +185,30 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
     },
     bundle_officier: {
       name: "Pack Officier de Terrain",
-      description: "450 Plutonium + 6 000 Caps + Couronne Animée Plasma Pulsar + Sillage Plasma",
+      description:
+        "450 Plutonium + 6 000 Caps + Couronne Animée Plasma Pulsar + Sillage Plasma",
       priceCents: 299, // 2.99 EUR
     },
     bundle_supreme: {
       name: "Édition Suprême Commandant",
-      description: "950 Plutonium + 15 000 Caps + Couronne Animée Supernova Royale + Impact MIRV",
+      description:
+        "950 Plutonium + 15 000 Caps + Couronne Animée Supernova Royale + Impact MIRV",
       priceCents: 499, // 4.99 EUR
     },
 
     // Point 1: Pass de Saison (Battle Pass)
     battle_pass_s1: {
       name: "Pass de Saison 1 : Tempête Nucléaire",
-      description: "Débloque la voie Premium du Pass de Saison : couronnes légendaires, caisses et bonus exclusifs",
+      description:
+        "Débloque la voie Premium du Pass de Saison : couronnes légendaires, caisses et bonus exclusifs",
       priceCents: 499, // 4.99 EUR
     },
 
     // Point 2: Statut VIP / Vétéran
     vip_status_30d: {
       name: "Abonnement Statut VIP Commandant (30 Jours)",
-      description: "Pseudo doré, Badge VIP, +25% de Caps par partie, création de clan débloquée, hébergement prioritaire",
+      description:
+        "Pseudo doré, Badge VIP, +25% de Caps par partie, création de clan débloquée, hébergement prioritaire",
       priceCents: 299, // 2.99 EUR
     },
 
@@ -226,7 +232,8 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
     // Module Forge de Skin de Territoire Personnalisé
     custom_skin_pass: {
       name: "Pass Forge de Skin de Territoire Personnalisé",
-      description: "Débloque la création, l'importation illimitée d'images et l'équipement de votre propre skin de territoire en jeu",
+      description:
+        "Débloque la création, l'importation illimitée d'images et l'équipement de votre propre skin de territoire en jeu",
       priceCents: 399, // 3.99 EUR
     },
   };
@@ -268,7 +275,9 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
     return res.json({ ok: true, checkoutUrl: session.url });
   } catch (err: any) {
     console.error("Stripe Checkout Error:", err);
-    return res.status(500).json({ error: err.message || "Erreur de création de session Stripe." });
+    return res
+      .status(500)
+      .json({ error: err.message || "Erreur de création de session Stripe." });
   }
 });
 
@@ -324,8 +333,12 @@ app.post("/api/account/login", (req, res) => {
 });
 
 app.all("/api/account/me", (req, res) => {
-  const email = (req.body?.email || req.query?.email || req.headers["x-account-email"]) as string;
-  const password = (req.body?.password || req.query?.password || req.headers["x-account-pass"]) as string;
+  const email = (req.body?.email ||
+    req.query?.email ||
+    req.headers["x-account-email"]) as string;
+  const password = (req.body?.password ||
+    req.query?.password ||
+    req.headers["x-account-pass"]) as string;
   if (!email || !password) {
     return res.status(401).json({ ok: false, error: "Identifiants requis." });
   }
@@ -346,7 +359,7 @@ app.post("/api/account/currency", (req, res) => {
     password,
     Number(deltaPlutonium) || 0,
     Number(deltaCaps) || 0,
-    reason
+    reason,
   );
   if (!result.ok) {
     return res.status(400).json({ ok: false, error: result.error });
@@ -383,7 +396,11 @@ app.post("/api/custom-skin/upload", (req, res) => {
   if (!imageBase64) {
     return res.status(400).json({ ok: false, error: "Image requise." });
   }
-  const result = accountDb.saveCustomSkin(email || "", imageBase64, publicId || "cmd");
+  const result = accountDb.saveCustomSkin(
+    email || "",
+    imageBase64,
+    publicId || "cmd",
+  );
   if (!result.ok) {
     return res.status(400).json({ ok: false, error: result.error });
   }
@@ -412,7 +429,8 @@ const gameBounties = new Map<string, Map<string, ActiveBountyRecord>>();
 const gamePnas = new Map<string, ActivePnaRecord[]>();
 
 app.post("/api/tactical/bounty", (req, res) => {
-  const { gameId, targetId, targetName, amount, sponsorName, sponsorId } = req.body || {};
+  const { gameId, targetId, targetName, amount, sponsorName, sponsorId } =
+    req.body || {};
   if (!gameId || !targetId || !amount) {
     return res.status(400).json({ ok: false, error: "Missing parameters" });
   }
@@ -459,7 +477,13 @@ app.post("/api/tactical/pna", (req, res) => {
   if (!gamePnas.has(gameId)) gamePnas.set(gameId, []);
   const list = gamePnas.get(gameId)!;
   const sec = Number(durationSec) || 180;
-  const filtered = list.filter(p => !((p.p1Id === p1Id && p.p2Id === p2Id) || (p.p1Id === p2Id && p.p2Id === p1Id)));
+  const filtered = list.filter(
+    (p) =>
+      !(
+        (p.p1Id === p1Id && p.p2Id === p2Id) ||
+        (p.p1Id === p2Id && p.p2Id === p1Id)
+      ),
+  );
   filtered.push({
     p1Id: String(p1Id),
     p2Id: String(p2Id),
@@ -474,7 +498,7 @@ app.post("/api/tactical/pna", (req, res) => {
 app.get("/api/tactical/pna/:gameId", (req, res) => {
   const list = gamePnas.get(req.params.gameId) || [];
   const now = Date.now();
-  const active = list.filter(p => p.expiresAt > now);
+  const active = list.filter((p) => p.expiresAt > now);
   gamePnas.set(req.params.gameId, active);
   return res.json({ ok: true, pnas: active });
 });
@@ -483,7 +507,13 @@ app.post("/api/tactical/pna/break", (req, res) => {
   const { gameId, p1Id, p2Id } = req.body || {};
   if (!gameId) return res.status(400).json({ ok: false });
   const list = gamePnas.get(gameId) || [];
-  const filtered = list.filter(p => !((p.p1Id === p1Id && p.p2Id === p2Id) || (p.p1Id === p2Id && p.p2Id === p1Id)));
+  const filtered = list.filter(
+    (p) =>
+      !(
+        (p.p1Id === p1Id && p.p2Id === p2Id) ||
+        (p.p1Id === p2Id && p.p2Id === p1Id)
+      ),
+  );
   gamePnas.set(gameId, filtered);
   return res.json({ ok: true });
 });
@@ -519,8 +549,10 @@ app.get("/api/public/clans/conquest-map", (_req, res) => {
 
 // Centralized Clans Endpoints
 app.get("/api/clans", (req, res) => {
-  const filter = typeof req.query.filter === "string" ? req.query.filter : "all";
-  const sort = typeof req.query.sort === "string" ? req.query.sort : "memberCount";
+  const filter =
+    typeof req.query.filter === "string" ? req.query.filter : "all";
+  const sort =
+    typeof req.query.sort === "string" ? req.query.sort : "memberCount";
   return res.json(accountDb.getClansBrowse(filter, sort));
 });
 
@@ -531,14 +563,15 @@ app.get("/api/clans/:tag", (req, res) => {
 });
 
 app.post("/api/clans/create", (req, res) => {
-  const { tag, name, description, isOpen, creatorPublicId, creatorUsername } = req.body || {};
+  const { tag, name, description, isOpen, creatorPublicId, creatorUsername } =
+    req.body || {};
   const result = accountDb.createClan(
     tag,
     name,
     description,
     isOpen ?? true,
     creatorPublicId || "cmd-leader",
-    creatorUsername || "Leader"
+    creatorUsername || "Leader",
   );
   if (!result.ok) {
     return res.status(400).json({ ok: false, error: result.error });
@@ -551,7 +584,7 @@ app.post("/api/clans/:tag/join", (req, res) => {
   const result = accountDb.joinClan(
     req.params.tag,
     publicId || "cmd-member",
-    username || "Membre"
+    username || "Membre",
   );
   if (!result.ok) {
     return res.status(400).json({ ok: false, error: result.error });

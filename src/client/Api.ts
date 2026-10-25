@@ -64,9 +64,9 @@ import {
   userAuth,
 } from "./Auth";
 import { ClientEnv } from "./ClientEnv";
+import { commanderStore } from "./CommanderStore";
 import { ensureServerList } from "./ServerList";
 import { UserSettings } from "./UserSettings";
-import { commanderStore } from "./CommanderStore";
 
 export async function fetchPlayerById(
   playerId: string,
@@ -115,7 +115,9 @@ export async function fetchPublicPlayerProfile(
 ): Promise<PlayerProfile | false> {
   try {
     try {
-      const localRes = await fetch(`/api/public/player/${encodeURIComponent(publicId)}`);
+      const localRes = await fetch(
+        `/api/public/player/${encodeURIComponent(publicId)}`,
+      );
       if (localRes.ok) {
         const localJson = await localRes.json();
         const parsed = PlayerProfileSchema.safeParse(localJson);
@@ -2347,9 +2349,11 @@ export async function fetchPlayerLeaderboard(
 ): Promise<RankedLeaderboardResponse | "reached_limit" | false> {
   try {
     try {
-      const local = await fetch('/api/leaderboard/ranked');
+      const local = await fetch("/api/leaderboard/ranked");
       if (local.ok) {
-        const parsed = RankedLeaderboardResponseSchema.safeParse(await local.json());
+        const parsed = RankedLeaderboardResponseSchema.safeParse(
+          await local.json(),
+        );
         if (parsed.success) return parsed.data;
       }
     } catch {
