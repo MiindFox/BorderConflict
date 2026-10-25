@@ -182,6 +182,20 @@ app.post("/api/stripe/create-checkout-session", async (req, res) => {
     string,
     { name: string; description: string; priceCents: number }
   > = {
+    // Packs Événement Spécial Halloween
+    halloween_necropolis: {
+      name: "🎃 Pack Nécropole Maudite (Édition Halloween)",
+      description:
+        "Cornes Démoniaques, Toile Nécromantique, Étendard Faucheuse d'Âmes, Sillage Ectoplasme, Déflagration Toxique + 500 Plutonium & 8 000 Caps offerts !",
+      priceCents: 399, // 3.99 EUR
+    },
+    halloween_pumpkin_infernal: {
+      name: "🔥 Pack Citrouille Infernale (Édition Halloween)",
+      description:
+        "Couronne Roi Citrouille, Lanterne d'Effroi, Blason Samhain, Coque Citrouille Infernale, Traînée d'Âmes + 600 Plutonium & 10 000 Caps offerts !",
+      priceCents: 449, // 4.49 EUR
+    },
+
     // 3 Starter Bundles
     bundle_recrue: {
       name: "Kit de Recrue Stratégique",

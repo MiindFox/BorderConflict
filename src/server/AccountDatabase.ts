@@ -400,7 +400,27 @@ class AccountDatabase {
     let addCaps = 0;
     const addFlares: string[] = [];
 
-    if (bundleId === "bundle_recrue") {
+    if (bundleId === "halloween_necropolis") {
+      addPlutonium = 500;
+      addCaps = 8000;
+      addFlares.push(
+        "crown:crown_spectral_horns",
+        "pattern:spider_web_necropolis:halloween_purpur",
+        "flag:flag_soul_reaper",
+        "effect:ectoplasm_wake",
+        "effect:necropolis_toxic_detonation",
+      );
+    } else if (bundleId === "halloween_pumpkin_infernal") {
+      addPlutonium = 600;
+      addCaps = 10000;
+      addFlares.push(
+        "crown:crown_pumpkin_king",
+        "pattern:cursed_pumpkin_carve:halloween_blaze",
+        "flag:flag_jack_lantern",
+        "effect:infernal_pumpkin_hull",
+        "effect:halloween_soul_trail",
+      );
+    } else if (bundleId === "bundle_recrue") {
       addPlutonium = 120;
       addCaps = 1500;
       addFlares.push("crown:vanguard_silver");

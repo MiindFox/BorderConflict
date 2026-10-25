@@ -340,6 +340,22 @@ export class StoreModal extends BaseModal {
     this.requestUpdate();
   }
 
+  private openPackByName(packName: string): void {
+    const all = resolveCosmetics(
+      this.cosmetics,
+      this.userMeResponse,
+      this.affiliateCode,
+    );
+    const found = all.find(
+      (r) =>
+        r.type === "cosmeticPack" &&
+        ((r.cosmetic as any)?.name === packName || r.key === `cosmeticPack:${packName}`),
+    );
+    if (found) {
+      this.activate(found);
+    }
+  }
+
   private reconcileInspection(
     groups: readonly (readonly ResolvedCosmetic[])[],
   ): void {
@@ -351,6 +367,9 @@ export class StoreModal extends BaseModal {
       if (match !== undefined) {
         this.requestedItem = null;
         this.inspected = match;
+        if (match.type === "cosmeticPack") {
+          this.openedPack = match;
+        }
         return;
       }
     }
@@ -1114,6 +1133,114 @@ export class StoreModal extends BaseModal {
   private renderStripeBundlesSection(): TemplateResult {
     return html`
       <div class="p-4 space-y-5">
+        <!-- BANNIÈRE SPÉCIALE ÉVÉNEMENT HALLOWEEN -->
+        <div
+          class="rounded-2xl border-2 border-orange-500/60 bg-gradient-to-r from-purple-950/95 via-slate-900/95 to-orange-950/95 p-5 shadow-[0_0_35px_rgba(249,115,22,0.3)] relative overflow-hidden"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-2xl animate-bounce">🎃</span>
+                <span class="text-xs font-black uppercase tracking-widest text-orange-400">
+                  ÉVÉNEMENT SPÉCIAL HALLOWEEN · ÉDITION LIMITÉE
+                </span>
+                <span class="rounded-full bg-orange-500/20 border border-orange-400 px-2 py-0.5 text-[10px] font-black uppercase text-orange-300">
+                  EXCLUSIF
+                </span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-200 mt-1 max-w-2xl">
+                Célébrez Samhain avec les deux packs légendaires d'Halloween ! Débloquez des couronnes exclusives, motifs spectraux, sillages ectoplasmiques et traînées de missiles enflammées.
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- HALLOWEEN PACK 1: NÉCROPOLE MAUDITE -->
+            <div class="rounded-xl border border-purple-500/50 hover:border-purple-400 bg-purple-950/40 p-4 flex flex-col justify-between shadow-lg backdrop-blur transition-all">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-2xl">💀</span>
+                  <div class="flex items-center gap-2">
+                    <span class="rounded bg-purple-500/30 border border-purple-400/50 px-2 py-0.5 text-xs font-black uppercase text-purple-200">
+                      3,99 €
+                    </span>
+                    <span class="rounded bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 text-xs font-black uppercase text-amber-300">
+                      450 ☢️
+                    </span>
+                  </div>
+                </div>
+                <h4 class="mt-2 text-base font-black text-purple-200 uppercase">
+                  Pack Nécropole Maudite
+                </h4>
+                <p class="text-xs text-slate-300 mt-1">
+                  Cornes Démoniaques, Toile Nécromantique, Étendard Faucheuse d'Âmes, Sillage Ectoplasme & Déflagration Toxique Mort-Vivante.
+                </p>
+                <div class="mt-2 text-[11px] text-emerald-400 font-bold">
+                  🎁 Bonus Stripe : +500 Plutonium & +8 000 Caps offerts !
+                </div>
+              </div>
+              <div class="mt-4 flex gap-2">
+                <button
+                  type="button"
+                  @click=${() => this.handleBuyStripeBundle("halloween_necropolis")}
+                  class="flex-1 cursor-pointer rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 py-2.5 text-xs font-black uppercase text-white shadow transition-all active:scale-95 text-center"
+                >
+                  💳 Carte · 3,99 €
+                </button>
+                <button
+                  type="button"
+                  @click=${() => this.openPackByName("pack_halloween_necropolis")}
+                  class="cursor-pointer rounded-lg bg-slate-800 hover:bg-slate-700 border border-purple-400/40 px-3 py-2.5 text-xs font-black uppercase text-purple-300 shadow transition-all active:scale-95 text-center flex items-center gap-1"
+                >
+                  <span>450 ☢️</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- HALLOWEEN PACK 2: CITROUILLE INFERNALE -->
+            <div class="rounded-xl border border-orange-500/50 hover:border-orange-400 bg-orange-950/40 p-4 flex flex-col justify-between shadow-lg backdrop-blur transition-all">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-2xl">🎃</span>
+                  <div class="flex items-center gap-2">
+                    <span class="rounded bg-orange-500/30 border border-orange-400/50 px-2 py-0.5 text-xs font-black uppercase text-orange-200">
+                      4,49 €
+                    </span>
+                    <span class="rounded bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 text-xs font-black uppercase text-amber-300">
+                      490 ☢️
+                    </span>
+                  </div>
+                </div>
+                <h4 class="mt-2 text-base font-black text-orange-200 uppercase">
+                  Pack Citrouille Infernale
+                </h4>
+                <p class="text-xs text-slate-300 mt-1">
+                  Couronne Roi Citrouille, Lanterne d'Effroi, Blason Samhain, Coque Citrouille Infernale & Traînée d'Âmes Enflammées.
+                </p>
+                <div class="mt-2 text-[11px] text-emerald-400 font-bold">
+                  🎁 Bonus Stripe : +600 Plutonium & +10 000 Caps offerts !
+                </div>
+              </div>
+              <div class="mt-4 flex gap-2">
+                <button
+                  type="button"
+                  @click=${() => this.handleBuyStripeBundle("halloween_pumpkin_infernal")}
+                  class="flex-1 cursor-pointer rounded-lg bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 py-2.5 text-xs font-black uppercase text-white shadow transition-all active:scale-95 text-center"
+                >
+                  💳 Carte · 4,49 €
+                </button>
+                <button
+                  type="button"
+                  @click=${() => this.openPackByName("pack_halloween_pumpkin_infernal")}
+                  class="cursor-pointer rounded-lg bg-slate-800 hover:bg-slate-700 border border-orange-400/40 px-3 py-2.5 text-xs font-black uppercase text-orange-300 shadow transition-all active:scale-95 text-center flex items-center gap-1"
+                >
+                  <span>490 ☢️</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div
           class="rounded-2xl border border-indigo-500/40 bg-gradient-to-r from-slate-900/95 via-indigo-950/40 to-slate-900/95 p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl"
         >

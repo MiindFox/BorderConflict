@@ -123,6 +123,8 @@ export function storeRouteFor(equipped: EquippedCosmetic): string | null {
  */
 export function matchesStoreItem(key: string, wanted: string): boolean {
   if (key === wanted) return true;
+  if (key === `cosmeticPack:${wanted}` || wanted === `cosmeticPack:${key}`) return true;
+  if (key.endsWith(`:${wanted}`)) return true;
   if (!key.startsWith("pattern:") || !wanted.startsWith("pattern:")) {
     return false;
   }

@@ -84,6 +84,18 @@ const PALETTE_DEFS: {
   secondaryColor: string;
 }[] = [
   {
+    name: "halloween_purpur",
+    label: "Spectre d'Halloween",
+    primaryColor: "#170326",
+    secondaryColor: "#39ff14",
+  },
+  {
+    name: "halloween_blaze",
+    label: "Brasier d'Halloween",
+    primaryColor: "#140500",
+    secondaryColor: "#ff5500",
+  },
+  {
     name: "cyber_neon",
     label: "Cyber Néon",
     primaryColor: "#082f49",
@@ -255,6 +267,36 @@ interface PatternSpec {
  * All patterns are evaluated on a 16x16 seamless tile grid.
  */
 const HUNDRED_PATTERN_SPECS: PatternSpec[] = [
+  // ÉVÉNEMENT HALLOWEEN LÉGENDAIRE
+  {
+    name: "spider_web_necropolis",
+    label: "Toile Nécromantique",
+    rarity: "legendary",
+    scale: 2,
+    fn: (x, y) => {
+      const cx = 8, cy = 8;
+      const dx = Math.abs(x - cx);
+      const dy = Math.abs(y - cy);
+      const dist = Math.max(dx, dy);
+      if (dist === 3 || dist === 6) return true;
+      if (dx === dy || x === cx || y === cy) return true;
+      return false;
+    },
+  },
+  {
+    name: "cursed_pumpkin_carve",
+    label: "Lanterne d'Effroi",
+    rarity: "legendary",
+    scale: 2,
+    fn: (x, y) => {
+      if ((y === 4 && (x === 4 || x === 11)) || (y === 5 && (x >= 3 && x <= 5 || x >= 10 && x <= 12))) return true;
+      if (y === 7 && (x === 7 || x === 8)) return true;
+      if (y === 10 && (x % 3 === 0) && x >= 3 && x <= 12) return true;
+      if (y === 11 && x >= 3 && x <= 12) return true;
+      if (y === 12 && (x % 3 === 1) && x >= 4 && x <= 11) return true;
+      return false;
+    },
+  },
   // ============================================================================
   // SÉRIE I — TACTIQUE & BLINDAGE (20 COMMUNS)
   // ============================================================================
@@ -1559,6 +1601,34 @@ interface CrownSpec {
  * 20 Distinct SVG Crowns across all 5 rarities.
  */
 const TWENTY_CROWN_SPECS: CrownSpec[] = [
+  // HALLOWEEN LÉGENDAIRE
+  {
+    name: "crown_spectral_horns",
+    label: "Cornes Démoniaques d'Effroi",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <path d="M15 80 Q10 40 30 15 Q28 45 38 65 Z" fill="#a855f7"/>
+      <path d="M85 80 Q90 40 70 15 Q72 45 62 65 Z" fill="#a855f7"/>
+      <polygon points="25,85 50,70 75,85 68,92 32,92" fill="#39ff14"/>
+      <circle cx="50" cy="78" r="6" fill="#ff0055"/>
+      <polygon points="50,45 42,70 58,70" fill="#c084fc"/>
+    </svg>`,
+  },
+  {
+    name: "crown_pumpkin_king",
+    label: "Couronne Roi Citrouille",
+    rarity: "legendary",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <polygon points="15,85 20,40 38,65 50,25 62,65 80,40 85,85" fill="#ff5500" stroke="#ffaa00" stroke-width="3"/>
+      <path d="M47 25 Q50 12 58 10 Q53 18 53 25 Z" fill="#22c55e"/>
+      <polygon points="35,68 42,68 38,60" fill="#ffe600"/>
+      <polygon points="58,68 65,68 61,60" fill="#ffe600"/>
+      <path d="M33 76 L38 80 L43 76 L48 81 L53 76 L58 81 L63 76 L67 80" stroke="#ffe600" stroke-width="3" fill="none"/>
+      <circle cx="20" cy="40" r="4" fill="#ffaa00"/>
+      <circle cx="50" cy="25" r="5" fill="#39ff14"/>
+      <circle cx="80" cy="40" r="4" fill="#ffaa00"/>
+    </svg>`,
+  },
   // COMMUNS (3)
   {
     name: "iron_circlet",
@@ -2557,6 +2627,25 @@ interface FlagSpec {
  * 20 Custom Faction SVG Flags.
  */
 const TWENTY_FLAG_SPECS: FlagSpec[] = [
+  // HALLOWEEN LÉGENDAIRE
+  {
+    name: "flag_soul_reaper",
+    label: "Étendard Faucheuse d'Âmes",
+    rarity: "legendary",
+    bg: "#0f051d",
+    accent: "#39ff14",
+    emblemColor: "#a855f7",
+    shape: "hex",
+  },
+  {
+    name: "flag_jack_lantern",
+    label: "Blason Lanterne d'Effroi",
+    rarity: "legendary",
+    bg: "#1a0800",
+    accent: "#ff5500",
+    emblemColor: "#ffaa00",
+    shape: "sun",
+  },
   {
     name: "hexafront_command",
     label: "Commandement BorderConflict",
@@ -3097,6 +3186,69 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
     registerLabel("effects", effect.name, label);
     effects[effect.effectType][effect.name] = effect;
   }
+
+  // ==========================================================================
+  // EFFETS ÉVÉNEMENT HALLOWEEN LÉGENDAIRE
+  // ==========================================================================
+  addEffect("Sillage Ectoplasmique d'Halloween", {
+    name: "ectoplasm_wake",
+    effectType: "transportShipTrail",
+    rarity: "legendary",
+    priceHard: 400,
+    priceSoft: 3500,
+    product: null,
+    attributes: {
+      type: "gradient",
+      colors: ["#170326", "#a855f7", "#39ff14", "#22c55e"],
+      colorSize: 6,
+      movementSpeed: 10,
+    },
+  });
+
+  addEffect("Déflagration Toxique Mort-Vivante", {
+    name: "necropolis_toxic_detonation",
+    effectType: "nukeExplosion",
+    rarity: "legendary",
+    priceHard: 450,
+    priceSoft: 4000,
+    product: null,
+    attributes: {
+      type: "gradient",
+      colors: ["#39ff14", "#22c55e", "#a855f7", "#170326"],
+      colorSize: 8,
+      movementSpeed: 12,
+    } as any,
+  });
+
+  addEffect("Coque Citrouille Infernale", {
+    name: "infernal_pumpkin_hull",
+    effectType: "warship",
+    rarity: "legendary",
+    priceHard: 400,
+    priceSoft: 3500,
+    product: null,
+    attributes: {
+      type: "gradient",
+      colors: ["#ff5500", "#ffaa00", "#dc2626"],
+      colorSize: 5,
+      movementSpeed: 10,
+    } as any,
+  });
+
+  addEffect("Traînée d'Âmes Enflammées", {
+    name: "halloween_soul_trail",
+    effectType: "nukeTrail",
+    rarity: "legendary",
+    priceHard: 380,
+    priceSoft: 3200,
+    product: null,
+    attributes: {
+      type: "gradient",
+      colors: ["#ff5500", "#ffaa00", "#ffe600"],
+      colorSize: 5,
+      movementSpeed: 11,
+    } as any,
+  });
 
   // ==========================================================================
   // 8 EFFETS SILLAGE DE NAVIRES (transportShipTrail)
@@ -3985,6 +4137,44 @@ export function getHexaFrontCosmeticsCatalog(): Cosmetics {
   // 15 PACKS MULTI-RARETÉS & COLLECTIONS THÉMATIQUES
   // ==========================================================================
   const packs: Record<string, CosmeticPack> = {
+    pack_halloween_necropolis: {
+      name: "pack_halloween_necropolis",
+      displayName: "🎃 Pack Nécropole Maudite (Événement Halloween)",
+      description:
+        "Édition Spéciale Halloween : Cornes Démoniaques, Toile Nécromantique, Étendard Faucheuse d'Âmes, Sillage Ectoplasme et Déflagration Toxique Mort-Vivante.",
+      priceHard: 450,
+      rarity: "legendary",
+      items: [
+        {
+          type: "pattern",
+          name: "spider_web_necropolis",
+          colorPalette: "halloween_purpur",
+        },
+        { type: "crown", name: "crown_spectral_horns" },
+        { type: "flag", name: "flag_soul_reaper" },
+        { type: "effect", name: "ectoplasm_wake" },
+        { type: "effect", name: "necropolis_toxic_detonation" },
+      ],
+    },
+    pack_halloween_pumpkin_infernal: {
+      name: "pack_halloween_pumpkin_infernal",
+      displayName: "🔥 Pack Citrouille Infernale (Édition Limitée)",
+      description:
+        "Édition Limitée Halloween : Couronne Roi Citrouille, Lanterne d'Effroi, Blason Samhain, Coque Citrouille Infernale et Traînée d'Âmes Enflammées.",
+      priceHard: 490,
+      rarity: "legendary",
+      items: [
+        {
+          type: "pattern",
+          name: "cursed_pumpkin_carve",
+          colorPalette: "halloween_blaze",
+        },
+        { type: "crown", name: "crown_pumpkin_king" },
+        { type: "flag", name: "flag_jack_lantern" },
+        { type: "effect", name: "infernal_pumpkin_hull" },
+        { type: "effect", name: "halloween_soul_trail" },
+      ],
+    },
     pack_tactical_recruit: {
       name: "pack_tactical_recruit",
       displayName: "Pack Recrue Tactique",
